@@ -1,0 +1,459 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create Instance Profiles for AEM Stack
+Parameters:
+  AOCStackPrefix:
+    Description: The AEM Stack Prerequisite Resources Stack Prefix
+    Type: String
+Resources:
+  AEMStackManagerSnapshotLambdaServiceRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+        Version: 2012-10-17
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Path: /
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - ec2:Describe*
+            - ec2:DeleteSnapshot
+            Effect: Allow
+            Resource: '*'
+          Version: 2012-10-17
+        PolicyName:
+          Fn::Sub: ${AOCStackPrefix}-SnapshotsPurgeLambdaPolicy
+      RoleName:
+        Fn::Sub: ${AOCStackPrefix}-AEMSnapPurgeLambdaRole
+    Type: AWS::IAM::Role
+  AuthorDispatcherInstanceProfile:
+    Properties:
+      Path: /
+      Roles:
+      - Ref: AuthorDispatcherRole
+    Type: AWS::IAM::InstanceProfile
+  AuthorDispatcherRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      Path: /
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - ec2:Describe*
+            - ec2:CreateTags
+            - autoscaling:CreateOrUpdateTags
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - s3:Get*
+            - s3:List*
+            Effect: Allow
+            Resource:
+              - !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                    - !Sub "/${AOCStackPrefix}"
+              - !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                    - !Sub "/${AOCStackPrefix}/*"
+          - Action:
+            - logs:*
+            Effect: Allow
+            Resource:
+            - arn:aws:logs:*:*:*
+          Version: '2012-10-17'
+        PolicyName: AuthorDispatcherRolePolicy
+      RoleName:
+        Fn::Sub: ${AOCStackPrefix}-AEMStackAuthorDispatcherRole
+    Type: AWS::IAM::Role
+  AuthorInstanceProfile:
+    Properties:
+      Path: /
+      Roles:
+      - Ref: AuthorRole
+    Type: AWS::IAM::InstanceProfile
+  AuthorRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      Path: /
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - ec2:Describe*
+            - ec2:CreateTags
+            - ec2:AttachVolume
+            - ec2:CreateVolume
+            - ec2:DetachVolume
+            - ec2:CreateSnapshot
+            - autoscaling:CreateOrUpdateTags
+            - cloudwatch:PutMetricData
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - s3:Get*
+            - s3:List*
+            - s3:Put*
+            Effect: Allow
+            Resource:
+              - !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                    - !Sub "/${AOCStackPrefix}"
+              - !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                    - !Sub "/${AOCStackPrefix}/*"
+          - Action:
+            - logs:*
+            Effect: Allow
+            Resource:
+            - arn:aws:logs:*:*:*
+          Version: '2012-10-17'
+        PolicyName: AuthorRolePolicy
+      RoleName:
+        Fn::Sub: ${AOCStackPrefix}-AEMStackAuthorRole
+    Type: AWS::IAM::Role
+  OrchestratorInstanceProfile:
+    Properties:
+      Path: /
+      Roles:
+      - Ref: OrchestratorRole
+    Type: AWS::IAM::InstanceProfile
+  OrchestratorRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      Path: /
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - ec2:Describe*
+            - ec2:CreateTags
+            - ec2:CreateSnapshot
+            - ec2:TerminateInstances
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - s3:Get*
+            - s3:List*
+            Effect: Allow
+            Resource:
+              - !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                    - !Sub "/${AOCStackPrefix}"
+              - !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                    - !Sub "/${AOCStackPrefix}/*"
+          - Action:
+            - sqs:*
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - SNS:ListTopics
+            - SNS:Publish
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - cloudformation:DescribeStacks
+            - cloudformation:DescribeStackEvents
+            - cloudformation:DescribeStackResource
+            - cloudformation:DescribeStackResources
+            - cloudformation:GetTemplate
+            - cloudformation:List*
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - cloudwatch:PutMetricAlarm
+            - cloudwatch:DeleteAlarms
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - elasticloadbalancing:Describe*
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - autoscaling:*
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - logs:*
+            Effect: Allow
+            Resource:
+            - arn:aws:logs:*:*:*
+          Version: '2012-10-17'
+        PolicyName: OrchestratorRolePolicy
+      RoleName:
+        Fn::Sub: ${AOCStackPrefix}-AEMStackOrchestratorRole
+    Type: AWS::IAM::Role
+  PublishDispatcherInstanceProfile:
+    Properties:
+      Path: /
+      Roles:
+      - Ref: PublishDispatcherRole
+    Type: AWS::IAM::InstanceProfile
+  PublishDispatcherRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      Path: /
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - ec2:Describe*
+            - ec2:CreateTags
+            - autoscaling:CreateLaunchConfiguration
+            - autoscaling:DescribeLaunchConfigurations
+            - autoscaling:UpdateAutoScalingGroup
+            - autoscaling:CreateOrUpdateTags
+            - cloudwatch:PutMetricData
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - s3:Get*
+            - s3:List*
+            Effect: Allow
+            Resource:
+              - !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                    - !Sub "/${AOCStackPrefix}"
+              - !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                    - !Sub "/${AOCStackPrefix}/*"
+          - Action:
+            - logs:*
+            Effect: Allow
+            Resource:
+            - arn:aws:logs:*:*:*
+          Version: '2012-10-17'
+        PolicyName: PublishDispatcherRolePolicy
+      RoleName:
+        Fn::Sub: ${AOCStackPrefix}-AEMStackPublishDispatcherRole
+    Type: AWS::IAM::Role
+  PublishInstanceProfile:
+    Properties:
+      Path: /
+      Roles:
+      - Ref: PublishRole
+    Type: AWS::IAM::InstanceProfile
+  PublishRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+        Version: '2012-10-17'
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      Path: /
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action:
+            - ec2:Describe*
+            - ec2:AttachVolume
+            - ec2:CreateVolume
+            - ec2:DeleteVolume
+            - ec2:DetachVolume
+            - ec2:CreateSnapshot
+            - ec2:CreateTags
+            - ec2:ModifyInstanceAttribute
+            - cloudwatch:PutMetricData
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - s3:Get*
+            - s3:List*
+            - s3:Put*
+            Effect: Allow
+            Resource:
+              - !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                    - !Sub "/${AOCStackPrefix}"
+              - !Join
+                  - ""
+                  - - "arn:aws:s3:::"
+                    - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                    - !Sub "/${AOCStackPrefix}/*"
+          - Action:
+            - autoscaling:CreateLaunchConfiguration
+            - autoscaling:DeleteLaunchConfiguration
+            - autoscaling:DescribeAutoScalingGroups
+            - autoscaling:DescribeLaunchConfigurations
+            - autoscaling:UpdateAutoScalingGroup
+            - iam:PassRole
+            Effect: Allow
+            Resource: '*'
+          - Action:
+            - logs:*
+            Effect: Allow
+            Resource:
+            - arn:aws:logs:*:*:*
+          Version: '2012-10-17'
+        PolicyName: PublishRolePolicy
+      RoleName:
+        Fn::Sub: ${AOCStackPrefix}-AEMStackPublishRole
+    Type: AWS::IAM::Role
+  AEMStackManagerSnapshotLambdaServiceRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/aemstackmanagersnapshotlambdaservicerolearn
+      Description: Stack Manager Lambda Service Role ARN
+      Type: String
+      Value:
+        Fn::GetAtt: AEMStackManagerSnapshotLambdaServiceRole.Arn
+  AEMStackManagerSnapshotLambdaServiceRoleNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/aemstackmanagersnapshotlambdaservicerolename
+      Description: StackManager Snapshot Lambda Service Role Name
+      Type: String
+      Value:
+        Ref: AEMStackManagerSnapshotLambdaServiceRole
+  AuthorDispatcherInstanceProfileParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/authordispatcherinstanceprofile
+      Description: Author Dispatcher Instance Profile
+      Type: String
+      Value:
+        Ref: AuthorDispatcherInstanceProfile
+  AuthorDispatcherRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/authordispatcherrolearn
+      Description: Author Dispatcher Instance Role ARN
+      Type: String
+      Value:
+        Fn::GetAtt: AuthorDispatcherRole.Arn
+  AuthorInstanceProfileParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/authorinstanceprofile
+      Description: Author Instance Profile
+      Type: String
+      Value:
+        Ref: AuthorInstanceProfile
+  AuthorRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/authorrolearn
+      Description: Author Instance Role ARN
+      Type: String
+      Value:
+        Fn::GetAtt: AuthorRole.Arn
+  OrchestratorInstanceProfileParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/orchestratorinstanceprofile
+      Description: Orchestrator Instance Profile
+      Type: String
+      Value:
+        Ref: OrchestratorInstanceProfile
+  OrchestratorRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/orchestratorrolearn
+      Description: Orchestrator Instance Role ARN
+      Type: String
+      Value:
+        Fn::GetAtt: OrchestratorRole.Arn
+  PublishDispatcherInstanceProfileParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/publishdispatcherinstanceprofile
+      Description: Publish Dispatcher Instance Profile
+      Type: String
+      Value:
+        Ref: PublishDispatcherInstanceProfile
+  PublishDispatcherRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/publishdispatcherrolearn
+      Description: PublishDispatcher Instance Role ARN
+      Type: String
+      Value:
+        Fn::GetAtt: PublishDispatcherRole.Arn
+  PublishInstanceProfileParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/publishinstanceprofile
+      Description: Publish Instance Profile
+      Type: String
+      Value:
+        Ref: PublishInstanceProfile
+  PublishRoleArnParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/iam/publishrolearn
+      Description: Publish Instance Role ARN
+      Type: String
+      Value:
+        Fn::GetAtt: PublishRole.Arn

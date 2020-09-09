@@ -1,0 +1,917 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AEM OpenCloud AMI Creation Stack
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: AEM OpenCloud Settings
+        Parameters:
+          - AOCStackPrefix
+      - Label:
+          default: Amazon EC2 configuration
+        Parameters:
+          - BaseAmiImageName
+          - AuthorInstanceType
+          - PublishInstanceType
+          - DispatcherInstanceType
+          - JavaInstanceType
+      - Label:
+          default: AWS Quick Start Configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3BucketRegion
+          - QSS3KeyPrefix
+    ParameterLabels:
+      AOCStackPrefix:
+        default: AEM OpenCloud Stack Prefix
+      BaseAmiImageName:
+        default: Base Image SSM Name
+      AuthorInstanceType:
+        default: Author instance type
+      PublishInstanceType:
+        default: Publish instance type
+      DispatcherInstanceType:
+        default: Dispatcher instance type
+      JavaInstanceType:
+        default: Java instance type
+      QSS3BucketName:
+        default: Quick Start S3 Bucket Name
+      QSS3BucketRegion:
+        default: Quick Start S3 bucket region
+      QSS3KeyPrefix:
+        default: Quick Start S3 Key Prefix
+Parameters:
+  AOCStackPrefix:
+    AllowedPattern: '[a-zA-Z0-9\-]*'
+    ConstraintDescription: Must start with alphabetical character and must follow the cloudformation stack naming convention
+    Default: 'aem-opencloud'
+    Description: The name of the created AEM OpenCloud Stack.
+    Type: String
+  BaseAmiImageName:
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+    Description: SSM parameter pointing to the desired Amazon Linux 2 AMI
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+  AuthorInstanceType:
+    AllowedValues:
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
+    Default: m5.2xlarge
+    Description: Amazon EC2 instance type for the AEM Author Component
+    Type: String
+  PublishInstanceType:
+    AllowedValues:
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
+    Default: m5.2xlarge
+    Description: Amazon EC2 instance type for the AEM Publish Component
+    Type: String
+  DispatcherInstanceType:
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+    Default: t2.small
+    Description: Amazon EC2 instance type for the AEM Dispatcher Component
+    Type: String
+  JavaInstanceType:
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+    Default: t2.small
+    Description: Amazon EC2 instance type for the AOC Orchestrator Comonent
+    Type: String
+  QSS3BucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Default: aws-quickstart
+    Description: S3 bucket name for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
+  QSS3BucketRegion:
+    Default: ap-southeast-2
+    Description: The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.
+    Type: String
+  QSS3KeyPrefix:
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: >-
+      AWS Quick Start key prefix can include numbers, lowercase letters, uppercase
+      letters, hyphens (-), and forward slash (/). It cannot start or end with forward
+      slash (/) because they are automatically appended.
+    Default: quickstart-aem-opencloud/
+    Description: >-
+      S3 key prefix for the AWS Quick Start assets.AWS Quick Start key prefix can
+      include numbers, lowercase letters, uppercase letters, hyphens (-), and forward
+      slash (/). It cannot start or end with forward slash (/) because they are automatically
+      appended.
+    Type: String
+Conditions:
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
+Resources:
+  AmiCreationSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: App Server Security Group (AWS Quick Start)
+      VpcId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpccidr:1}}"
+      SecurityGroupEgress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 0.0.0.0/0
+  AmiCreationInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: aoc-ami-creation
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - s3:GetObject*
+                Resource:
+                  - !Sub "arn:aws:s3:::${QSS3BucketName}/${QSS3KeyPrefix}*"
+                  - !Join
+                      - ""
+                      - - "arn:aws:s3:::"
+                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                        - "/"
+                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3installationsource:1}}"
+                        - "*"
+                  - !Join
+                      - ""
+                      - - "arn:aws:s3:::"
+                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                        - !Sub "/${AOCStackPrefix}/*"
+              - Effect: Allow
+                Action:
+                  - 'logs:*'
+                Resource:
+                  - 'arn:aws:logs:*:*:*'
+              - Effect: Allow
+                Action:
+                  - ssm:GetParametersByPath
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource:
+                  - !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*"
+              - Effect: Allow
+                Action:
+                  - acm:GetCertificate
+                Resource: !Sub "{{resolve:ssm:/${AOCStackPrefix}/cert/defaultinternal:1}}"
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${AOCStackPrefix}-aemssl-private-key*"
+  AmiCreationInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref AmiCreationInstanceRole
+  AuthorAMIWaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  PublishAMIWaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  DispatcherAMIWaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  JavaAMIWaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  AuthorAMIWaitCondition:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: AuthorAMI
+    Properties:
+      Handle: !Ref AuthorAMIWaitHandle
+      Timeout: '5400'
+  PublishAMIWaitCondition:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: PublishAMI
+    Properties:
+      Handle: !Ref PublishAMIWaitHandle
+      Timeout: '5400'
+  DispatcherAMIWaitCondition:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: DispatcherAMI
+    Properties:
+      Handle: !Ref DispatcherAMIWaitHandle
+      Timeout: '5400'
+  JavaAMIWaitCondition:
+    Type: AWS::CloudFormation::WaitCondition
+    DependsOn: JavaAMI
+    Properties:
+      Handle: !Ref JavaAMIWaitHandle
+      Timeout: '5400'
+  AuthorAMI:
+    Type: AWS::EC2::Instance
+    Metadata:
+      Comment: Install AEM Author Component
+      AWS::CloudFormation::Authentication:
+        S3AccessCreds:
+          type: S3
+          roleName: !Ref AmiCreationInstanceRole
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            rpm:
+              epel: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+            yum:
+              yum-utils: []
+              sudo: []
+          files:
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+              mode: '000400'
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.LaunchConfig.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfig --region ${AWS::Region}
+                runas=root
+            /tmp/shinesolutions/install_aem_opencloud.sh:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/install_aem_opencloud.sh
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+            /tmp/shinesolutions/hiera.yaml:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/hiera.yaml
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+            /tmp/shinesolutions/hiera3.yaml:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/hiera3.yaml
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: 'true'
+                ensureRunning: 'true'
+                files:
+                - /etc/cfn/cfn-hup.conf
+                - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+    Properties:
+      BlockDeviceMappings:
+      - DeviceName: '/dev/xvda'
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize: 100
+          VolumeType: gp2
+      - DeviceName: '/dev/xvdb'
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize: 500
+          VolumeType: gp2
+      KeyName: !Sub "{{resolve:ssm:/${AOCStackPrefix}/ec2/keypairname:1}}"
+      IamInstanceProfile: !Ref AmiCreationInstanceProfile
+      ImageId: !Ref BaseAmiImageName
+      InstanceType: !Ref AuthorInstanceType
+      SubnetId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privatesubnet1aid:1}}"
+      SecurityGroupIds:
+      - !Ref AmiCreationSecurityGroup
+      UserData:
+        !Base64
+          Fn::Sub: |
+            #!/bin/bash
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource AuthorAMI  --region ${AWS::Region}
+            echo "Start AEM OpenCloud installation"
+            s3_data_bucket=$(aws --region=${AWS::Region} ssm get-parameter --name /${AOCStackPrefix}/config/s3databucketname --output text --query Parameter.Value)
+            packer_aem_version=$(aws --region=${AWS::Region} ssm get-parameter --name /${AOCStackPrefix}/version/packeraem --output text --query Parameter.Value)
+            mkdir -p /tmp/shinesolutions
+            cd /tmp/shinesolutions
+            aws s3 cp s3://$s3_data_bucket/${AOCStackPrefix}/packer-aem-$packer_aem_version.tar.gz /tmp/shinesolutions/packer-aem.tar.gz
+            aws s3 cp s3://$s3_data_bucket/${AOCStackPrefix}/ami.yaml /tmp/shinesolutions/local.yaml
+            ls -l /tmp/
+            chmod a+x /tmp/shinesolutions/install_aem_opencloud.sh
+            /tmp/shinesolutions/install_aem_opencloud.sh author ${AWS::Region}
+            /opt/aws/bin/cfn-signal -e $? -r "Completed AEM OpenCloud installation" '${AuthorAMIWaitHandle}'
+      Tags:
+      - Key: Application Id
+        Value: Adobe Experience Manager (AEM)
+      - Key: Application Profile
+        Value: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aem:1}}"
+      - Key: Application
+        Value: AWS Quick Start (AEMOpenCloud)
+      - Key: Application Role
+        Value: Author AMI
+      - Key: OS Type
+        Value: amazon-linux2
+      - Key: Packer AEM Version
+        Value: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/packeraem:1}}"
+      - Key: Project
+        Value: AEM OpenCloud
+  PublishAMI:
+    Type: AWS::EC2::Instance
+    Metadata:
+      Comment: Install AEM Publish Component
+      AWS::CloudFormation::Authentication:
+        S3AccessCreds:
+          type: S3
+          roleName: !Ref AmiCreationInstanceRole
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            rpm:
+              epel: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+            yum:
+              yum-utils: []
+              sudo: []
+          files:
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+              mode: '000400'
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.LaunchConfig.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfig --region ${AWS::Region}
+                runas=root
+            /tmp/shinesolutions/install_aem_opencloud.sh:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/install_aem_opencloud.sh
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+            /tmp/shinesolutions/hiera.yaml:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/hiera.yaml
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+            /tmp/shinesolutions/hiera3.yaml:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/hiera3.yaml
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: 'true'
+                ensureRunning: 'true'
+                files:
+                - /etc/cfn/cfn-hup.conf
+                - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+    Properties:
+      BlockDeviceMappings:
+      - DeviceName: '/dev/xvda'
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize: 100
+          VolumeType: gp2
+      - DeviceName: '/dev/xvdb'
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize: 500
+          VolumeType: gp2
+      KeyName: !Sub "{{resolve:ssm:/${AOCStackPrefix}/ec2/keypairname:1}}"
+      IamInstanceProfile: !Ref AmiCreationInstanceProfile
+      ImageId: !Ref BaseAmiImageName
+      InstanceType: !Ref PublishInstanceType
+      SubnetId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privatesubnet1aid:1}}"
+      SecurityGroupIds:
+      - !Ref AmiCreationSecurityGroup
+      UserData:
+        !Base64
+          Fn::Sub: |
+            #!/bin/bash
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource PublishAMI  --region ${AWS::Region}
+            echo "Start AEM OpenCloud installation"
+            s3_data_bucket=$(aws --region=${AWS::Region} ssm get-parameter --name /${AOCStackPrefix}/config/s3databucketname --output text --query Parameter.Value)
+            packer_aem_version=$(aws --region=${AWS::Region} ssm get-parameter --name /${AOCStackPrefix}/version/packeraem --output text --query Parameter.Value)
+            mkdir -p /tmp/shinesolutions
+            cd /tmp/shinesolutions
+            aws s3 cp s3://$s3_data_bucket/${AOCStackPrefix}/packer-aem-$packer_aem_version.tar.gz /tmp/shinesolutions/packer-aem.tar.gz
+            aws s3 cp s3://$s3_data_bucket/${AOCStackPrefix}/ami.yaml /tmp/shinesolutions/local.yaml
+            ls -l /tmp/
+            chmod a+x /tmp/shinesolutions/install_aem_opencloud.sh
+            /tmp/shinesolutions/install_aem_opencloud.sh publish ${AWS::Region}
+            /opt/aws/bin/cfn-signal -e $? -r "Completed AEM OpenCloud installation" '${PublishAMIWaitHandle}'
+      Tags:
+      - Key: Application Id
+        Value: Adobe Experience Manager (AEM)
+      - Key: Application Profile
+        Value: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aem:1}}"
+      - Key: Application
+        Value: AWS Quick Start (AEMOpenCloud)
+      - Key: Application Role
+        Value: Publish AMI
+      - Key: OS Type
+        Value: amazon-linux2
+      - Key: Packer AEM Version
+        Value: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/packeraem:1}}"
+      - Key: Project
+        Value: AEM OpenCloud
+  DispatcherAMI:
+    Type: AWS::EC2::Instance
+    Metadata:
+      Comment: Install AEM Dispatcher Component
+      AWS::CloudFormation::Authentication:
+        S3AccessCreds:
+          type: S3
+          roleName: !Ref AmiCreationInstanceRole
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            rpm:
+              epel: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+            yum:
+              yum-utils: []
+              sudo: []
+          files:
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+              mode: '000400'
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.LaunchConfig.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfig --region ${AWS::Region}
+                runas=root
+            /tmp/shinesolutions/install_aem_opencloud.sh:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/install_aem_opencloud.sh
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+            /tmp/shinesolutions/hiera.yaml:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/hiera.yaml
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+            /tmp/shinesolutions/hiera3.yaml:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/hiera3.yaml
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: 'true'
+                ensureRunning: 'true'
+                files:
+                - /etc/cfn/cfn-hup.conf
+                - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+    Properties:
+      BlockDeviceMappings:
+      - DeviceName: '/dev/xvda'
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize: 100
+          VolumeType: gp2
+      - DeviceName: '/dev/xvdb'
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize: 500
+          VolumeType: gp2
+      KeyName: !Sub "{{resolve:ssm:/${AOCStackPrefix}/ec2/keypairname:1}}"
+      IamInstanceProfile: !Ref AmiCreationInstanceProfile
+      ImageId: !Ref BaseAmiImageName
+      InstanceType: !Ref DispatcherInstanceType
+      SubnetId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privatesubnet1aid:1}}"
+      SecurityGroupIds:
+      - !Ref AmiCreationSecurityGroup
+      UserData:
+        !Base64
+          Fn::Sub: |
+            #!/bin/bash
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource DispatcherAMI  --region ${AWS::Region}
+            echo "Start AEM OpenCloud installation"
+            s3_data_bucket=$(aws --region=${AWS::Region} ssm get-parameter --name /${AOCStackPrefix}/config/s3databucketname --output text --query Parameter.Value)
+            packer_aem_version=$(aws --region=${AWS::Region} ssm get-parameter --name /${AOCStackPrefix}/version/packeraem --output text --query Parameter.Value)
+            mkdir -p /tmp/shinesolutions
+            cd /tmp/shinesolutions
+            aws s3 cp s3://$s3_data_bucket/${AOCStackPrefix}/packer-aem-$packer_aem_version.tar.gz /tmp/shinesolutions/packer-aem.tar.gz
+            aws s3 cp s3://$s3_data_bucket/${AOCStackPrefix}/ami.yaml /tmp/shinesolutions/local.yaml
+            ls -l /tmp/
+            chmod a+x /tmp/shinesolutions/install_aem_opencloud.sh
+            /tmp/shinesolutions/install_aem_opencloud.sh dispatcher ${AWS::Region}
+            /opt/aws/bin/cfn-signal -e $? -r "Completed AEM OpenCloud installation" '${DispatcherAMIWaitHandle}'
+      Tags:
+      - Key: Application Id
+        Value: Adobe Experience Manager (AEM)
+      - Key: Application Profile
+        Value: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aem:1}}"
+      - Key: Application
+        Value: AWS Quick Start (AEMOpenCloud)
+      - Key: Application Role
+        Value: Dispatcher AMI
+      - Key: OS Type
+        Value: amazon-linux2
+      - Key: Packer AEM Version
+        Value: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/packeraem:1}}"
+      - Key: Project
+        Value: AEM OpenCloud
+  JavaAMI:
+    Type: AWS::EC2::Instance
+    Metadata:
+      Comment: Install AEM Java Component
+      AWS::CloudFormation::Authentication:
+        S3AccessCreds:
+          type: S3
+          roleName: !Ref AmiCreationInstanceRole
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            rpm:
+              epel: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm"
+            yum:
+              yum-utils: []
+              sudo: []
+          files:
+            /etc/cfn/cfn-hup.conf:
+              content: !Sub |
+                [main]
+                stack=${AWS::StackId}
+                region=${AWS::Region}
+              mode: '000400'
+              owner: root
+              group: root
+            /etc/cfn/hooks.d/cfn-auto-reloader.conf:
+              content: !Sub |
+                [cfn-auto-reloader-hook]
+                triggers=post.update
+                path=Resources.LaunchConfig.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfig --region ${AWS::Region}
+                runas=root
+            /tmp/shinesolutions/install_aem_opencloud.sh:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/install_aem_opencloud.sh
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+            /tmp/shinesolutions/hiera.yaml:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/hiera.yaml
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+            /tmp/shinesolutions/hiera3.yaml:
+              source:
+                !Sub
+                  - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}scripts/hiera3.yaml
+                  - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+                    S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+              mode: '000655'
+              owner: root
+              group: root
+              authentication: S3AccessCreds
+          services:
+            sysvinit:
+              cfn-hup:
+                enabled: 'true'
+                ensureRunning: 'true'
+                files:
+                - /etc/cfn/cfn-hup.conf
+                - /etc/cfn/hooks.d/cfn-auto-reloader.conf
+    Properties:
+      BlockDeviceMappings:
+      - DeviceName: '/dev/xvda'
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize: 100
+          VolumeType: gp2
+      - DeviceName: '/dev/xvdb'
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize: 500
+          VolumeType: gp2
+      KeyName: !Sub "{{resolve:ssm:/${AOCStackPrefix}/ec2/keypairname:1}}"
+      IamInstanceProfile: !Ref AmiCreationInstanceProfile
+      ImageId: !Ref BaseAmiImageName
+      InstanceType: !Ref JavaInstanceType
+      SubnetId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privatesubnet1aid:1}}"
+      SecurityGroupIds:
+      - !Ref AmiCreationSecurityGroup
+      UserData:
+        !Base64
+          Fn::Sub: |
+            #!/bin/bash
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource JavaAMI  --region ${AWS::Region}
+            echo "Start AEM OpenCloud installation"
+            s3_data_bucket=$(aws --region=${AWS::Region} ssm get-parameter --name /${AOCStackPrefix}/config/s3databucketname --output text --query Parameter.Value)
+            packer_aem_version=$(aws --region=${AWS::Region} ssm get-parameter --name /${AOCStackPrefix}/version/packeraem --output text --query Parameter.Value)
+            mkdir -p /tmp/shinesolutions
+            cd /tmp/shinesolutions
+            aws s3 cp s3://$s3_data_bucket/${AOCStackPrefix}/packer-aem-$packer_aem_version.tar.gz /tmp/shinesolutions/packer-aem.tar.gz
+            aws s3 cp s3://$s3_data_bucket/${AOCStackPrefix}/ami.yaml /tmp/shinesolutions/local.yaml
+            ls -l /tmp/
+            chmod a+x /tmp/shinesolutions/install_aem_opencloud.sh
+            /tmp/shinesolutions/install_aem_opencloud.sh java ${AWS::Region}
+            /opt/aws/bin/cfn-signal -e $? -r "Completed AEM OpenCloud installation" '${JavaAMIWaitHandle}'
+      Tags:
+      - Key: Application Id
+        Value: Adobe Experience Manager (AEM)
+      - Key: Application Profile
+        Value: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aem:1}}"
+      - Key: Application
+        Value: AWS Quick Start (AEMOpenCloud)
+      - Key: Application Role
+        Value: Java AMI
+      - Key: OS Type
+        Value: amazon-linux2
+      - Key: Packer AEM Version
+        Value: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/packeraem:1}}"
+      - Key: Project
+        Value: AEM OpenCloud
+  AMIInfoFunctionExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: /
+      Policies:
+      - PolicyName: root
+        PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Effect: Allow
+            Action:
+            - ec2:Describe*
+            - ec2:StopInstances
+            - ec2:CreateImage
+            - ec2:DeregisterImage
+            Resource: '*'
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  AMIInfoFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python3.7
+      Timeout: 900
+      Role: !GetAtt AMIInfoFunctionExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import cfnresponse
+          import boto3
+          from random import randint
+          def lambda_handler(event, context):
+            if event['RequestType'] == 'Delete':
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+              return
+            try:
+              ec2 = boto3.resource('ec2')
+              instance = ec2.Instance(event['ResourceProperties']['InstanceId'])
+              instance.stop()
+              instance.wait_until_stopped()
+              image = instance.create_image(Name="%s-%i" % (event['ResourceProperties']['AMIName'], randint(0,100000)), Description="AEM OpenCloud AMI Created with Cloudformation")
+              boto3.client('ec2').get_waiter('image_available').wait(ImageIds=[image.id], WaiterConfig={'Delay': 30, 'MaxAttempts': 40})
+              responseData = {'ami':image.id}
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+            except Exception as inst:
+              print(inst)
+              cfnresponse.send(event, context, cfnresponse.FAILED, {})
+  AMICleanUpFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Runtime: python3.7
+      Timeout: 900
+      Role: !GetAtt AMIInfoFunctionExecutionRole.Arn
+      Code:
+        ZipFile: |
+          import json
+          import cfnresponse
+          import boto3
+          from random import randint
+          def lambda_handler(event, context):
+            if event['RequestType'] == 'Delete':
+              try:
+                ec2 = boto3.resource('ec2')
+                image = ec2.Image(event['ResourceProperties']['AMIId'])
+                image.deregister()
+                cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+              except Exception as inst:
+                print(inst)
+                cfnresponse.send(event, context, cfnresponse.FAILED, {})
+            else:
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+  CreateAuthorAMI:
+    Type: Custom::CreateAuthorAMI
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    DependsOn: AuthorAMIWaitCondition
+    Properties:
+      ServiceToken: !GetAtt AMIInfoFunction.Arn
+      InstanceId: !Ref AuthorAMI
+      AMIName: AuthorAMI
+      Version: 1
+  CreatePublishAMI:
+    Type: Custom::CreatePublishAMI
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    DependsOn: PublishAMIWaitCondition
+    Properties:
+      ServiceToken: !GetAtt AMIInfoFunction.Arn
+      InstanceId: !Ref PublishAMI
+      AMIName: PublishAMI
+      Version: 1
+  CreateDispatcherAMI:
+    Type: Custom::CreateDispatcherAMI
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    DependsOn: DispatcherAMIWaitCondition
+    Properties:
+      ServiceToken: !GetAtt AMIInfoFunction.Arn
+      InstanceId: !Ref DispatcherAMI
+      AMIName: DispatcherAMI
+      Version: 1
+  CreateJavaAMI:
+    Type: Custom::CreateJavaAMI
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    DependsOn: JavaAMIWaitCondition
+    Properties:
+      ServiceToken: !GetAtt AMIInfoFunction.Arn
+      InstanceId: !Ref JavaAMI
+      AMIName: JavaAMI
+      Version: 1
+  CleanUpAuthorAMI:
+    Type: Custom::CleanUpAuthorAMI
+    Properties:
+      ServiceToken: !GetAtt AMICleanUpFunction.Arn
+      AMIId: !GetAtt CreateAuthorAMI.ami
+      Version: 1
+  CleanUpPublishAMI:
+    Type: Custom::CleanUpPublishAMI
+    Properties:
+      ServiceToken: !GetAtt AMICleanUpFunction.Arn
+      AMIId: !GetAtt CreatePublishAMI.ami
+      Version: 1
+  CleanUpDispatcherAMI:
+    Type: Custom::CleanUpDispatcherAMI
+    Properties:
+      ServiceToken: !GetAtt AMICleanUpFunction.Arn
+      AMIId: !GetAtt CreateDispatcherAMI.ami
+      Version: 1
+  CleanUpJavaAMI:
+    Type: Custom::CleanUpJavaAMI
+    Properties:
+      ServiceToken: !GetAtt AMICleanUpFunction.Arn
+      AMIId: !GetAtt CreateJavaAMI.ami
+      Version: 1
+  AuthorAMIId:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/ec2/images/author
+      Description: AEM OpenClod Author Component AMI ID
+      Type: String
+      Value: !GetAtt CreateAuthorAMI.ami
+  PublishAMIId:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/ec2/images/publish
+      Description: AEM OpenClod Publish Component AMI ID
+      Type: String
+      Value: !GetAtt CreatePublishAMI.ami
+  DispatcherAMIId:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/ec2/images/dispatcher
+      Description: AEM OpenClod Dispatcher Component AMI ID
+      Type: String
+      Value: !GetAtt CreateDispatcherAMI.ami
+  JavaAMIId:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/ec2/images/java
+      Description: AEM OpenClod Java Component AMI ID
+      Type: String
+      Value: !GetAtt CreateJavaAMI.ami

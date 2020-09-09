@@ -1,0 +1,331 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create the Compute resources for the AEM Orchestrator
+Parameters:
+  AEMASGEventQueueName:
+    Default: ''
+    Description: The name of the messaging stack.
+    Type: String
+  AemAwsStackProvisionerVersionParameter:
+    Description: AEM AWS Stack Provisioner version number
+    Type: String
+  AuthorDispatcherStackArn:
+    Default: ''
+    Description: The ARN of the author-dispatcher stack.
+    Type: String
+  AuthorStackArn:
+    Default: ''
+    Description: The ARN of the author stack.
+    Type: String
+  DataBucketNameParameter:
+    Description: Bucket name that stores Stack data files
+    Type: String
+  AOCStackPrefix:
+    Description: The AEM Stack Compute Resources Stack Prefix
+    Type: String
+  MessagingStackArn:
+    Default: ''
+    Description: The ARN of the messaging stack.
+    Type: String
+  OrchestratorASGAvailabilityZoneListParameter:
+    Description: The Orchestrator Availability Zone List
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+  OrchestratorDataVolSizeParameter:
+    Description: Orchestrator Instances Data EBS Volume Size
+    Type: Number
+  OrchestratorImageParameter:
+    Description: The Orchestrator Image Id
+    Type: AWS::EC2::Image::Id
+  OrchestratorImageRootDevice:
+    Default: /dev/sda1
+    Description: The root device name for the Orchestrator Image Id
+    Type: String
+  OrchestratorImageDataDevice:
+    Default: /dev/sdb
+    Description: The data device name for the Orchestrator Image Id
+    Type: String
+  OrchestratorInstanceTypeParameter:
+    Description: The Orchestrator Instance Type
+    Type: String
+  OrchestratorRootVolSizeParameter:
+    Description: Orchestrator Instances Root EBS Volume Size
+    Type: Number
+  PublishDispatcherStackName:
+    Default: ''
+    Description: The name of the publish-dispatcher stack.
+    Type: String
+  PublishStackArn:
+    Default: ''
+    Description: The ARN of the author stack.
+    Type: String
+Resources:
+  OrchestratorAutoScalingGroup:
+    Properties:
+      AvailabilityZones:
+        Ref: OrchestratorASGAvailabilityZoneListParameter
+      HealthCheckGracePeriod: 300
+      HealthCheckType: EC2
+      LaunchConfigurationName:
+        Ref: OrchestratorLaunchConfiguration
+      MaxSize: '1'
+      MetricsCollection:
+      - Granularity: 1Minute
+        Metrics:
+        - GroupMinSize
+        - GroupMaxSize
+        - GroupDesiredCapacity
+        - GroupInServiceInstances
+        - GroupPendingInstances
+        - GroupStandbyInstances
+        - GroupTerminatingInstances
+        - GroupTotalInstances
+      MinSize: '1'
+      Tags:
+      - Key: Name
+        PropagateAtLaunch: true
+        Value: AEM Orchestrator
+      - Key: StackPrefix
+        PropagateAtLaunch: true
+        Value:
+          Ref: AOCStackPrefix
+      - Key: Component
+        PropagateAtLaunch: true
+        Value: orchestrator
+      VPCZoneIdentifier:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privatesubnet1aid:1}}"
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privatesubnet2aid:1}}"
+    Type: AWS::AutoScaling::AutoScalingGroup
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT2H
+  OrchestratorLaunchConfiguration:
+    Properties:
+      AssociatePublicIpAddress: false
+      BlockDeviceMappings:
+      - DeviceName:
+          Ref: OrchestratorImageRootDevice
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize:
+            Ref: OrchestratorRootVolSizeParameter
+          VolumeType: gp2
+      - DeviceName:
+          Ref: OrchestratorImageDataDevice
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize:
+            Ref: OrchestratorDataVolSizeParameter
+          VolumeType: gp2
+      IamInstanceProfile: !Sub "{{resolve:ssm:/${AOCStackPrefix}/iam/orchestratorinstanceprofile:1}}"
+      ImageId:
+        Ref: OrchestratorImageParameter
+      InstanceMonitoring: false
+      InstanceType:
+        Ref: OrchestratorInstanceTypeParameter
+      KeyName: !Sub "{{resolve:ssm:/${AOCStackPrefix}/ec2/keypairname:1}}"
+      SecurityGroups:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/sg/orchestrator:1}}"
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash -x
+            source /etc/profile
+            mkdir -p /opt/shinesolutions/aem-aws-stack-builder/
+            # Configure other stack names in Orchestrator's stack provisioner's local.yaml
+            echo '
+            aem_orchestrator::application_properties::aws_cloudformation_stack_name_author: "${AuthorStackArn}"
+            aem_orchestrator::application_properties::aws_cloudformation_stack_name_author_dispatcher: "${AuthorDispatcherStackArn}"
+            aem_orchestrator::application_properties::aws_cloudformation_stack_name_publish: "${PublishStackArn}"
+            aem_orchestrator::application_properties::aws_cloudformation_stack_name_publish_dispatcher: "${PublishDispatcherStackName}"
+            aem_orchestrator::application_properties::aws_cloudformation_stack_name_messaging: "${MessagingStackArn}"
+            aem_orchestrator::application_properties::aws_sqs_queue_name: "${AEMASGEventQueueName}"
+            ' > /opt/shinesolutions/aem-aws-stack-builder/extra_local.yaml
+            aws s3 cp s3://${DataBucketNameParameter}/${AOCStackPrefix}/stack-init.sh /opt/shinesolutions/aem-aws-stack-builder/stack-init.sh
+            chmod 755 /opt/shinesolutions/aem-aws-stack-builder/stack-init.sh
+            /opt/shinesolutions/aem-aws-stack-builder/stack-init.sh ${DataBucketNameParameter} ${AOCStackPrefix} orchestrator ${AemAwsStackProvisionerVersionParameter} /opt/shinesolutions/aem-aws-stack-builder/extra_local.yaml
+            /opt/shinesolutions/aem-tools/test-readiness.sh
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource OrchestratorAutoScalingGroup --region ${AWS::Region}
+    Type: AWS::AutoScaling::LaunchConfiguration
+  CriticalOrchestratorNoInstanceAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      AlarmDescription: No Orchestrator Instance in Service
+      AlarmName:
+        Fn::Sub: ${AOCStackPrefix}-Critical-Orchestrator-NoInstanceAlarm
+      ComparisonOperator: LessThanThreshold
+      Dimensions:
+      - Name: AutoScalingGroupName
+        Value:
+          Ref: OrchestratorAutoScalingGroup
+      EvaluationPeriods: 5
+      MetricName: GroupInServiceInstances
+      Namespace: AWS/AutoScaling
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      Period: 60
+      Statistic: Average
+      Threshold: 1
+    Type: AWS::CloudWatch::Alarm
+
+  WarningOrchestratorMemoryHighAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      AlarmDescription: Memory Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Warning-Orchestrator-MemoryHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: OrchestratorAutoScalingGroup
+      EvaluationPeriods: 1
+      MetricName: MemoryUtilization
+      Namespace: "System/Linux"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Average
+      Threshold: 80
+    Type: AWS::CloudWatch::Alarm
+  CriticalOrchestratorMemoryHighAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      AlarmDescription: Memory Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Critical-Orchestrator-MemoryHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: OrchestratorAutoScalingGroup
+      EvaluationPeriods: 1
+      MetricName: MemoryUtilization
+      Namespace: "System/Linux"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Average
+      Threshold: 90
+    Type: AWS::CloudWatch::Alarm
+  WarningOrchestratorRootDiskSpaceUtilizationAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      AlarmDescription: Disk Space Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Warning-Orchestrator-RootDiskSpaceHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: OrchestratorAutoScalingGroup
+        - Name: MountPath
+          Value: "/"
+        - Name: Filesystem
+          Value: "/"
+      EvaluationPeriods: 1
+      MetricName: DiskSpaceUtilization
+      Namespace: "System/Linux"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Average
+      Threshold: 80
+    Type: AWS::CloudWatch::Alarm
+  CriticalOrchestratorRootDiskSpaceUtilizationAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      AlarmDescription: Disk Space Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Critical-Orchestrator-RootDiskSpaceHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: OrchestratorAutoScalingGroup
+        - Name: MountPath
+          Value: "/"
+        - Name: Filesystem
+          Value: "/"
+      EvaluationPeriods: 1
+      MetricName: DiskSpaceUtilization
+      Namespace: "System/Linux"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Average
+      Threshold: 90
+    Type: AWS::CloudWatch::Alarm
+  WarningOrchestratorCPUUtilizationAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      AlarmDescription: CPU Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Warning-Orchestrator-CPUHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: OrchestratorAutoScalingGroup
+      EvaluationPeriods: 1
+      MetricName: CPUUtilization
+      Namespace: "AWS/EC2"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Maximum
+      Threshold: 60
+    Type: AWS::CloudWatch::Alarm
+  CriticalOrchestratorCPUUtilizationAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      AlarmDescription: CPU Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Critical-Orchestrator-CPUHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: OrchestratorAutoScalingGroup
+      EvaluationPeriods: 1
+      MetricName: CPUUtilization
+      Namespace: "AWS/EC2"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Maximum
+      Threshold: 90
+    Type: AWS::CloudWatch::Alarm

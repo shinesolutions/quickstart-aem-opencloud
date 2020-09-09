@@ -1,0 +1,817 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create Security Groups for the AEM Stack
+Parameters:
+  AuthorDispatcherELBSecurityGroupInboundCidrIpParameter:
+    Description: AEM Author Dispatcher ELB Security Group Inbound Cidr Ip
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+    Type: String
+  AOCStackPrefix:
+    Description: The AEM Stack Prerequisite Resources Stack Prefix
+    Type: String
+  PrivateSubnetInternetOutboundCidrIpParameter:
+    Description: AEM Stack Private Subnet Internet Outbound Cidr Ip Destination
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+    Type: String
+  PublishDispatcherELBSecurityGroupInboundCidrIpParameter:
+    Description: AEM Publish Dispatcher ELB Security Group Inbound Cidr Ip
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+    Type: String
+  SecureShellInboundCidrIpParameter:
+    Description: AEM Stack Secure Shell Inbound Cidr Ip
+    AllowedPattern: '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$'
+    Type: String
+Resources:
+  AuthorDipatcherELBSecurityGroupEgress0:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      FromPort: 80
+      GroupId:
+        Ref: AuthorDispatcherELBSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorDipatcherELBSecurityGroupEgress1:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      FromPort: 443
+      GroupId:
+        Ref: AuthorDispatcherELBSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorDipatcherSecurityGroupEgress0:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorELBSecurityGroup
+      FromPort: 80
+      GroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorDipatcherSecurityGroupEgress1:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorELBSecurityGroup
+      FromPort: 443
+      GroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorDipatcherSecurityGroupEgress2:
+    Properties:
+      CidrIp:
+        Ref: PrivateSubnetInternetOutboundCidrIpParameter
+      FromPort: 80
+      GroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorDipatcherSecurityGroupEgress3:
+    Properties:
+      CidrIp:
+        Ref: PrivateSubnetInternetOutboundCidrIpParameter
+      FromPort: 443
+      GroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorDispatcherELBSecurityGroup:
+    Properties:
+      GroupDescription: AEM Author Dispatcher ELB Security Group
+      Tags:
+      - Key: Name
+        Value: AEM Author Dispatcher ELB Security Group
+      - Key: StackPrefix
+        Value:
+          Ref: AOCStackPrefix
+      VpcId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+    Type: AWS::EC2::SecurityGroup
+  AuthorDispatcherELBSecurityGroupIngress0:
+    Properties:
+      CidrIp:
+        Ref: AuthorDispatcherELBSecurityGroupInboundCidrIpParameter
+      FromPort: 80
+      GroupId:
+        Ref: AuthorDispatcherELBSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorDispatcherELBSecurityGroupIngress1:
+    Properties:
+      CidrIp:
+        Ref: AuthorDispatcherELBSecurityGroupInboundCidrIpParameter
+      FromPort: 443
+      GroupId:
+        Ref: AuthorDispatcherELBSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorDispatcherSecurityGroup:
+    Properties:
+      GroupDescription: AEM Author Dispatcher Security Group
+      Tags:
+      - Key: Name
+        Value: AEM Author Dispatcher Security Group
+      - Key: StackPrefix
+        Value:
+          Ref: AOCStackPrefix
+      VpcId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+    Type: AWS::EC2::SecurityGroup
+  AuthorDispatcherSecurityGroupIngress0:
+    Properties:
+      FromPort: 80
+      GroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorDispatcherELBSecurityGroup
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorDispatcherSecurityGroupIngress1:
+    Properties:
+      FromPort: 443
+      GroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorDispatcherELBSecurityGroup
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorDispatcherSecurityGroupIngress3:
+    Properties:
+      FromPort: 4502
+      GroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      ToPort: 4502
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorDispatcherSecurityGroupIngress4:
+    Properties:
+      FromPort: 5432
+      GroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      ToPort: 5432
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorDispatcherSecurityGroupIngress5:
+    Properties:
+      CidrIp:
+        Ref: SecureShellInboundCidrIpParameter
+      FromPort: 22
+      GroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      IpProtocol: tcp
+      ToPort: 22
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorELBSecurityGroup:
+    Properties:
+      GroupDescription: AEM Author ELB Security Group
+      Tags:
+      - Key: Name
+        Value: AEM Author ELB Security Group
+      - Key: StackPrefix
+        Value:
+          Ref: AOCStackPrefix
+      VpcId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+    Type: AWS::EC2::SecurityGroup
+  AuthorELBSecurityGroupEgress0:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      FromPort: 4502
+      GroupId:
+        Ref: AuthorELBSecurityGroup
+      IpProtocol: tcp
+      ToPort: 4502
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorELBSecurityGroupEgress1:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      FromPort: 5432
+      GroupId:
+        Ref: AuthorELBSecurityGroup
+      IpProtocol: tcp
+      ToPort: 5432
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorELBSecurityGroupIngress0:
+    Properties:
+      FromPort: 80
+      GroupId:
+        Ref: AuthorELBSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorELBSecurityGroupIngress1:
+    Properties:
+      FromPort: 443
+      GroupId:
+        Ref: AuthorELBSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorELBSecurityGroupIngress2:
+    Properties:
+      FromPort: 80
+      GroupId:
+        Ref: AuthorELBSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: OrchestratorSecurityGroup
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorELBSecurityGroupIngress3:
+    Properties:
+      FromPort: 443
+      GroupId:
+        Ref: AuthorELBSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: OrchestratorSecurityGroup
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorSecurityGroup:
+    Properties:
+      GroupDescription: AEM Author Security Group
+      Tags:
+      - Key: Name
+        Value: AEM Author Security Group
+      - Key: StackPrefix
+        Value:
+          Ref: AOCStackPrefix
+      VpcId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+    Type: AWS::EC2::SecurityGroup
+  AuthorSecurityGroupEgress0:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: PublishSecurityGroup
+      FromPort: 4503
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 4503
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorSecurityGroupEgress1:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: PublishSecurityGroup
+      FromPort: 5433
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 5433
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorSecurityGroupEgress2:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      FromPort: 4502
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 4502
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorSecurityGroupEgress3:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      FromPort: 5432
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 5432
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorSecurityGroupEgress4:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      FromPort: 8023
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 8023
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorSecurityGroupEgress5:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      FromPort: 80
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorSecurityGroupEgress6:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorDispatcherSecurityGroup
+      FromPort: 443
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorSecurityGroupEgress7:
+    Properties:
+      CidrIp:
+        Ref: PrivateSubnetInternetOutboundCidrIpParameter
+      FromPort: 80
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorSecurityGroupEgress8:
+    Properties:
+      CidrIp:
+        Ref: PrivateSubnetInternetOutboundCidrIpParameter
+      FromPort: 443
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  AuthorSecurityGroupIngress0:
+    Properties:
+      FromPort: 4502
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorELBSecurityGroup
+      ToPort: 4502
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorSecurityGroupIngress1:
+    Properties:
+      FromPort: 5432
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorELBSecurityGroup
+      ToPort: 5432
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorSecurityGroupIngress2:
+    Properties:
+      FromPort: 4502
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      ToPort: 4502
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorSecurityGroupIngress3:
+    Properties:
+      FromPort: 5432
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      ToPort: 5432
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorSecurityGroupIngress4:
+    Properties:
+      FromPort: 8023
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      ToPort: 8023
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorSecurityGroupIngress5:
+    Properties:
+      CidrIp:
+        Ref: SecureShellInboundCidrIpParameter
+      FromPort: 22
+      GroupId:
+        Ref: AuthorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 22
+    Type: AWS::EC2::SecurityGroupIngress
+  OrchestratorSecurityGroup:
+    Properties:
+      GroupDescription: AEM Orchestrator Security Group
+      Tags:
+      - Key: Name
+        Value: AEM Orchestrator Security Group
+      - Key: StackPrefix
+        Value:
+          Ref: AOCStackPrefix
+      VpcId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+    Type: AWS::EC2::SecurityGroup
+  OrchestratorSecurityGroupEgress1:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorELBSecurityGroup
+      FromPort: 80
+      GroupId:
+        Ref: OrchestratorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  OrchestratorSecurityGroupEgress2:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: AuthorELBSecurityGroup
+      FromPort: 443
+      GroupId:
+        Ref: OrchestratorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  OrchestratorSecurityGroupEgress3:
+    Properties:
+      CidrIp:
+        Ref: PrivateSubnetInternetOutboundCidrIpParameter
+      FromPort: 80
+      GroupId:
+        Ref: OrchestratorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  OrchestratorSecurityGroupEgress4:
+    Properties:
+      CidrIp:
+        Ref: PrivateSubnetInternetOutboundCidrIpParameter
+      FromPort: 443
+      GroupId:
+        Ref: OrchestratorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  OrchestratorSecurityGroupEgress5:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: PublishSecurityGroup
+      FromPort: 4503
+      GroupId:
+        Ref: OrchestratorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 4503
+    Type: AWS::EC2::SecurityGroupEgress
+  OrchestratorSecurityGroupEgress6:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: PublishSecurityGroup
+      FromPort: 5433
+      GroupId:
+        Ref: OrchestratorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 5433
+    Type: AWS::EC2::SecurityGroupEgress
+  OrchestratorSecurityGroupIngress0:
+    Properties:
+      CidrIp:
+        Ref: SecureShellInboundCidrIpParameter
+      FromPort: 22
+      GroupId:
+        Ref: OrchestratorSecurityGroup
+      IpProtocol: tcp
+      ToPort: 22
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishDispatcherELBSecurityGroup:
+    Properties:
+      GroupDescription: AEM Publish Dispatcher ELB Security Group
+      Tags:
+      - Key: Name
+        Value: AEM Publish Dispatcher ELB Security Group
+      - Key: StackPrefix
+        Value:
+          Ref: AOCStackPrefix
+      VpcId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+    Type: AWS::EC2::SecurityGroup
+  PublishDispatcherELBSecurityGroupEgress0:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: PublishDispatcherSecurityGroup
+      FromPort: 80
+      GroupId:
+        Ref: PublishDispatcherELBSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  PublishDispatcherELBSecurityGroupEgress1:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: PublishDispatcherSecurityGroup
+      FromPort: 443
+      GroupId:
+        Ref: PublishDispatcherELBSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  PublishDispatcherELBSecurityGroupIngress0:
+    Properties:
+      CidrIp:
+        Ref: PublishDispatcherELBSecurityGroupInboundCidrIpParameter
+      FromPort: 80
+      GroupId:
+        Ref: PublishDispatcherELBSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishDispatcherELBSecurityGroupIngress1:
+    Properties:
+      CidrIp:
+        Ref: PublishDispatcherELBSecurityGroupInboundCidrIpParameter
+      FromPort: 443
+      GroupId:
+        Ref: PublishDispatcherELBSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishDispatcherSecurityGroup:
+    Properties:
+      GroupDescription: AEM Publish Dispatcher Security Group
+      Tags:
+      - Key: Name
+        Value: AEM Publish Dispatcher Security Group
+      - Key: StackPrefix
+        Value:
+          Ref: AOCStackPrefix
+      VpcId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+    Type: AWS::EC2::SecurityGroup
+  PublishDispatcherSecurityGroupEgress0:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: PublishSecurityGroup
+      FromPort: 4503
+      GroupId:
+        Ref: PublishDispatcherSecurityGroup
+      IpProtocol: tcp
+      ToPort: 4503
+    Type: AWS::EC2::SecurityGroupEgress
+  PublishDispatcherSecurityGroupEgress1:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: PublishSecurityGroup
+      FromPort: 5433
+      GroupId:
+        Ref: PublishDispatcherSecurityGroup
+      IpProtocol: tcp
+      ToPort: 5433
+    Type: AWS::EC2::SecurityGroupEgress
+  PublishDispatcherSecurityGroupEgress2:
+    Properties:
+      CidrIp:
+        Ref: PrivateSubnetInternetOutboundCidrIpParameter
+      FromPort: 80
+      GroupId:
+        Ref: PublishDispatcherSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  PublishDispatcherSecurityGroupEgress3:
+    Properties:
+      CidrIp:
+        Ref: PrivateSubnetInternetOutboundCidrIpParameter
+      FromPort: 443
+      GroupId:
+        Ref: PublishDispatcherSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  PublishDispatcherSecurityGroupIngress0:
+    Properties:
+      FromPort: 80
+      GroupId:
+        Ref: PublishDispatcherSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: PublishDispatcherELBSecurityGroup
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishDispatcherSecurityGroupIngress1:
+    Properties:
+      FromPort: 443
+      GroupId:
+        Ref: PublishDispatcherSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: PublishDispatcherELBSecurityGroup
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishDispatcherSecurityGroupIngress2:
+    Properties:
+      FromPort: 80
+      GroupId:
+        Ref: PublishDispatcherSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: PublishSecurityGroup
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishDispatcherSecurityGroupIngress3:
+    Properties:
+      FromPort: 443
+      GroupId:
+        Ref: PublishDispatcherSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: PublishSecurityGroup
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishDispatcherSecurityGroupIngress4:
+    Properties:
+      CidrIp:
+        Ref: SecureShellInboundCidrIpParameter
+      FromPort: 22
+      GroupId:
+        Ref: PublishDispatcherSecurityGroup
+      IpProtocol: tcp
+      ToPort: 22
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishSecurityGroup:
+    Properties:
+      GroupDescription: AEM Publish Security Group
+      Tags:
+      - Key: Name
+        Value: AEM Publish Security Group
+      - Key: StackPrefix
+        Value:
+          Ref: AOCStackPrefix
+      VpcId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+    Type: AWS::EC2::SecurityGroup
+  PublishSecurityGroupEgress0:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: PublishDispatcherSecurityGroup
+      FromPort: 80
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  PublishSecurityGroupEgress1:
+    Properties:
+      DestinationSecurityGroupId:
+        Ref: PublishDispatcherSecurityGroup
+      FromPort: 443
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  PublishSecurityGroupEgress2:
+    Properties:
+      CidrIp:
+        Ref: PrivateSubnetInternetOutboundCidrIpParameter
+      FromPort: 80
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      ToPort: 80
+    Type: AWS::EC2::SecurityGroupEgress
+  PublishSecurityGroupEgress3:
+    Properties:
+      CidrIp:
+        Ref: PrivateSubnetInternetOutboundCidrIpParameter
+      FromPort: 443
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      ToPort: 443
+    Type: AWS::EC2::SecurityGroupEgress
+  PublishSecurityGroupIngress0:
+    Properties:
+      FromPort: 4503
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: PublishDispatcherSecurityGroup
+      ToPort: 4503
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishSecurityGroupIngress1:
+    Properties:
+      FromPort: 5433
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: PublishDispatcherSecurityGroup
+      ToPort: 5433
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishSecurityGroupIngress2:
+    Properties:
+      FromPort: 4503
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      ToPort: 4503
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishSecurityGroupIngress3:
+    Properties:
+      FromPort: 5433
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: AuthorSecurityGroup
+      ToPort: 5433
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishSecurityGroupIngress4:
+    Properties:
+      CidrIp:
+        Ref: SecureShellInboundCidrIpParameter
+      FromPort: 22
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      ToPort: 22
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishSecurityGroupIngress5:
+    Properties:
+      FromPort: 4503
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: OrchestratorSecurityGroup
+      ToPort: 4503
+    Type: AWS::EC2::SecurityGroupIngress
+  PublishSecurityGroupIngress6:
+    Properties:
+      FromPort: 5433
+      GroupId:
+        Ref: PublishSecurityGroup
+      IpProtocol: tcp
+      SourceSecurityGroupId:
+        Ref: OrchestratorSecurityGroup
+      ToPort: 5433
+    Type: AWS::EC2::SecurityGroupIngress
+  AuthorDispatcherELBSecurityGroupSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/sg/authordispatcherelb
+      Description: Author Dispatcher ELB Security Group
+      Type: String
+      Value: !Ref AuthorDispatcherELBSecurityGroup
+  AuthorDispatcherSecurityGroupSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/sg/authordispatcher
+      Description: Author Dispatcher Security Group
+      Type: String
+      Value: !Ref AuthorDispatcherSecurityGroup
+  AuthorELBSecurityGroupSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/sg/authorelb
+      Description: Author ELB Security Group
+      Type: String
+      Value: !Ref AuthorELBSecurityGroup
+  AuthorSecurityGroupSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/sg/author
+      Description: Author Security Group
+      Type: String
+      Value: !Ref AuthorSecurityGroup
+  OrchestratorSecurityGroupSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/sg/orchestrator
+      Description: Orchestrator Security Group
+      Type: String
+      Value: !Ref OrchestratorSecurityGroup
+  PublishDispatcherELBSecurityGroupSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/sg/publishdispatcherelb
+      Description: Publish Dispatcher ELB Security Group
+      Type: String
+      Value: !Ref PublishDispatcherELBSecurityGroup
+  PublishDispatcherSecurityGroupSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/sg/publishdispatcher
+      Description: Publish Dispatcher Security Group
+      Type: String
+      Value: !Ref PublishDispatcherSecurityGroup
+  PublishSecurityGroupSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/sg/publish
+      Description: Publish Security Group
+      Type: String
+      Value: !Ref PublishSecurityGroup

@@ -1,0 +1,70 @@
+---
+project:
+  owner: opensource@shinesolutions.com
+  name: quickstart-aem-opencloud
+  regions:
+    - ap-northeast-1
+    - ap-northeast-2
+    - ap-south-1
+    - ap-southeast-1
+    - ap-southeast-2
+    - eu-central-1
+    - eu-north-1
+    - eu-west-1
+    - eu-west-2
+    - eu-west-3
+    - sa-east-1
+    - us-east-1
+    - us-west-1
+    - us-east-2
+    - us-west-2
+    - ca-central-1
+  lambda_source_path: functions/source
+  lambda_zip_path: functions/packages
+  package_lambda: false
+  parameters:
+    AvailabilityZones: "$[taskcat_getaz_2]"
+    RemoteAccessCIDR: 10.2.16.0/21
+    VPCCIDR: 10.2.16.0/21
+    PrivateSubnet1CIDR: 10.2.16.0/24
+    PrivateSubnet2CIDR: 10.2.18.0/24
+    PublicSubnet1CIDR: 10.2.20.0/24
+    PublicSubnet2CIDR: 10.2.22.0/24
+    AOCStackPrefix: "$[taskcat_random-string]"
+    EnableCloudfront: 'true'
+    ExternalCertificateARN: ''
+    ExternalFQDN: ''
+    ExternalRoute53ZoneID: ''
+    InternalCertificateARN: ''
+    InternalRoute53ZoneName: ''
+    InternalRoute53ZoneID: ''
+    JavaJDKVersion: '8u251'
+    KeyPairName: "$[taskcat_getkeypair]"
+    QSS3BucketName: "$[taskcat_autobucket]"
+    QSS3BucketRegion: "$[taskcat_current_region]"
+    QSS3KeyPrefix: quickstart-aem-opencloud/
+tests:
+  aem63-sp2-cfp2:
+    regions:
+      - us-east-1
+    template: templates/workload-main.template.yaml
+    parameters:
+      AemVersion: '63-SP2-CFP2'
+      S3DataBucketName: "$[taskcat_autobucket]"
+      S3InstallationSource:  "quickstart-aem-opencloud/library/"
+  aem64-sp8:
+    regions:
+      - us-east-1
+    template: templates/workload-main.template.yaml
+    parameters:
+      AemVersion: '64-SP8'
+      S3DataBucketName: "$[taskcat_autobucket]"
+      S3InstallationSource:  "quickstart-aem-opencloud/library/"
+  aem65-sp4:
+    regions:
+      - us-east-1
+    template: templates/workload-main.template.yaml
+    parameters:
+      AemVersion: '65-SP4'
+      S3DataBucketName: "$[taskcat_autobucket]"
+      S3InstallationSource:  "quickstart-aem-opencloud/library/"

@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Create internal Route53 Hosted Zone
+Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Tooling Stack"
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: AEM OpenCloud configuration
+        Parameters:
+          - AOCStackPrefix
+    ParameterLabels:
+      AOCStackPrefix:
+        default: AEM OpenCloud Stack Prefix
+Parameters:
+  AOCStackPrefix:
+    AllowedPattern: '[a-zA-Z0-9\-]*'
+    ConstraintDescription: Must start with alphabetical character and must follow the cloudformation stack naming convention
+    Default: 'aem-opencloud'
+    Description: Stack Prefix used to tag and identify the AEM OpenCloud Stack.
+    Type: String
+Resources:
+  InternalR53:
+    Type: AWS::Route53::HostedZone
+    Properties:
+      Name: !Sub "{{resolve:ssm:/${AOCStackPrefix}/r53/internal/defaultzonename:1}}"
+      VPCs:
+        - VPCId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+          VPCRegion: !Sub ${AWS::Region}
+  InternalR53ZoneIdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/r53/internal/defaultzoneid
+      Description: Created internal Route53 zone id
+      Type: String
+      Value: !Ref InternalR53
+
+Outputs:
+  oRoute53InternalHostedZoneID:
+    Description: R53 Internal Zone ID
+    Value: !Ref InternalR53
