@@ -1,13 +1,27 @@
 // If no preperation is required, remove all content from here
 
-==== Prepare your AWS account
+This Quick Start requires that you have access to https://experience.adobe.com/[Adobe Experience Cloud] to obtain the AEM
+resource files.
 
-_Describe any setup required in the AWS account prior to template launch_
-
-==== Prepare your {partner-company-name} account
-
-_Describe any setup required in the partner portal/account prior to template launch_
-
-==== Prepare for the deployment
-
-_Describe any preparation required to complete the product build, such as obtaining licenses or placing files in S3_
+. Contact your Adobe sales representative or Adobe partner for a full Adobe AEM On-Premise license.
+. Name the license file "license.properties" and prepare the content of the license file as follows:
+```
+license.product.name=Adobe Experience Manager
+license.customer.name=Customer Name
+license.product.version=6.5.0
+license.downloadID=AEM License Key
+```
+. Download the Linux x86_64 AEM Dispatcher module for Apache 2.4 with OpenSSL 1.0 Support as tar.gz file https://docs.adobe.com/content/help/en/experience-manager-dispatcher/using/getting-started/release-notes.html[AEM Dispatcher Release Notes]
+. Download the JDK 8 installation rpm e.g. jdk-8u251-linux-x64.rpm
+. Download the AEM Jar file and if necessary the required AEM service pack
+. Upload the AEM license, AEM Dispatcher module, JDK8 rpm installation, AEM Jar & AEM Service-Packs
+to the S3 bucket which will be use for the Quick Start deployment into a prefix of your choice.
+. (optional) Create a certificate for your internal URL in Amazon Certificate Manager (ACM)
+in the Region where you deploy the Quick Start. This certificate must be created as a
+wildcard certificate for your AEM OpenCloud internal domain (for example, *.example.internal).
+Alternatively a Self-Signed Certificate will be used.
+. (optional) Create a certificate for your external URL in Amazon Certificate Manager (ACM)
+in the Region where you deploy the Quick Start. This certificate must be created as a
+wildcard certificate for your AEM OpenCloud domain (for example, *.example.com).
+Alternatively an external Certificate will be created for you.
+y preparation required to complete the product build, such as obtaining licenses or placing files in S3_
