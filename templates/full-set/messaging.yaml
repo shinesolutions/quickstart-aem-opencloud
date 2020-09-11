@@ -1,0 +1,198 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Conditions:
+  UseEventNotificationEmailCondition:
+    Fn::Not:
+      - Fn::Or:
+        - Fn::Equals:
+          - Fn::Select:
+            - 0
+            - Ref: AWSNotificationParameters
+          - 'overwrite-me'
+        - Fn::Equals:
+          - Fn::Select:
+            - 0
+            - Ref: AWSNotificationParameters
+          - ''
+  UseEventNotificationHttpsCondition:
+    Fn::Not:
+    - Fn::Or:
+      - Fn::Equals:
+        - Fn::Select:
+          - 1
+          - Ref: AWSNotificationParameters
+        - 'overwrite-me'
+      - Fn::Equals:
+        - Fn::Select:
+          - 1
+          - Ref: AWSNotificationParameters
+        - ''
+Description: Create Messaging resources for the AEM Stack Auto Scaling Group Events
+Parameters:
+  AEMASGEventQueueNameParameter:
+    Description: The AEM Stack Auto Scaling Group Event Quene Name
+    Type: String
+  AEMASGEventTopicDisplayNameParameter:
+    Description: The AEM Stack Auto Scaling Group Event Topic Display Name
+    Type: String
+  AEMASGEventTopicNameParameter:
+    Description: The AEM Stack Auto Scaling Group Event Topic Name
+    Type: String
+  AWSNotificationParameters:
+    Description: "A list of AWS notification parameters.\nList must contain the following\
+      \ values in the following order:\n  - Notification email address, if the value\
+      \ is 'overwrite-me' then it's considered to be disabled\n  - Notification https\
+      \ URL, if the value is 'overwrite-me' then it's considered to be disabled\n"
+    Type: CommaDelimitedList
+  AOCStackPrefix:
+    Description: The AEM Stack Prerequisite Resources Stack Prefix
+    Type: String
+Resources:
+  AEMASGEventQueuePolicy:
+    Properties:
+      PolicyDocument:
+        Statement:
+        - Action:
+          - sqs:SendMessage
+          Condition:
+            ArnEquals:
+              aws:SourceArn:
+                Ref: AEMASGEventTopic
+          Effect: Allow
+          Principal:
+            AWS: '*'
+          Resource:
+          - Fn::GetAtt:
+            - AEMAutoScalingGroupEventQueue
+            - Arn
+        Version: '2012-10-17'
+      Queues:
+      - Ref: AEMAutoScalingGroupEventQueue
+    Type: AWS::SQS::QueuePolicy
+  AEMASGEventTopic:
+    Properties:
+      DisplayName:
+        Ref: AEMASGEventTopicDisplayNameParameter
+      Subscription:
+      - Endpoint:
+          Fn::GetAtt:
+          - AEMAutoScalingGroupEventQueue
+          - Arn
+        Protocol: sqs
+      TopicName:
+        Ref: AEMASGEventTopicNameParameter
+    Type: AWS::SNS::Topic
+  AEMAutoScalingGroupEventQueue:
+    Properties:
+      QueueName:
+        Ref: AEMASGEventQueueNameParameter
+      VisibilityTimeout: 60
+    Type: AWS::SQS::Queue
+  CriticalAEMASGEventQueueLengthHighAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+      - Ref: CriticalAlarmNotificationTopic
+      AlarmDescription: Alarm if queue length avg > 10 for 2 minutes
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: QueueName
+        Value:
+          Ref: AEMASGEventQueueNameParameter
+      EvaluationPeriods: 2
+      MetricName: ApproximateNumberOfMessagesVisible
+      Namespace: AWS/SQS
+      Period: 60
+      Statistic: Average
+      Threshold: 10
+      TreatMissingData: ignore
+    Type: AWS::CloudWatch::Alarm
+  CriticalAlarmNotificationTopic:
+    Properties:
+      DisplayName:
+        Fn::Sub:
+        - ${AOCStackPrefix}-Critical-Utilities-alarm-notification-topic
+        - AOCStackPrefix:
+            Ref: AOCStackPrefix
+      Subscription:
+      - Fn::If:
+        - UseEventNotificationEmailCondition
+        - Endpoint:
+            Fn::Select:
+            - 0
+            - Ref: AWSNotificationParameters
+          Protocol: email
+        - Ref: AWS::NoValue
+      - Fn::If:
+        - UseEventNotificationHttpsCondition
+        - Endpoint:
+            Fn::Select:
+            - 1
+            - Ref: AWSNotificationParameters
+          Protocol: https
+        - Ref: AWS::NoValue
+    Type: AWS::SNS::Topic
+  WarningAlarmNotificationTopic:
+    Properties:
+      DisplayName:
+        Fn::Sub:
+        - ${AOCStackPrefix}-Warning-Utilities-alarm-notification-topic
+        - AOCStackPrefix:
+            Ref: AOCStackPrefix
+      Subscription:
+      - Fn::If:
+        - UseEventNotificationEmailCondition
+        - Endpoint:
+            Fn::Select:
+            - 0
+            - Ref: AWSNotificationParameters
+          Protocol: email
+        - Ref: AWS::NoValue
+      - Fn::If:
+        - UseEventNotificationHttpsCondition
+        - Endpoint:
+            Fn::Select:
+            - 1
+            - Ref: AWSNotificationParameters
+          Protocol: https
+        - Ref: AWS::NoValue
+    Type: AWS::SNS::Topic
+  AEMASGEventQueueNameSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/messaging/aemasgeventqueuename
+      Description: AEM ASG Event Queue Name
+      Type: String
+      Value:
+        Fn::GetAtt: AEMAutoScalingGroupEventQueue.QueueName
+  AEMASGEventTopicSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/messaging/aemasgeventtopic
+      Description: AEM ASG Event Topic
+      Type: String
+      Value:
+        Ref: AEMASGEventTopic
+  AEMAutoScalingGroupEventQueueSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/messaging/aemautoscalinggroupeventqueue
+      Description: AEM ASG Event Queue
+      Type: String
+      Value:
+        Ref: AEMAutoScalingGroupEventQueue
+  CriticalAlarmNotificationTopicSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/messaging/criticalalarmnotificationtopic
+      Description: AEM Alarm Notification Topic
+      Type: String
+      Value:
+        Ref: CriticalAlarmNotificationTopic
+  WarningAlarmNotificationTopicSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/messaging/warningalarmnotificationtopic
+      Description: AEM Alarm Notification Topic
+      Type: String
+      Value:
+        Ref: WarningAlarmNotificationTopic

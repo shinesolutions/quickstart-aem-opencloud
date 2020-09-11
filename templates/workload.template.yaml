@@ -1,0 +1,797 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deploy AEM on AWS (Existing VPC).
+Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into an existing VPC"
+    OptionalParameters:
+      - LambdaZipsBucketName
+      - InternalRoute53ZoneName
+      - InternalRoute53ZoneID
+      - InternalCertificateARN
+      - ExternalFQDN
+      - ExternalRoute53ZoneID
+      - ExternalCertificateARN
+      - AuthorBackupSnapshotID
+      - PublishBackupSnapshotID
+      - AlarmNotificationEmail
+      - AlarmNotificationHttpsEndpoint
+      - EnableCloudfront
+      - CloudfrontPriceClass
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Network configuration
+        Parameters:
+          - AvailabilityZones
+          - VPCID
+          - VPCCIDR
+          - PrivateSubnet1ID
+          - PrivateSubnet2ID
+          - PublicSubnet1ID
+          - PublicSubnet2ID
+          - PrivateSubnet1RouteTableID
+          - PrivateSubnet2RouteTableID
+          - PublicSubnetRouteTableID
+      - Label:
+          default: Amazon EC2 Configuration
+        Parameters:
+          - KeyPairName
+          - BaseAmiImageName
+          - AuthorInstanceType
+          - PublishInstanceType
+          - AuthorDispatcherInstanceType
+          - PublishDispatcherInstanceType
+          - OrchestratorInstanceType
+      - Label:
+          default: AEM OpenCloud configuration
+        Parameters:
+          - S3DataBucketName
+          - S3InstallationSource
+          - AOCStackPrefix
+          - AemVersion
+          - AemDispatcherVersion
+          - JavaJDKVersion
+          - LambdaZipsBucketName
+      - Label:
+          default: (optional) AEM OpenCloud Certificate configuration
+        Parameters:
+          - InternalRoute53ZoneName
+          - InternalRoute53ZoneID
+          - InternalCertificateARN
+          - ExternalFQDN
+          - ExternalRoute53ZoneID
+          - ExternalCertificateARN
+      - Label:
+          default: (optional) Advanced AEM OpenCloud configuration
+        Parameters:
+          - AuthorBackupSnapshotID
+          - PublishBackupSnapshotID
+          - AlarmNotificationEmail
+          - AlarmNotificationHttpsEndpoint
+      - Label:
+          default: (optional) AWS Cloudfront configuration
+        Parameters:
+          - EnableCloudfront
+          - CloudfrontPriceClass
+      - Label:
+          default: AWS Quick Start configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3BucketRegion
+          - QSS3KeyPrefix
+    ParameterLabels:
+      AvailabilityZones:
+        default: Availability zones
+      VPCID:
+        default: VPC ID
+      VPCCIDR:
+        default: VPC CIDR
+      PrivateSubnet1ID:
+        default: Private Subnet 1 ID
+      PrivateSubnet2ID:
+        default: Private Subnet 2 ID
+      PublicSubnet1ID:
+        default: Public Subnet 1 ID
+      PublicSubnet2ID:
+        default: Public Subnet 2 ID
+      PrivateSubnet1RouteTableID:
+        default: Private Subnet 1 Route Table ID
+      PrivateSubnet2RouteTableID:
+        default: Private Subnet 2 Route Table ID
+      PublicSubnetRouteTableID:
+        default: Public Subnet Route Table ID
+      KeyPairName:
+        default: EC2 instance KeyPair name
+      BaseAmiImageName:
+        default: Base AMI SSM Name
+      AuthorInstanceType:
+        default: Author instance type
+      PublishInstanceType:
+        default: Publish instance type
+      AuthorDispatcherInstanceType:
+        default: Author-Dispatcher instance type
+      PublishDispatcherInstanceType:
+        default: Publish-Dispatcher instance type
+      OrchestratorInstanceType:
+        default: Orchestrator instance type
+      S3DataBucketName:
+        default: AEM OpenCloud S3 Data bucket
+      S3InstallationSource:
+        default: AEM OpenCloud S3 Artifacts Source Path
+      AOCStackPrefix:
+        default: AEM OpenCloud Stack Prefix
+      AemVersion:
+        default: AEM Version to install
+      AemDispatcherVersion:
+        default: AEM Dispatcher version to install
+      JavaJDKVersion:
+        default: Java JDK version to install
+      LambdaZipsBucketName:
+        default: Lambda S3 bucket name
+      InternalRoute53ZoneName:
+        default: Internal Route53 Zone name
+      InternalRoute53ZoneID:
+        default: Internal Route53 Zone ID
+      InternalCertificateARN:
+        default: Internal ACM Certificate ARN
+      ExternalFQDN:
+        default: External FQDN
+      ExternalRoute53ZoneID:
+        default: External Route53 Zone ID
+      ExternalCertificateARN:
+        default: External Certificate ARN
+      AuthorBackupSnapshotID:
+        default: Author Backup EC2 Snapshot ID
+      PublishBackupSnapshotID:
+        default: Publish Backup EC2 Snapshot ID
+      AlarmNotificationEmail:
+        default: Alarm notification E-Mail address
+      AlarmNotificationHttpsEndpoint:
+        default: Alarm notification HTTPS endpoint
+      EnableCloudfront:
+        default: Enable Cloudfront Stack
+      CloudfrontPriceClass:
+        default: CloudFront PriceClass
+      QSS3BucketName:
+        default: Quick Start S3 Bucket name
+      QSS3BucketRegion:
+        default: Quick Start S3 bucket region
+      QSS3KeyPrefix:
+        default: Quick Start S3 Key Prefix
+Parameters:
+  AvailabilityZones:
+    Description: List of Availability Zones to use for the subnets in the VPC. Only
+      two Availability Zones are used for this deployment, and the logical order of
+      your selections is preserved.
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+  VPCID:
+    Description: ID of the VPC which the subnets are located.
+    Type: AWS::EC2::VPC::Id
+  VPCCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[0-2][0-9]|[0-3][0-2]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/1-29
+    Description: CIDR block for the VPC
+    Type: String
+  PrivateSubnet1ID:
+    Description: Subnet ID for private subnet 1 located in Availability Zone 1
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet2ID:
+    Description: Subnet ID for private subnet 2 located in Availability Zone 2
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet1ID:
+    Description: Subnet ID for private subnet 1 located in Availability Zone 1
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet2ID:
+    Description: Subnet ID for private subnet 2 located in Availability Zone 2
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet1RouteTableID:
+    Description: Route Table ID of the Private Subnet 1
+    Type: String
+  PrivateSubnet2RouteTableID:
+    Description: Route Table ID of the Private Subnet 2
+    Type: String
+  PublicSubnetRouteTableID:
+    Description: Route Table ID of the Pulic Subnet
+    Type: String
+  KeyPairName:
+    Description: >-
+      Name of an existing Amazon EC2 public/private key pair to enable remote
+      access to instances.
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  BaseAmiImageName:
+    Description: >-
+      SSM Parameter Name of the Base Image ID. Supported OS are AL2 & RHEL7.
+      Default OS is AL2.
+    Default: /aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2
+    Type: AWS::SSM::Parameter::Name
+  AuthorInstanceType:
+    AllowedValues:
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - m5.16xlarge
+      - m5.24xlarge
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
+      - c5.12xlarge
+      - c5.18xlarge
+      - c5.24xlarge
+    Default: m5.2xlarge
+    Description: Amazon EC2 instance type for the AEM Author instance
+    Type: String
+  PublishInstanceType:
+    AllowedValues:
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.8xlarge
+      - m5.12xlarge
+      - m5.16xlarge
+      - m5.24xlarge
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - c5.large
+      - c5.xlarge
+      - c5.2xlarge
+      - c5.4xlarge
+      - c5.9xlarge
+      - c5.12xlarge
+      - c5.18xlarge
+      - c5.24xlarge
+    Default: m5.2xlarge
+    Description: Amazon EC2 instance type for the AEM Publish instance
+    Type: String
+  AuthorDispatcherInstanceType:
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+    Default: t3.small
+    Description: Amazon EC2 instance type for the AEM Author-Dispatcher instance
+    Type: String
+  PublishDispatcherInstanceType:
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+    Default: t3.small
+    Description: Amazon EC2 instance type for the AEM Publish-Dispatcher instance
+    Type: String
+  OrchestratorInstanceType:
+    AllowedValues:
+      - t2.micro
+      - t2.small
+      - t2.medium
+      - t2.large
+      - t2.xlarge
+      - t2.2xlarge
+      - t3.nano
+      - t3.micro
+      - t3.small
+      - t3.medium
+      - t3.large
+      - t3.xlarge
+      - t3.2xlarge
+    Default: t3.small
+    Description: Amazon EC2 instance type for the Orchestrator instance
+    Type: String
+  S3DataBucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Data bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Description: >-
+      S3 bucket where the AEM OpenCloud resources are located (installation files, license file, etc.).
+      This Bucket is also used to store the AEM Stack datas.
+    Type: String
+  S3InstallationSource:
+    Description: >-
+      S3 path within the S3 Data Bucket where the AEM OpenCloud installation resources are located (installation files, license file, etc.).
+    Type: String
+    Default: 'quickstart-aem-opencloud/library/'
+  AOCStackPrefix:
+    AllowedPattern: '[a-zA-Z0-9\-]*'
+    ConstraintDescription: Must start with alphabetical character and must follow the cloudformation stack naming convention
+    Default: 'aem-opencloud'
+    Description: Stack Prefix used to tag and IDentify the AEM OpenCloud Stack.
+    Type: String
+  AemVersion:
+    AllowedValues:
+      - "63"
+      - "63-SP1"
+      - "63-SP2"
+      - "63-SP2-CFP1"
+      - "63-SP2-CFP2"
+      - "64"
+      - "64-SP1"
+      - "64-SP2"
+      - "64-SP3"
+      - "64-SP4"
+      - "64-SP5"
+      - "64-SP6"
+      - "64-SP7"
+      - "64-SP8"
+      - "65"
+      - "65-SP1"
+      - "65-SP2"
+      - "65-SP3"
+      - "65-SP4"
+    Default: "65-SP4"
+    Description: AEM Version to install.
+    Type: String
+  AemDispatcherVersion:
+    Default: '4.3.3'
+    Description: AEM Dispatcher version to install.
+    Type: String
+  JavaJDKVersion:
+    AllowedValues:
+      - 8u171
+      - 8u181
+      - 8u191
+      - 8u201
+      - 8u211
+      - 8u221
+      - 8u231
+      - 8u241
+      - 8u251
+    Default: '8u251'
+    Description: Java JDK Version to install and run AEM.
+    Type: String
+  LambdaZipsBucketName:
+    Description: '(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.'
+    Type: String
+    Default: ''
+  InternalRoute53ZoneName:
+    Type: String
+    Default: ''
+    Description: (Optional) Internal Route53 Zone name. If Left blank, one is generated for you.
+      If you want to use your own Route 53 hosted zone, please provide the hosted zone name.
+  InternalRoute53ZoneID:
+    Type: String
+    Default: ''
+    Description: (Optional) Internal Route53 Zone ID of the provided internal Route53 Zone name.
+  InternalCertificateARN:
+    Default: ''
+    Description: >-
+      (Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager Private CA,
+      for the provided Internal Route53 Zone name.
+      If not provided, a self-signed certificate will be used for you.
+    Type: String
+  ExternalFQDN:
+    Description: (Optional) External FQDN for the AEM OpenCloud deployment (e.g., aoc.example.com).
+      If not provided, no external Route53 Record will be created.
+      If provided the External Route53 Zone ID becomes mandatory.
+    Type: String
+    Default: ''
+  ExternalRoute53ZoneID:
+    Description: (Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN.
+      Mandatory if an External FQDN was provided.
+    Default: ''
+    Type: String
+  ExternalCertificateARN:
+    Default: ''
+    Description: (Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM).
+      If not provided, but External FQDN & External Route53 Zone ID were provided, an external wildcard certificate will be created for you.
+    Type: String
+  AuthorBackupSnapshotID:
+    Default: ''
+    Description: (Optional) Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.
+    Type: String
+  PublishBackupSnapshotID:
+    Default: ''
+    Description: (Optional) Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.
+    Type: String
+  AlarmNotificationEmail:
+    Default: ''
+    Description: (Optional) Provode a valid Email address if you want to receive Stack alarm messages.
+    Type: String
+  AlarmNotificationHttpsEndpoint:
+    Default: ''
+    Description: (Optional) Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.
+    Type: String
+  EnableCloudfront:
+    AllowedValues:
+      - 'true'
+      - 'false'
+    Default: 'true'
+    Description: (Optional) Set to false to disable Cloudfront.
+    Type: String
+  CloudfrontPriceClass:
+    AllowedValues:
+      - PriceClass_100
+      - PriceClass_200
+      - PriceClass_All
+    Default: 'PriceClass_All'
+    Description: (Optional) Select the price class associated with the maximum price that you
+      want to pay for CloudFront service. If you select a price class other than All,
+      some of your users may experience higher latency.
+    Type: String
+    ConstraintDescription: Select a valid CloudFront Price Class.
+  QSS3BucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Default: 'aws-quickstart'
+    Description: S3 bucket name for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
+  QSS3BucketRegion:
+    Default: us-east-1
+    Description: The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.
+    Type: String
+  QSS3KeyPrefix:
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: >-
+      AWS Quick Start key prefix can include numbers, lowercase letters, uppercase
+      letters, hyphens (-), and forward slash (/). It cannot start or end with forward
+      slash (/) because they are automatically appended.
+    Default: quickstart-aem-opencloud/
+    Description: >-
+      S3 key prefix for the AWS Quick Start assets.AWS Quick Start key prefix can
+      include numbers, lowercase letters, uppercase letters, hyphens (-), and forward
+      slash (/). It cannot start or end with forward slash (/) because they are automatically
+      appended.
+    Type: String
+Conditions:
+  CloudFrontEnabled: !Equals [!Ref EnableCloudfront, 'true']
+  CreateExternalRoute53DNSRecordCondition: !And
+    - !Not
+      - !Equals
+        - !Ref 'ExternalFQDN'
+        - ''
+    - !Not
+      - !Equals
+        - !Ref 'ExternalRoute53ZoneID'
+        - ''
+  CreateExternalCertificateCondition: !And
+    - !Equals
+      - !Ref EnableCloudfront
+      - 'false'
+    - !Equals
+      - !Ref 'ExternalCertificateARN'
+      - ''
+    - !Not
+      - !Equals
+        - !Ref 'ExternalFQDN'
+        - ''
+    - !Not
+      - !Equals
+        - !Ref 'ExternalRoute53ZoneID'
+        - ''
+  CreateInternalRoute53DNSRecordsCondition: !Equals [ !Ref InternalRoute53ZoneName, '']
+  CreateLambdaZipsBucket: !Equals [!Ref 'LambdaZipsBucketName', '']
+  PublicELBCondition: !Or
+    - !Condition CreateExternalRoute53DNSRecordCondition
+    - !Condition CloudFrontEnabled
+  UseCloudFrontExternalFQDN: !And
+    - !Equals
+      - !Ref EnableCloudfront
+      - 'true'
+    - !Not
+      - !Equals
+        - !Ref 'ExternalCertificateARN'
+        - ''
+    - !Not
+      - !Equals
+        - !Ref 'ExternalFQDN'
+        - ''
+  UseInternalDefaultELBCertificateCondition: !Equals [!Ref InternalCertificateARN, '']
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
+Mappings:
+  AemVersionMap:
+    "63":
+      installationprofile: 'aem63'
+    "63-SP1":
+      installationprofile: 'aem63_sp1'
+    "63-SP2":
+      installationprofile: 'aem63_sp2'
+    "63-SP2-CFP1":
+      installationprofile: 'aem63_sp2_cfp1'
+    "63-SP2-CFP2":
+      installationprofile: 'aem63_sp2_cfp2'
+    "64":
+      installationprofile: 'aem64'
+    "64-SP1":
+      installationprofile: 'aem64_sp1'
+    "64-SP2":
+      installationprofile: 'aem64_sp2'
+    "64-SP3":
+      installationprofile: 'aem64_sp3'
+    "64-SP4":
+      installationprofile: 'aem64_sp4'
+    "64-SP5":
+      installationprofile: 'aem64_sp5'
+    "64-SP6":
+      installationprofile: 'aem64_sp6'
+    "64-SP7":
+      installationprofile: 'aem64_sp7'
+    "64-SP8":
+      installationprofile: 'aem64_sp8'
+    "65":
+      installationprofile: 'aem65'
+    "65-SP1":
+      installationprofile: 'aem65_sp1'
+    "65-SP2":
+      installationprofile: 'aem65_sp2'
+    "65-SP3":
+      installationprofile: 'aem65_sp3'
+    "65-SP4":
+      installationprofile: 'aem65_sp4'
+Resources:
+  LambdaZipsBucket:
+    Type: AWS::S3::Bucket
+    Condition: CreateLambdaZipsBucket
+  ParameterStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/parameters.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        ACMExternalCertificateARN: !Ref 'ExternalCertificateARN'
+        ACMInternalCertificateARN: !Ref 'InternalCertificateARN'
+        AOCS3DataBucketName: !Ref 'S3DataBucketName'
+        AOCS3InstallationSource: !Ref S3InstallationSource
+        AOCStackPrefix: !Ref 'AOCStackPrefix'
+        AOCAemDispatcherVersion: !Ref 'AemDispatcherVersion'
+        AOCAemVersion: !FindInMap [AemVersionMap, !Ref 'AemVersion', 'installationprofile']
+        AOCAlarmNotificationEmail: !Ref AlarmNotificationEmail
+        AOCAlarmNotificationHttpsEndpoint: !Ref AlarmNotificationHttpsEndpoint
+        AOCAuthorBackupSnapshotID: !Ref AuthorBackupSnapshotID
+        AOCPublishBackupSnapshotID: !Ref PublishBackupSnapshotID
+        AOCJavaJDKVersion: !Ref 'JavaJDKVersion'
+        CloudfrontPriceClass: !Ref CloudfrontPriceClass
+        EC2KeyPairName: !Ref KeyPairName
+        NetworkAvailabilityZones: !Join
+          - ','
+          - !Ref AvailabilityZones
+        NetworkPrivateSubnet1AID: !Ref PrivateSubnet1ID
+        NetworkPrivateSubnet2AID: !Ref PrivateSubnet2ID
+        NetworkPublicSubnet1ID: !Ref PublicSubnet1ID
+        NetworkPublicSubnet2ID: !Ref PublicSubnet2ID
+        NetworkRouteTablePublicSubnet: !Ref PublicSubnetRouteTableID
+        NetworkRouteTablePrivateSubnet1A: !Ref PrivateSubnet1RouteTableID
+        NetworkRouteTablePrivateSubnet2A: !Ref PrivateSubnet2RouteTableID
+        NetworkVPCCIDR: !Ref VPCCIDR
+        NetworkVPCID: !Ref VPCID
+        Route53ExternalFQDN: !Ref ExternalFQDN
+        Route53ExternalHostedZoneID: !Ref ExternalRoute53ZoneID
+        Route53InternalHostedZoneName: !If [CreateInternalRoute53DNSRecordsCondition, !Sub '${AWS::Region}.aemopencloud.cms', !Ref InternalRoute53ZoneName]
+        Route53InternalHostedZoneID: !Ref InternalRoute53ZoneID
+  InternalRoute53Stack:
+    DependsOn:
+      - ParameterStack
+    Condition: CreateInternalRoute53DNSRecordsCondition
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/route53-internal.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        AOCStackPrefix: !Ref 'AOCStackPrefix'
+  CertificateStack:
+    Condition: CreateExternalCertificateCondition
+    DependsOn:
+      - ParameterStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/acm.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        AOCStackPrefix: !Ref 'AOCStackPrefix'
+        LambdaZipsBucketName:
+          !If [
+            CreateLambdaZipsBucket,
+            !Ref LambdaZipsBucket,
+            !Ref LambdaZipsBucketName,
+          ]
+        QSS3BucketName: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+        QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
+  ToolingStack:
+    DependsOn:
+      - ParameterStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/tooling.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        AOCStackPrefix: !Ref 'AOCStackPrefix'
+        LambdaZipsBucketName:
+          !If [
+            CreateLambdaZipsBucket,
+            !Ref LambdaZipsBucket,
+            !Ref LambdaZipsBucketName,
+          ]
+        QSS3BucketName: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+        QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
+  AmiCreationStack:
+    DependsOn:
+      - ParameterStack
+      - ToolingStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/amis/create-amis.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        AOCStackPrefix: !Ref 'AOCStackPrefix'
+        BaseAmiImageName: !Ref 'BaseAmiImageName'
+        QSS3BucketName: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
+        QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
+  AemOpenCloudPrerequisiteStack:
+    DependsOn:
+      - ParameterStack
+      - ToolingStack
+      - AmiCreationStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/full-set/prerequisites.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        AOCStackPrefix: !Ref 'AOCStackPrefix'
+        QSS3BucketName: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
+        QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
+  AemOpenCloudMainStack:
+    DependsOn:
+      - ToolingStack
+      - AmiCreationStack
+      - AemOpenCloudPrerequisiteStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/full-set/main.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        AuthorDispatcherInstanceTypeParameter: !Ref 'AuthorDispatcherInstanceType'
+        AuthorInstanceTypeParameter: !Ref 'AuthorInstanceType'
+        DataBucketNameParameter: !Ref 'S3DataBucketName'
+        AOCStackPrefix: !Ref 'AOCStackPrefix'
+        OrchestratorInstanceTypeParameter: !Ref 'OrchestratorInstanceType'
+        PublishDispatcherLoadBalancerSchemeParameter: !If
+          - PublicELBCondition
+          - 'internet-facing'
+          - 'internal'
+        PublishDispatcherInstanceTypeParameter: !Ref 'PublishDispatcherInstanceType'
+        PublishInstanceTypeParameter: !Ref 'PublishInstanceType'
+        Route53InternalHostedZoneID: !If
+          - CreateInternalRoute53DNSRecordsCondition
+          - !GetAtt 'InternalRoute53Stack.Outputs.oRoute53InternalHostedZoneID'
+          - !GetAtt 'ParameterStack.Outputs.oRoute53InternalHostedZoneID'
+        UseInternalDefaultELBCertificate: !If
+          - UseInternalDefaultELBCertificateCondition
+          - 'true'
+          - 'false'
+        UseExternalELBCertificate: !If
+          - CloudFrontEnabled
+          - 'false'
+          - !If
+            - CreateExternalRoute53DNSRecordCondition
+            - 'true'
+            - 'false'
+        ExternalCertificateARN: !If
+          - CreateExternalCertificateCondition
+          - !GetAtt 'CertificateStack.Outputs.oACMExternalCertificateARN'
+          - !GetAtt 'ParameterStack.Outputs.oACMExternalCertificateARN'
+        QSS3BucketName: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+        QSS3BucketRegion: !Ref 'QSS3BucketRegion'
+        QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
+  CloudFrontStack:
+    DependsOn:
+      - ToolingStack
+      - AmiCreationStack
+      - AemOpenCloudPrerequisiteStack
+      - AemOpenCloudMainStack
+    Type: AWS::CloudFormation::Stack
+    Condition: CloudFrontEnabled
+    Properties:
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/cdn/main.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+      Parameters:
+        AliasParameter: !GetAtt 'ParameterStack.Outputs.oRoute53ExternalFQDN'
+        AOCStackPrefix: !Ref 'AOCStackPrefix'
+        ViewerCertificateAcmCertificateARNParameter: !GetAtt 'ParameterStack.Outputs.oACMExternalCertificateARN'
+  ExternalRoute53Record:
+    DependsOn:
+      - ToolingStack
+      - AmiCreationStack
+      - AemOpenCloudPrerequisiteStack
+    Type: AWS::Route53::RecordSet
+    Condition: CreateExternalRoute53DNSRecordCondition
+    Properties:
+      HostedZoneId: !Ref ExternalRoute53ZoneID
+      Name: !GetAtt 'ParameterStack.Outputs.oRoute53ExternalFQDN'
+      ResourceRecords:
+        - !If
+          - UseCloudFrontExternalFQDN
+          - !GetAtt 'CloudFrontStack.Outputs.CDNDistributionUrl'
+          - !GetAtt 'AemOpenCloudMainStack.Outputs.PublishDispatcherLoadBalancerDNSName'
+      TTL: 300
+      Type: CNAME
+Outputs:
+  AuthorDispatcherInternalDNSRecord:
+    Description: The Route53 record of the Author-Dispatcher ELB
+    Value: !GetAtt 'AemOpenCloudMainStack.Outputs.AuthorDispatcherDNSRecord'
+  PublishDispatcherInternalDNSRecord:
+    Description: The Route53 record of the Publish-Dispatcher ELB
+    Value: !GetAtt 'AemOpenCloudMainStack.Outputs.PublishDispatcherDNSRecord'
+  CloudfrontURL:
+    Description: Cloudfront Distribution URL
+    Value: !If
+        - CloudFrontEnabled
+        - !GetAtt 'CloudFrontStack.Outputs.CDNDistributionUrl'
+        - ''
+  ExternalDNSRecord:
+    Description: External URL
+    Value: !If
+        - CreateExternalRoute53DNSRecordCondition
+        - !Ref 'ExternalRoute53Record'
+        - ''

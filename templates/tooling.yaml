@@ -1,0 +1,627 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Tooling Stack to prepare AEM OpenCloud
+Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Tooling Stack"
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: AEM OpenCloud configuration
+        Parameters:
+          - AOCStackPrefix
+          - LambdaZipsBucketName
+      - Label:
+          default: AWS Quick Start Configuration
+        Parameters:
+          - QSS3BucketName
+          - QSS3KeyPrefix
+    ParameterLabels:
+      AOCStackPrefix:
+        default: AEM OpenCloud Stack Prefix
+      LambdaZipsBucketName:
+        default: Lambda Zips Bucket Name
+      QSS3BucketName:
+        default: Quick Start S3 Bucket Name
+      QSS3KeyPrefix:
+        default: Quick Start S3 Key Prefix
+Parameters:
+  AOCStackPrefix:
+    AllowedPattern: '[a-zA-Z0-9\-]*'
+    ConstraintDescription: Must start with alphabetical character and must follow the cloudformation stack naming convention
+    Default: 'aem-opencloud'
+    Description: Stack Prefix used to tag and identify the AEM OpenCloud Stack.
+    Type: String
+  LambdaZipsBucketName:
+    Description: Bucket Name where the lambda zip files should be placed
+    Type: String
+  QSS3BucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Default: 'aws-quickstart'
+    Description: S3 bucket name for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
+  QSS3KeyPrefix:
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: >-
+      AWS Quick Start key prefix can include numbers, lowercase letters, uppercase
+      letters, hyphens (-), and forward slash (/). It cannot start or end with forward
+      slash (/) because they are automatically appended.
+    Default: quickstart-aem-opencloud/
+    Description: >-
+      S3 key prefix for the AWS Quick Start assets.AWS Quick Start key prefix can
+      include numbers, lowercase letters, uppercase letters, hyphens (-), and forward
+      slash (/). It cannot start or end with forward slash (/) because they are automatically
+      appended.
+    Type: String
+Mappings:
+  RegionMap:
+    us-east-2:
+      timezone: 'America/New_York'
+    us-east-1:
+      timezone: 'America/New_York'
+    us-west-1:
+      timezone: 'America/Los_Angeles'
+    us-west-2:
+      timezone: 'America/Los_Angeles'
+    af-south-1:
+      timezone: 'Africa/Johannesburg'
+    ap-east-1:
+      timezone: 'Asia/Hong_Kong'
+    ap-south-1:
+      timezone: 'Asia/Kolkata'
+    ap-northeast-3:
+      timezone: 'Asia/Tokyo'
+    ap-northeast-2:
+      timezone: 'Asia/Seoul'
+    ap-southeast-1:
+      timezone: 'Asia/Singapore'
+    ap-southeast-2:
+      timezone: 'Australia/Sydney'
+    ap-northeast-1:
+      timezone: 'Asia/Tokyo'
+    ca-central-1:
+      timezone: 'America/Toronto'
+    eu-central-1:
+      timezone: 'Europe/Berlin'
+    eu-west-1:
+      timezone: 'Europe/Dublin'
+    eu-west-2:
+      timezone: 'Europe/London'
+    eu-south-1:
+      timezone: 'Europe/Rome'
+    eu-west-3:
+      timezone: 'Europe/Paris'
+    eu-north-1:
+      timezone: 'Europe/Stockholm'
+    me-south-1:
+      timezone: 'Asia/Bahrain'
+    sa-east-1:
+      timezone: 'America/Sao_Paulo'
+Resources:
+  LambdaFunctionExecuteRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: SyncLibrariesPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:*
+                Resource: !Join
+                  - ''
+                  - - 'arn:'
+                    - 'aws'
+                    - ':logs:'
+                    - !Ref 'AWS::Region'
+                    - ':'
+                    - !Ref 'AWS::AccountId'
+                    - :*
+              - Effect: Allow
+                Action:
+                  - s3:GetObject*
+                Resource:
+                  - !Sub "arn:aws:s3:::${QSS3BucketName}/${QSS3KeyPrefix}*"
+                  - !Join
+                      - ""
+                      - - "arn:aws:s3:::"
+                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                        - "/"
+                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3installationsource:1}}"
+                        - "*"
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource:
+                  - !Join
+                      - ""
+                      - - "arn:aws:s3:::"
+                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+        - PolicyName: Manage-Stack-S3-Objects
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:DeleteObject*
+                  - s3:GetObject*
+                  - s3:PutObject*
+                Resource:
+                  - !Join
+                      - ""
+                      - - "arn:aws:s3:::"
+                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                        - !Sub "/${AOCStackPrefix}"
+                  - !Join
+                      - ""
+                      - - "arn:aws:s3:::"
+                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                        - !Sub "/${AOCStackPrefix}/*"
+        - PolicyName: Import-Delete-ACM
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - acm:ImportCertificate
+                  - acm:DeleteCertificate
+                  - acm:AddTagsToCertificate
+                  - acm:RemoveTagsFromCertificate
+                Resource: '*'
+        - PolicyName: Get-Secret-Value
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:GetSecretValue
+                Resource: !Sub "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${AOCStackPrefix}-aem-keystore-password*"
+        - PolicyName: Create-Delete-Secret-Value
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - secretsmanager:CreateSecret
+                  - secretsmanager:DeleteSecret
+                Resource: !Sub "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:${AOCStackPrefix}-aemssl-private-key*"
+        - PolicyName: Certificate-SSM-Parameter
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:PutParameter
+                  - ssm:DeleteParameter
+                Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AOCStackPrefix}/cert/defaultinternal"
+        - PolicyName: AEM-License-SSM-Parameter
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:PutParameter
+                  - ssm:DeleteParameter
+                Resource: !Sub "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${AOCStackPrefix}/aem/license"
+  CopyZipsRoleArn:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: lambda-copier
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::${QSS3BucketName}/${QSS3KeyPrefix}*'
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:DeleteObject
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::${LambdaZipsBucketName}/${QSS3KeyPrefix}*'
+  CopyZipsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Copies objects from a source S3 bucket to a destination
+      Handler: index.handler
+      Runtime: python3.7
+      Role:
+        Fn::GetAtt: CopyZipsRoleArn.Arn
+      Timeout: 900
+      Code:
+        ZipFile: |
+          import cfnresponse
+          import logging
+          import boto3
+          logger = logging.getLogger(__name__)
+          logger.setLevel(logging.INFO)
+          def copy_objects(source_bucket, dest_bucket, prefix, objects):
+              s3 = boto3.client('s3')
+              for o in objects:
+                  key = prefix + o
+                  copy_source = {'Bucket': source_bucket, 'Key': key}
+                  logger.info(f'copy_source: {copy_source}\ndest_bucket: {dest_bucket}\nkey: {key}')
+                  s3.copy_object(CopySource=copy_source, Bucket=dest_bucket, Key=key)
+          def delete_objects(bucket, prefix, objects):
+              s3 = boto3.client('s3')
+              objects = {'Objects': [{'Key': prefix + o} for o in objects]}
+              s3.delete_objects(Bucket=bucket, Delete=objects)
+          def handler(event, context):
+              logger.debug(event)
+              status = cfnresponse.SUCCESS
+              try:
+                  if event['RequestType'] == 'Delete':
+                      delete_objects(event['ResourceProperties']['DestBucket'], event['ResourceProperties']['Prefix'],
+                                     event['ResourceProperties']['Objects'])
+                  else:
+                      copy_objects(event['ResourceProperties']['SourceBucket'], event['ResourceProperties']['DestBucket'],
+                                   event['ResourceProperties']['Prefix'], event['ResourceProperties']['Objects'])
+              except Exception:
+                  logger.error('Unhandled exception', exc_info=True)
+                  status = cfnresponse.FAILED
+              finally:
+                  cfnresponse.send(event, context, status, {}, None)
+  SyncLibrariesFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Sync libraries for AEM OpenCloud to the AEM OpenCloud Stack S3 data location
+      Handler: index.lambda_handler
+      Runtime: python3.7
+      MemorySize: 512
+      Timeout: 900
+      Role: !GetAtt 'LambdaFunctionExecuteRole.Arn'
+      Code:
+        ZipFile: |
+          import cfnresponse
+          import boto3
+          import urllib.request
+
+          def download_file(url, file):
+            print("Download URL: %s" % url)
+            response = urllib.request.urlopen(url)
+            data = response.read()
+            newFileByteArray = bytearray(data)
+            newFile = open(file, "wb")
+            newFile.write(newFileByteArray)
+          def upload_to_s3(s3_client, s3_bucket, s3_key, source_file):
+            s3_client.meta.client.upload_file(source_file, s3_bucket, s3_key)
+          def lambda_handler(event, context):
+            if event['RequestType'] == 'Delete':
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+              return
+            try:
+              aem_aws_stack_provisioner_version = event['ResourceProperties']['AemAwsStackProvisionerVersion']
+              aem_healthcheck_content_version = event['ResourceProperties']['AemHealthcheckContentVersion']
+              aem_orchestrator_version = event['ResourceProperties']['AemOrchestratorVersion']
+              aem_password_reset_version = event['ResourceProperties']['AemPasswordResetContentVersion']
+              aem_oak_run_version = event['ResourceProperties']['AemOakRunVersion']
+              packer_aem_version = event['ResourceProperties']['PackerAemVersion']
+              aem_aws_stack_provisioner_file_name = 'aem-aws-stack-provisioner-' + aem_aws_stack_provisioner_version + '.tar.gz'
+              packer_aem_file_name = 'packer-aem-' + packer_aem_version + '.tar.gz'
+              aem_healthcheck_content_file_name = 'aem-healthcheck-content-' + aem_healthcheck_content_version + '.zip'
+              aem_orchestrator_file_name = 'aem-orchestrator-' + aem_orchestrator_version + '.jar'
+              aem_oak_run_version_file_name = 'oak-run-' + aem_oak_run_version + '.jar'
+              aem_password_reset_file_name = 'aem-password-reset-content-' + aem_password_reset_version + '.zip'
+              file_list = [
+                aem_aws_stack_provisioner_file_name,
+                aem_orchestrator_file_name,
+                aem_healthcheck_content_file_name,
+                aem_password_reset_file_name,
+                packer_aem_file_name,
+                aem_oak_run_version_file_name
+              ]
+              maven_base_url = 'https://repo1.maven.org/maven2'
+              github_base_url = 'https://github.com/shinesolutions'
+              aem_aws_stack_privisioner_source_url = github_base_url + '/aem-aws-stack-provisioner/releases/download/' + aem_aws_stack_provisioner_version + '/' + aem_aws_stack_provisioner_file_name
+              packer_aem_source_url = github_base_url + '/packer-aem/releases/download/' + packer_aem_version + '/' + packer_aem_file_name
+              aem_healthcheck_content_source_url = maven_base_url + '/com/shinesolutions/aem-healthcheck-content/' + aem_healthcheck_content_version + '/' + aem_healthcheck_content_file_name
+              aem_orchestrator_source_url = maven_base_url + '/com/shinesolutions/aem-orchestrator/' + aem_orchestrator_version + '/' + aem_orchestrator_file_name
+              aem_oak_run_source_url = maven_base_url + '/org/apache/jackrabbit/oak-run/' + aem_oak_run_version + '/' + aem_oak_run_version_file_name
+              aem_password_reset_source_url = maven_base_url + '/com/shinesolutions/aem-password-reset-content/' + aem_password_reset_version + '/' + aem_password_reset_file_name
+              s3_client = boto3.resource('s3')
+              # Download
+              download_file(aem_aws_stack_privisioner_source_url, '/tmp/' + aem_aws_stack_provisioner_file_name)
+              download_file(packer_aem_source_url, '/tmp/' + packer_aem_file_name)
+              download_file(aem_healthcheck_content_source_url, '/tmp/' + aem_healthcheck_content_file_name)
+              download_file(aem_orchestrator_source_url, '/tmp/' + aem_orchestrator_file_name)
+              download_file(aem_oak_run_source_url, '/tmp/' + aem_oak_run_version_file_name)
+              download_file(aem_password_reset_source_url, '/tmp/' + aem_password_reset_file_name)
+              # Upload
+              for file in file_list:
+                upload_to_s3(s3_client, event['ResourceProperties']['S3DataBucket'],event['ResourceProperties']['AOCStackPrefix'] + '/' + file, '/tmp/' + file)
+              cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+            except Exception as err:
+              print(err)
+              cfnresponse.send(event, context, cfnresponse.FAILED, {})
+  SyncArtifactsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Sync Artifacts for AEM OpenCloud to the AEM OpenCloud Stack S3 data location
+      Handler: index.lambda_handler
+      Runtime: python3.7
+      Timeout: 300
+      Role: !GetAtt 'LambdaFunctionExecuteRole.Arn'
+      Code:
+        ZipFile: |
+          import cfnresponse
+          import logging
+          import boto3
+          logger = logging.getLogger(__name__)
+          logger.setLevel(logging.INFO)
+          def copy_objects(source_bucket, dest_bucket, source_prefix, dest_prefix, objects):
+              s3 = boto3.client('s3')
+              for o in objects:
+                  source_key = source_prefix + o
+                  dest_key = dest_prefix + o
+                  copy_source = {'Bucket': source_bucket, 'Key': source_key}
+                  logger.info(f'copy_source: {copy_source}\ndest_bucket: {dest_bucket}\nkey: {dest_key}')
+                  s3.copy_object(CopySource=copy_source, Bucket=dest_bucket, Key=dest_key)
+          def lambda_handler(event, context):
+              logger.debug(event)
+              status = cfnresponse.SUCCESS
+              try:
+                  if event['RequestType'] == 'Create':
+                      copy_objects(event['ResourceProperties']['SourceBucket'], event['ResourceProperties']['DestBucket'],
+                                   event['ResourceProperties']['SourcePrefix'], event['ResourceProperties']['DestPrefix'],
+                                   event['ResourceProperties']['Objects'])
+              except Exception:
+                  logger.error('Unhandled exception', exc_info=True)
+                  status = cfnresponse.FAILED
+              finally:
+                  cfnresponse.send(event, context, status, {}, None)
+  SyncGeneratedSystemUsersCredentialsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Generate AEM System Users Credentials and Sync to the AEM OpenCloud Stack S3 data location
+      Handler: index.lambda_handler
+      Runtime: python3.7
+      Timeout: 300
+      Role: !GetAtt 'LambdaFunctionExecuteRole.Arn'
+      Code:
+        ZipFile: |
+          import boto3
+          import cfnresponse
+          import json
+          import random
+          import string
+          import logging
+          logger = logging.getLogger(__name__)
+          logger.setLevel(logging.INFO)
+          def generate_password(length=100):
+                  return ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(length))
+
+          def lambda_handler(event, context):
+              logger.debug(event)
+              if event['RequestType'] == 'Delete':
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+              try:
+                  status = cfnresponse.SUCCESS
+                  s3 = boto3.resource('s3')
+                  system_users = ['orchestrator', 'replicator', 'deployer', 'exporter', 'importer', 'admin']
+                  credentials = {}
+                  for system_user in system_users:
+                      credentials[system_user] = generate_password(100)
+                  with open('/tmp/system-users-credentials.json', 'w', encoding='utf-8') as outfile:
+                      json.dump(credentials, outfile, ensure_ascii=False, indent=4)
+                  s3.meta.client.upload_file('/tmp/system-users-credentials.json', event['ResourceProperties']['S3DataBucket'], event['ResourceProperties']['AOCStackPrefix'] + '/system-users-credentials.json')
+              except Exception:
+                  logger.error('Unhandled exception', exc_info=True)
+                  status = cfnresponse.FAILED
+              finally:
+                  cfnresponse.send(event, context, status, {}, None)
+  GenerateAemSslCertificateFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Generate AEM SSL Certificate to encrypt internal AEM communication
+      Handler: lambda_function.handler
+      MemorySize: 128
+      Role: !GetAtt 'LambdaFunctionExecuteRole.Arn'
+      Runtime: python3.6
+      Timeout: 900
+      Code:
+        S3Bucket: !Ref LambdaZipsBucketName
+        S3Key: !Sub "${QSS3KeyPrefix}functions/packages/generateAemSslCertificate/lambda.zip"
+  SyncEditStackConfigFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Edit AEM OpenCloud Stack config and Sync to the AEM OpenCloud Stack S3 data location
+      Handler: lambda_function.handler
+      Runtime: python3.6
+      Timeout: 300
+      Role: !GetAtt 'LambdaFunctionExecuteRole.Arn'
+      Code:
+        S3Bucket: !Ref LambdaZipsBucketName
+        S3Key: !Sub "${QSS3KeyPrefix}functions/packages/syncEditStackConfig/lambda.zip"
+  SyncEditPackerConfigFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Edit AEM OpenCloud Packer configiratopm and Sync to the AEM OpenCloud Stack S3 data location
+      Handler: lambda_function.handler
+      Runtime: python3.6
+      Timeout: 300
+      Role: !GetAtt 'LambdaFunctionExecuteRole.Arn'
+      Code:
+        S3Bucket: !Ref LambdaZipsBucketName
+        S3Key: !Sub "${QSS3KeyPrefix}functions/packages/syncEditPackerConfig/lambda.zip"
+  SyncEditStackFactsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Edit AEM OpenCloud Stack fact asset and Sync to the AEM OpenCloud Stack S3 data location
+      Handler: lambda_function.handler
+      Runtime: python3.6
+      Timeout: 300
+      Role: !GetAtt 'LambdaFunctionExecuteRole.Arn'
+      Code:
+        S3Bucket: !Ref LambdaZipsBucketName
+        S3Key: !Sub "${QSS3KeyPrefix}functions/packages/syncEditStackFacts/lambda.zip"
+  CleanupSyncLibrariesFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Cleanup Synced libraries for AEM OpenCloud from the AEM OpenCloud Stack S3 data location
+      Handler: index.lambda_handler
+      Runtime: python3.7
+      Timeout: 300
+      Role: !GetAtt 'LambdaFunctionExecuteRole.Arn'
+      Code:
+        ZipFile: |
+          import cfnresponse
+          import boto3
+
+          def lambda_handler(event, context):
+              if event['RequestType'] == 'Delete':
+                  try:
+                      bucket = event['ResourceProperties']['S3DataBucket']
+                      key = event['ResourceProperties']['AOCStackPrefix']
+
+                      s3 = boto3.resource('s3')
+                      s3_bucket = s3.Bucket(bucket)
+
+                      objects_to_delete = []
+                      for obj in s3_bucket.objects.filter(Prefix=key + '/'):
+                          objects_to_delete.append({'Key': obj.key})
+
+                      s3_bucket.delete_objects(
+                          Delete={
+                              'Objects': objects_to_delete
+                          }
+                      )
+
+                      object = s3.Object(bucket, key)
+                      object.delete
+                      cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+                  except Exception as err:
+                      print(err)
+                      cfnresponse.send(event, context, cfnresponse.FAILED, {})
+              else:
+                  cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
+  CopyZips:
+    Type: Custom::CopyZips
+    Properties:
+      ServiceToken: !GetAtt 'CopyZipsFunction.Arn'
+      DestBucket: !Ref LambdaZipsBucketName
+      SourceBucket: !Ref 'QSS3BucketName'
+      Prefix: !Ref 'QSS3KeyPrefix'
+      Objects:
+      - functions/packages/ACMCert/lambda.zip
+      - functions/packages/generateAemSslCertificate/lambda.zip
+      - functions/packages/syncEditPackerConfig/lambda.zip
+      - functions/packages/syncEditStackConfig/lambda.zip
+      - functions/packages/syncEditStackFacts/lambda.zip
+  SyncLibraries:
+    Type: Custom::SyncLibraries
+    DeletionPolicy: Delete
+    Properties:
+      ServiceToken: !GetAtt 'SyncLibrariesFunction.Arn'
+      Version: 1
+      AemAwsStackProvisionerVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aemawsstackprovisioner:1}}"
+      AemOrchestratorVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aemorchestrator:1}}"
+      AemHealthcheckContentVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aemhealthcheckcontent:1}}"
+      AemPasswordResetContentVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aempasswordresetcontent:1}}"
+      AemOakRunVersion:  !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aemoakrun:1}}"
+      PackerAemVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/packeraem:1}}"
+      S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+      AOCStackPrefix: !Ref AOCStackPrefix
+  SyncArtifacts:
+    Type: Custom::Artifacts
+    DeletionPolicy: Delete
+    Properties:
+      ServiceToken: !GetAtt 'SyncArtifactsFunction.Arn'
+      Version: 1
+      SourceBucket: !Ref QSS3BucketName
+      SourcePrefix: !Sub "${QSS3KeyPrefix}scripts/"
+      DestBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+      DestPrefix: !Sub "${AOCStackPrefix}/"
+      Objects:
+      - stack-init.sh
+  SyncGeneratedSystemUsersCredentialsStackAsset:
+    Type: Custom::SyncGeneratedSystemUsersCredentialsStackAsset
+    DeletionPolicy: Delete
+    Properties:
+      ServiceToken: !GetAtt 'SyncGeneratedSystemUsersCredentialsFunction.Arn'
+      Version: 1
+      S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+      AOCStackPrefix: !Ref AOCStackPrefix
+  SyncEditStackConfigStackAssets:
+    Type: Custom::SyncEditStackConfigStackAssets
+    DeletionPolicy: Delete
+    Properties:
+      ServiceToken: !GetAtt 'SyncEditStackConfigFunction.Arn'
+      Version: 1
+      Region: !Ref AWS::Region
+      AemOakRunVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aemoakrun:1}}"
+      S3SourceBucket: !Ref QSS3BucketName
+      S3SourceKey: !Ref QSS3KeyPrefix
+      S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+      AOCStackPrefix: !Ref AOCStackPrefix
+  SyncEditStackFactsStackAssets:
+    Type: Custom::SyncEditStackFactsStackAssets
+    DeletionPolicy: Delete
+    Properties:
+      ServiceToken: !GetAtt 'SyncEditStackFactsFunction.Arn'
+      Version: 1
+      Region: !Ref AWS::Region
+      S3SourceBucket: !Ref QSS3BucketName
+      S3SourceKey: !Ref QSS3KeyPrefix
+      S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+      AOCStackPrefix: !Ref AOCStackPrefix
+  GenerateAemSslCertificate:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      ServiceToken: !GetAtt 'GenerateAemSslCertificateFunction.Arn'
+      Version: 1
+      CertificateSSMPath: !Sub "/${AOCStackPrefix}/cert/defaultinternal"
+      SSLCertFQDN: !Sub "{{resolve:ssm:/${AOCStackPrefix}/r53/internal/defaultzonename:1}}"
+      PrivateKeySecretsManagerName: !Sub "${AOCStackPrefix}-aemssl-private-key"
+  SyncEditPackerConfigFunctionStackAssets:
+    Type: Custom::SyncEditPackerConfigFunctionStackAssets
+    DeletionPolicy: Delete
+    Properties:
+      ServiceToken: !GetAtt 'SyncEditPackerConfigFunction.Arn'
+      Version: 1
+      AemDispatcherVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aemdispatcher:1}}"
+      AemInstallationProfile: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aem:1}}"
+      AemKeystorePasswordSmId: !Sub "${AOCStackPrefix}-aem-keystore-password"
+      AemLicenseSSMParameter: !Sub "/${AOCStackPrefix}/aem/license"
+      JavaJdkVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/javajdk:1}}"
+      SslCertificateAcmArn: !GetAtt GenerateAemSslCertificate.CertificateArn
+      SslPrivateKeySmArn: !GetAtt GenerateAemSslCertificate.PrivateKeyArn
+      Timezone: !FindInMap [RegionMap, !Ref 'AWS::Region', 'timezone']
+      Region: !Ref AWS::Region
+      S3SourceBucket: !Ref QSS3BucketName
+      S3SourceKey: !Ref QSS3KeyPrefix
+      S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+      S3InstallationSource: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3installationsource:1}}"
+      AOCStackPrefix: !Ref AOCStackPrefix
+  CleanupSyncLibraries:
+    Type: Custom::CleanupSyncLibraries
+    DeletionPolicy: Delete
+    Properties:
+      ServiceToken: !GetAtt 'CleanupSyncLibrariesFunction.Arn'
+      Version: 1
+      S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+      AOCStackPrefix: !Ref AOCStackPrefix

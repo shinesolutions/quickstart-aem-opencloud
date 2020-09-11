@@ -1,0 +1,654 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Conditions:
+  CreateSSLELBListenerCondition: !Not [!Equals [ !Ref SSLCertificateARNParameter , '']]
+  UseAuthorDispatcherDataVolSnapshotCondition:
+    Fn::Equals:
+    - Ref: UseAuthorDispatcherDataVolSnapshotParameter
+    - true
+Description: Create the Compute resources for the AEM Author Dispatcher
+Parameters:
+  AemAwsStackProvisionerVersionParameter:
+    Description: AEM AWS Stack Provisioner version number
+    Type: String
+  AuthorDispatcherASGAvailabilityZoneListParameter:
+    Description: The Author Dispatcher Availability Zone List
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+  AuthorDispatcherDataVolSizeParameter:
+    Description: Author Dispatcher Instances Data EBS Volume Size
+    Type: Number
+  AuthorDispatcherImageParameter:
+    Description: The Author Dispatcher Image Id
+    Type: AWS::EC2::Image::Id
+  AuthorDispatcherImageRootDevice:
+    Default: /dev/sda1
+    Description: The root device name for the Author Dispatcher Image Id
+    Type: String
+  AuthorDispatcherImageDataDevice:
+    Default: /dev/sdb
+    Description: The data device name for the Author Dispatcher Image Id
+    Type: String
+  AuthorDispatcherInstanceTypeParameter:
+    Description: The Author Dispatcher Instance Type
+    Type: String
+  AuthorDispatcherRootVolSizeParameter:
+    Description: Author Dispatcher Instances Root EBS Volume Size
+    Type: Number
+  DataBucketNameParameter:
+    Description: Bucket name that stores Stack data files
+    Type: String
+  AOCStackPrefix:
+    Description: The AEM Stack Compute Resources Stack Prefix
+    Type: String
+  SSLCertificateARNParameter:
+    Description: SSL Certificate ARN
+    Default: ''
+    Type: String
+  UseAuthorDispatcherDataVolSnapshotParameter:
+    AllowedValues:
+    - true
+    - false
+    Description: Wheather to use the Author Dispatcher Snapshot Data Volume.
+    Type: String
+  AuthorDispatcherDataVolSnapshotParameter:
+    Description: The Author Dispatcher Data Volume Snapshot Id
+    Type: String
+Resources:
+  AuthorDispatcherAutoScalingGroup:
+    Properties:
+      AvailabilityZones:
+        Ref: AuthorDispatcherASGAvailabilityZoneListParameter
+      Cooldown: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/authordispatcher/asg/cooldown:1}}"
+      DesiredCapacity: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/authordispatcher/asg/desiredcapacity:1}}"
+      HealthCheckGracePeriod: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/authordispatcher/asg/healthcheckgraceperiod:1}}"
+      HealthCheckType: ELB
+      LaunchConfigurationName:
+        Ref: AuthorDispatcherLaunchConfiguration
+      LoadBalancerNames:
+      - Ref: AuthorDispatcherLoadBalancer
+      MaxSize: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/authordispatcher/asg/maxsize:1}}"
+      MetricsCollection:
+      - Granularity: 1Minute
+        Metrics:
+        - GroupMinSize
+        - GroupMaxSize
+        - GroupDesiredCapacity
+        - GroupInServiceInstances
+        - GroupPendingInstances
+        - GroupStandbyInstances
+        - GroupTerminatingInstances
+        - GroupTotalInstances
+      MinSize: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/authordispatcher/asg/minsize:1}}"
+      NotificationConfigurations:
+      - NotificationTypes:
+        - autoscaling:EC2_INSTANCE_LAUNCH
+        - autoscaling:EC2_INSTANCE_LAUNCH_ERROR
+        - autoscaling:EC2_INSTANCE_TERMINATE
+        - autoscaling:EC2_INSTANCE_TERMINATE_ERROR
+        TopicARN: !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/aemasgeventtopic:1}}"
+      Tags:
+      - Key: Name
+        PropagateAtLaunch: true
+        Value: AEM Author Dispatcher
+      - Key: StackPrefix
+        PropagateAtLaunch: true
+        Value:
+          Ref: AOCStackPrefix
+      - Key: Component
+        PropagateAtLaunch: true
+        Value: author-dispatcher
+      VPCZoneIdentifier:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privatesubnet1aid:1}}"
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privatesubnet2aid:1}}"
+    Type: AWS::AutoScaling::AutoScalingGroup
+  AuthorDispatcherLaunchConfiguration:
+    Properties:
+      AssociatePublicIpAddress: false
+      BlockDeviceMappings:
+      - DeviceName:
+          Ref: AuthorDispatcherImageRootDevice
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          VolumeSize:
+            Ref: AuthorDispatcherRootVolSizeParameter
+          VolumeType: gp2
+      - DeviceName:
+          Ref: AuthorDispatcherImageDataDevice
+        Ebs:
+          DeleteOnTermination: true
+          Encrypted: true
+          SnapshotId:
+            Fn::If:
+            - UseAuthorDispatcherDataVolSnapshotCondition
+            - Ref: AuthorDispatcherDataVolSnapshotParameter
+            - Ref: AWS::NoValue
+          VolumeSize:
+            Ref: AuthorDispatcherDataVolSizeParameter
+          VolumeType: gp2
+      IamInstanceProfile: !Sub "{{resolve:ssm:/${AOCStackPrefix}/iam/authordispatcherinstanceprofile:1}}"
+      ImageId:
+        Ref: AuthorDispatcherImageParameter
+      InstanceMonitoring: false
+      InstanceType:
+        Ref: AuthorDispatcherInstanceTypeParameter
+      KeyName: !Sub "{{resolve:ssm:/${AOCStackPrefix}/ec2/keypairname:1}}"
+      SecurityGroups:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/sg/authordispatcher:1}}"
+      UserData:
+        Fn::Base64:
+          Fn::Sub: "#!/bin/bash -x\n source /etc/profile\n mkdir -p /opt/shinesolutions/aem-aws-stack-builder/\n\
+            \ aws s3 cp s3://${DataBucketNameParameter}/${AOCStackPrefix}/stack-init.sh\
+            \ /opt/shinesolutions/aem-aws-stack-builder/stack-init.sh\n chmod 755\
+            \ /opt/shinesolutions/aem-aws-stack-builder/stack-init.sh\n /opt/shinesolutions/aem-aws-stack-builder/stack-init.sh\
+            \ ${DataBucketNameParameter} ${AOCStackPrefix} author-dispatcher\
+            \ ${AemAwsStackProvisionerVersionParameter}\n"
+    Type: AWS::AutoScaling::LaunchConfiguration
+  AuthorDispatcherLoadBalancer:
+    Properties:
+      ConnectionDrainingPolicy:
+        Enabled: true
+        Timeout: 300
+      CrossZone: true
+      HealthCheck:
+        HealthyThreshold: '2'
+        Interval: '30'
+        Target: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/authordispatcher/elb/healthurl:1}}"
+        Timeout: '5'
+        UnhealthyThreshold: '2'
+      Policies:
+      - PolicyName: AOCELBSecurityPolicy-TLS-1-2-2017-01
+        PolicyType: SSLNegotiationPolicyType
+        Attributes:
+        - Name: Protocol-SSLv3
+          Value: "false"
+        - Name: Protocol-TLSv1
+          Value: "false"
+        - Name: Protocol-TLSv1.1
+          Value: "false"
+        - Name: Protocol-TLSv1.2
+          Value: "true"
+        - Name: Server-Defined-Cipher-Order
+          Value: "true"
+        - Name: ECDHE-ECDSA-AES128-GCM-SHA256
+          Value: "true"
+        - Name: ECDHE-RSA-AES128-GCM-SHA256
+          Value: "true"
+        - Name: ECDHE-ECDSA-AES128-SHA256
+          Value: "true"
+        - Name: ECDHE-RSA-AES128-SHA256
+          Value: "true"
+        - Name: ECDHE-ECDSA-AES128-SHA
+          Value: "false"
+        - Name: ECDHE-RSA-AES128-SHA
+          Value: "false"
+        - Name: DHE-RSA-AES128-SHA
+          Value: "false"
+        - Name: ECDHE-ECDSA-AES256-GCM-SHA384
+          Value: "true"
+        - Name: ECDHE-RSA-AES256-GCM-SHA384
+          Value: "true"
+        - Name: ECDHE-ECDSA-AES256-SHA384
+          Value: "true"
+        - Name: ECDHE-RSA-AES256-SHA384
+          Value: "true"
+        - Name: ECDHE-RSA-AES256-SHA
+          Value: "false"
+        - Name: ECDHE-ECDSA-AES256-SHA
+          Value: "false"
+        - Name: AES128-GCM-SHA256
+          Value: "true"
+        - Name: AES128-SHA256
+          Value: "true"
+        - Name: AES128-SHA
+          Value: "false"
+        - Name: AES256-GCM-SHA384
+          Value: "true"
+        - Name: AES256-SHA256
+          Value: "true"
+        - Name: AES256-SHA
+          Value: "false"
+        - Name: DHE-DSS-AES128-SHA
+          Value: "false"
+        - Name: CAMELLIA128-SHA
+          Value: "false"
+        - Name: EDH-RSA-DES-CBC3-SHA
+          Value: "false"
+        - Name: DES-CBC3-SHA
+          Value: "false"
+        - Name: ECDHE-RSA-RC4-SHA
+          Value: "false"
+        - Name: RC4-SHA
+          Value: "false"
+        - Name: ECDHE-ECDSA-RC4-SHA
+          Value: "false"
+        - Name: DHE-DSS-AES256-GCM-SHA384
+          Value: "false"
+        - Name: DHE-RSA-AES256-GCM-SHA384
+          Value: "false"
+        - Name: DHE-RSA-AES256-SHA256
+          Value: "false"
+        - Name: DHE-DSS-AES256-SHA256
+          Value: "false"
+        - Name: DHE-RSA-AES256-SHA
+          Value: "false"
+        - Name: DHE-DSS-AES256-SHA
+          Value: "false"
+        - Name: DHE-RSA-CAMELLIA256-SHA
+          Value: "false"
+        - Name: DHE-DSS-CAMELLIA256-SHA
+          Value: "false"
+        - Name: CAMELLIA256-SHA
+          Value: "false"
+        - Name: EDH-DSS-DES-CBC3-SHA
+          Value: "false"
+        - Name: DHE-DSS-AES128-GCM-SHA256
+          Value: "false"
+        - Name: DHE-RSA-AES128-GCM-SHA256
+          Value: "false"
+        - Name: DHE-RSA-AES128-SHA256
+          Value: "false"
+        - Name: DHE-DSS-AES128-SHA256
+          Value: "false"
+        - Name: DHE-RSA-CAMELLIA128-SHA
+          Value: "false"
+        - Name: DHE-DSS-CAMELLIA128-SHA
+          Value: "false"
+        - Name: ADH-AES128-GCM-SHA256
+          Value: "false"
+        - Name: ADH-AES128-SHA
+          Value: "false"
+        - Name: ADH-AES128-SHA256
+          Value: "false"
+        - Name: ADH-AES256-GCM-SHA384
+          Value: "false"
+        - Name: ADH-AES256-SHA
+          Value: "false"
+        - Name: ADH-AES256-SHA256
+          Value: "false"
+        - Name: ADH-CAMELLIA128-SHA
+          Value: "false"
+        - Name: ADH-CAMELLIA256-SHA
+          Value: "false"
+        - Name: ADH-DES-CBC3-SHA
+          Value: "false"
+        - Name: ADH-DES-CBC-SHA
+          Value: "false"
+        - Name: ADH-RC4-MD5
+          Value: "false"
+        - Name: ADH-SEED-SHA
+          Value: "false"
+        - Name: DES-CBC-SHA
+          Value: "false"
+        - Name: DHE-DSS-SEED-SHA
+          Value: "false"
+        - Name: DHE-RSA-SEED-SHA
+          Value: "false"
+        - Name: EDH-DSS-DES-CBC-SHA
+          Value: "false"
+        - Name: EDH-RSA-DES-CBC-SHA
+          Value: "false"
+        - Name: IDEA-CBC-SHA
+          Value: "false"
+        - Name: RC4-MD5
+          Value: "false"
+        - Name: SEED-SHA
+          Value: "false"
+        - Name: DES-CBC3-MD5
+          Value: "false"
+        - Name: DES-CBC-MD5
+          Value: "false"
+        - Name: RC2-CBC-MD5
+          Value: "false"
+        - Name: PSK-AES256-CBC-SHA
+          Value: "false"
+        - Name: PSK-3DES-EDE-CBC-SHA
+          Value: "false"
+        - Name: KRB5-DES-CBC3-SHA
+          Value: "false"
+        - Name: KRB5-DES-CBC3-MD5
+          Value: "false"
+        - Name: PSK-AES128-CBC-SHA
+          Value: "false"
+        - Name: PSK-RC4-SHA
+          Value: "false"
+        - Name: KRB5-RC4-SHA
+          Value: "false"
+        - Name: KRB5-RC4-MD5
+          Value: "false"
+        - Name: KRB5-DES-CBC-SHA
+          Value: "false"
+        - Name: KRB5-DES-CBC-MD5
+          Value: "false"
+        - Name: EXP-EDH-RSA-DES-CBC-SHA
+          Value: "false"
+        - Name: EXP-EDH-DSS-DES-CBC-SHA
+          Value: "false"
+        - Name: EXP-ADH-DES-CBC-SHA
+          Value: "false"
+        - Name: EXP-DES-CBC-SHA
+          Value: "false"
+        - Name: EXP-RC2-CBC-MD5
+          Value: "false"
+        - Name: EXP-KRB5-RC2-CBC-SHA
+          Value: "false"
+        - Name: EXP-KRB5-DES-CBC-SHA
+          Value: "false"
+        - Name: EXP-KRB5-RC2-CBC-MD5
+          Value: "false"
+        - Name: EXP-KRB5-DES-CBC-MD5
+          Value: "false"
+        - Name: EXP-ADH-RC4-MD5
+          Value: "false"
+        - Name: EXP-RC4-MD5
+          Value: "false"
+        - Name: EXP-KRB5-RC4-SHA
+          Value: "false"
+        - Name: EXP-KRB5-RC4-MD5
+          Value: "false"
+      Listeners:
+      - InstancePort: '80'
+        LoadBalancerPort: '80'
+        Protocol: HTTP
+      - !If
+          - CreateSSLELBListenerCondition
+          - InstancePort: '443'
+            InstanceProtocol: HTTPS
+            LoadBalancerPort: '443'
+            Protocol: HTTPS
+            SSLCertificateId: !Ref SSLCertificateARNParameter
+            PolicyNames:
+              - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/elbcipher:1}}"
+          - !Ref AWS::NoValue
+      Scheme: internal
+      SecurityGroups:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/sg/authordispatcherelb:1}}"
+      Subnets:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privatesubnet1aid:1}}"
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privatesubnet2aid:1}}"
+      Tags:
+      - Key: Name
+        Value: AEM Author Dispatcher Load Balancer
+      - Key: StackPrefix
+        Value:
+          Ref: AOCStackPrefix
+    Type: AWS::ElasticLoadBalancing::LoadBalancer
+  WarningAuthorDispatcherAtLeastOneUnHealthyAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      AlarmDescription: At least one Author Dispatcher is Unhealthy
+      AlarmName:
+        Fn::Sub: ${AOCStackPrefix}-Warning-AuthorDispatcher-AtLeastOneUnHealthyAlarm
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      Dimensions:
+      - Name: LoadBalancerName
+        Value:
+          Ref: AuthorDispatcherLoadBalancer
+      EvaluationPeriods: 10
+      MetricName: UnHealthyHostCount
+      Namespace: AWS/ELB
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      Period: 60
+      Statistic: Average
+      Threshold: 1
+    Type: AWS::CloudWatch::Alarm
+  CriticalAuthorDispatcherMoreThanOneUnHealthyAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      AlarmDescription: More than one Author Dispatcher is Unhealthy
+      AlarmName:
+        Fn::Sub: ${AOCStackPrefix}-Critical-AuthorDispatcher-MoreThanOneUnHealthyAlarm
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+      - Name: LoadBalancerName
+        Value:
+          Ref: AuthorDispatcherLoadBalancer
+      EvaluationPeriods: 1
+      MetricName: UnHealthyHostCount
+      Namespace: AWS/ELB
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      Period: 60
+      Statistic: Average
+      Threshold: 1
+    Type: AWS::CloudWatch::Alarm
+  WarningAuthorDispatcherMemoryHighAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      AlarmDescription: Memory Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Warning-AuthorDispatcher-MemoryHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: AuthorDispatcherAutoScalingGroup
+      EvaluationPeriods: 1
+      MetricName: MemoryUtilization
+      Namespace: "System/Linux"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Average
+      Threshold: 80
+    Type: AWS::CloudWatch::Alarm
+  CriticalAuthorDispatcherMemoryHighAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      AlarmDescription: Memory Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Critical-AuthorDispatcher-MemoryHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: AuthorDispatcherAutoScalingGroup
+      EvaluationPeriods: 1
+      MetricName: MemoryUtilization
+      Namespace: "System/Linux"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Average
+      Threshold: 90
+    Type: AWS::CloudWatch::Alarm
+  WarningAuthorDispatcherRootDiskSpaceUtilizationAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      AlarmDescription: Disk Space Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Warning-AuthorDispatcher-RootDiskSpaceHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: AuthorDispatcherAutoScalingGroup
+        - Name: MountPath
+          Value: "/"
+        - Name: Filesystem
+          Value: "/"
+      EvaluationPeriods: 1
+      MetricName: DiskSpaceUtilization
+      Namespace: "System/Linux"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Average
+      Threshold: 80
+    Type: AWS::CloudWatch::Alarm
+  CriticalAuthorDispatcherRootDiskSpaceUtilizationAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      AlarmDescription: Disk Space Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Critical-AuthorDispatcher-RootDiskSpaceHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: AuthorDispatcherAutoScalingGroup
+        - Name: MountPath
+          Value: "/"
+        - Name: Filesystem
+          Value: "/"
+      EvaluationPeriods: 1
+      MetricName: DiskSpaceUtilization
+      Namespace: "System/Linux"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Average
+      Threshold: 90
+    Type: AWS::CloudWatch::Alarm
+  WarningAuthorDispatcherDataDiskSpaceUtilizationAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      AlarmDescription: Disk Space Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Warning-AuthorDispatcher-DataDiskSpaceHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: AuthorDispatcherAutoScalingGroup
+        - Name: MountPath
+          Value: "/mnt/ebs1"
+        - Name: Filesystem
+          Value: "/mnt/ebs1"
+      EvaluationPeriods: 1
+      MetricName: DiskSpaceUtilization
+      Namespace: "System/Linux"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Average
+      Threshold: 80
+    Type: AWS::CloudWatch::Alarm
+  CriticalAuthorDispatcherDataDiskSpaceUtilizationAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      AlarmDescription: Disk Space Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Critical-AuthorDispatcher-DataDiskSpaceHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: AuthorDispatcherAutoScalingGroup
+        - Name: MountPath
+          Value: "/mnt/ebs1"
+        - Name: Filesystem
+          Value: "/mnt/ebs1"
+      EvaluationPeriods: 1
+      MetricName: DiskSpaceUtilization
+      Namespace: "System/Linux"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Average
+      Threshold: 90
+    Type: AWS::CloudWatch::Alarm
+  WarningAuthorDispatcherCPUUtilizationAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      AlarmDescription: CPU Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Warning-AuthorDispatcher-CPUHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: AuthorDispatcherAutoScalingGroup
+      EvaluationPeriods: 1
+      MetricName: CPUUtilization
+      Namespace: "AWS/EC2"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Maximum
+      Threshold: 60
+    Type: AWS::CloudWatch::Alarm
+  CriticalAuthorDispatcherCPUUtilizationAlarm:
+    Properties:
+      ActionsEnabled: true
+      AlarmActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      AlarmDescription: CPU Utilization is high
+      AlarmName:
+        Fn::Sub:
+          - "${AOCStackPrefix}-Critical-AuthorDispatcher-CPUHighAlarm"
+          - AOCStackPrefix:
+              Ref: 'AOCStackPrefix'
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: "AutoScalingGroupName"
+          Value:
+            Ref: AuthorDispatcherAutoScalingGroup
+      EvaluationPeriods: 1
+      MetricName: CPUUtilization
+      Namespace: "AWS/EC2"
+      OKActions:
+        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
+      Period: 300
+      Statistic: Maximum
+      Threshold: 90
+    Type: AWS::CloudWatch::Alarm
+  AuthorDispatcherLoadBalancerDNSName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/authordispatcher/elbdns
+      Description: Author Dispatcher Load Balancer DNS Name
+      Type: String
+      Value:
+        Fn::GetAtt:
+          - AuthorDispatcherLoadBalancer
+          - DNSName
+Outputs:
+  AuthorDispatcherLoadBalancerDNSName:
+    Description: The Author Dispatcher Load Balancer
+    Export:
+      Name:
+        Fn::Sub: ${AOCStackPrefix}-AuthorDispatcherLoadBalancerDNSName
+    Value:
+      Fn::GetAtt:
+      - AuthorDispatcherLoadBalancer
+      - DNSName

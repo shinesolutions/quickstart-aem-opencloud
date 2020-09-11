@@ -3,12 +3,18 @@
 |Resource |This deployment uses
 
 // Space needed to maintain table headers
-|VPCs |<n>
-|Elastic IP addresses |<n>
-|AWS Identity and Access Management (IAM) security groups |<n>
-|IAM roles |<n>
-|Auto Scaling groups |<n>
-|Application Load Balancers |<n>
-|Network Load Balancers |<n>
-|<type> instances |<n>
+|VPCs |1
+|Elastic IP addresses |1
+|IAM roles |13
+|ACM Certificates |1
+|Cloudfront Distributions |1
+|Classic Load Balancers |3
+|Cloudfront Distributions |1
+|Lambda Functions |13
+|m5.2xlarge instances |4
+|t3.small instances |5
+|t2.micro instances |1
+|Route53 Hosted Zones |1
+|Route53 Records |3
+|Systems Manager parameters |127
 |===

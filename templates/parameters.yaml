@@ -1,0 +1,942 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Prameter Stack to configure AEM OpenCloud
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Network configuration
+        Parameters:
+          - NetworkAvailabilityZones
+          - NetworkVPCID
+          - NetworkVPCCIDR
+          - NetworkPrivateSubnet1AID
+          - NetworkPrivateSubnet2AID
+          - NetworkPublicSubnet1ID
+          - NetworkPublicSubnet2ID
+          - NetworkRouteTablePrivateSubnet1A
+          - NetworkRouteTablePrivateSubnet2A
+          - NetworkRouteTablePublicSubnet
+      - Label:
+          default: Amazon EC2 configuration
+        Parameters:
+          - EC2KeyPairName
+      - Label:
+          default: AEM OpenCloud configuration
+        Parameters:
+          - AOCS3DataBucketName
+          - AOCS3InstallationSource
+          - AOCStackPrefix
+          - AOCAemVersion
+          - AOCAemDispatcherVersion
+          - AOCJavaJDKVersion
+      - Label:
+          default: AEM OpenCloud Certificate configuration
+        Parameters:
+          - Route53InternalHostedZoneName
+          - Route53InternalHostedZoneID
+          - ACMInternalCertificateARN
+          - Route53ExternalFQDN
+          - Route53ExternalHostedZoneID
+          - ACMExternalCertificateARN
+      - Label:
+          default: Advanced AEM OpenCloud configuration
+        Parameters:
+          - AOCAuthorBackupSnapshotID
+          - AOCPublishBackupSnapshotID
+          - AOCAlarmNotificationEmail
+          - AOCAlarmNotificationHttpsEndpoint
+      - Label:
+          default: AWS Cloudfront configuration
+        Parameters:
+          - CloudfrontPriceClass
+    ParameterLabels:
+      NetworkAvailabilityZones:
+        default: Availability zones
+      NetworkVPCID:
+        default: VPC ID
+      NetworkVPCCIDR:
+        default: VPC CIDR
+      NetworkPrivateSubnet1AID:
+        default: Private Subnet 1 ID
+      NetworkPrivateSubnet2AID:
+        default: Private Subnet 2 ID
+      NetworkPublicSubnet1ID:
+        default: Public Subnet 1 ID
+      NetworkPublicSubnet2ID:
+        default: Public Subnet 2 ID
+      NetworkRouteTablePrivateSubnet1A:
+        default: Private Subnet 1 Route Table ID
+      NetworkRouteTablePrivateSubnet2A:
+        default: Private Subnet 2 Route Table ID
+      NetworkRouteTablePublicSubnet:
+        default: Public Subnet Route Table ID
+      EC2KeyPairName:
+        default: EC2 instance KeyPair name
+      AOCS3DataBucketName:
+        default: AEM OpenCloud S3 Data bucket
+      AOCS3InstallationSource:
+        default: AEM OpenCloud S3 Installation Source Path
+      AOCStackPrefix:
+        default: AEM OpenCloud Stack Prefix
+      AOCAemVersion:
+        default: AEM Version to install
+      AOCAemDispatcherVersion:
+        default: AEM Dispatcher version to install
+      AOCJavaJDKVersion:
+        default: Java JDK version to install
+      Route53InternalHostedZoneName:
+        default: Internal Route53 Zone name
+      Route53InternalHostedZoneID:
+        default: Internal Route53 Zone ID
+      ACMInternalCertificateARN:
+        default: Internal ACM Certificate ARN
+      Route53ExternalFQDN:
+        default: External FQDN
+      Route53ExternalHostedZoneID:
+        default: External Route53 Zone ID
+      ACMExternalCertificateARN:
+        default: External Certificate ARN
+      AOCAuthorBackupSnapshotID:
+        default: Author Backup EC2 Snapshot ID
+      AOCPublishBackupSnapshotID:
+        default: Publish Backup EC2 Snapshot ID
+      AOCAlarmNotificationEmail:
+        default: Alarm notification E-Mail address
+      AOCAlarmNotificationHttpsEndpoint:
+        default: Alarm notification HTTPS endpoint
+      CloudfrontPriceClass:
+        default: CloudFront PriceClass
+Parameters:
+  NetworkAvailabilityZones:
+    Description: List of Availability Zones to use for the subnets in the VPC. Only
+      two Availability Zones are used for this deployment, and the logical order of
+      your selections is preserved.
+    Type: List<AWS::EC2::AvailabilityZone::Name>
+  NetworkVPCID:
+    Description: ID of the VPC which the subnets are located.
+    Type: AWS::EC2::VPC::Id
+  NetworkVPCCIDR:
+    Description: CIDR block for the VPC
+    Type: String
+    Default: 'overwrite-me'
+  NetworkPrivateSubnet1AID:
+    Description: Subnet ID for private subnet 1 located in Availability Zone 1
+    Type: AWS::EC2::Subnet::Id
+  NetworkPrivateSubnet2AID:
+    Description: Subnet ID for private subnet 2 located in Availability Zone 2
+    Type: AWS::EC2::Subnet::Id
+  NetworkPublicSubnet1ID:
+    Description: Subnet ID for private subnet 1 located in Availability Zone 1
+    Type: AWS::EC2::Subnet::Id
+  NetworkPublicSubnet2ID:
+    Description: Subnet ID for private subnet 2 located in Availability Zone 2
+    Type: AWS::EC2::Subnet::Id
+  NetworkRouteTablePrivateSubnet1A:
+    Description: Route Table ID of the Private Subnet 1
+    Type: String
+    Default: 'overwrite-me'
+  NetworkRouteTablePrivateSubnet2A:
+    Description: Route Table ID of the Private Subnet 2
+    Type: String
+    Default: 'overwrite-me'
+  NetworkRouteTablePublicSubnet:
+    Description: Route Table ID of the Pulic Subnet
+    Type: String
+    Default: 'overwrite-me'
+  EC2KeyPairName:
+    Description: >-
+      Name of an existing Amazon EC2 public/private key pair to enable remote
+      access to instances.
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  AOCS3DataBucketName:
+    Description: >-
+      S3 bucket where the AEM OpenCloud resources are located (installation files, license file, etc.).
+      This Bucket is also used to store the AEM Stack datas.
+    Type: String
+  AOCS3InstallationSource:
+    Description: >-
+      S3 path within the S3 Data Bucket where the AEM OpenCloud installation resources are located (installation files, license file, etc.).
+    Type: String
+  AOCStackPrefix:
+    Description: Stack Prefix used to tag and IDentify the AEM OpenCloud Stack.
+    Type: String
+  AOCAemVersion:
+    Description: AEM Version to install.
+    Type: String
+    Default: 'overwrite-me'
+  AOCAemDispatcherVersion:
+    Description: AEM Dispatcher version to install.
+    Type: String
+    Default: 'overwrite-me'
+  AOCJavaJDKVersion:
+    Description: Java JDK Version to install and run AEM.
+    Type: String
+    Default: 'overwrite-me'
+  Route53InternalHostedZoneName:
+    Type: String
+    Default: 'overwrite-me'
+    Description: Internal Route53 Zone name. If Left blank, one is generated for you.
+      If you want to use your own Route 53 hosted zone, please provide the hosted zone name.
+  Route53InternalHostedZoneID:
+    Type: String
+    Description: Internal Route53 Zone ID of the provided internal Route53 Zone name.
+    Default: ''
+  ACMInternalCertificateARN:
+    Description: >-
+      Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager Private CA,
+      for the provided Internal Route53 Zone name.
+    Type: String
+    Default: ''
+  Route53ExternalFQDN:
+    Description: External FQDN for the AEM OpenCloud deployment (e.g., aoc.example.com).
+      If not provided, no external Route53 Record will be created.
+      If provided the External Route53 Zone ID becomes mandatory.
+    Type: String
+    Default: 'overwrite-me'
+  Route53ExternalHostedZoneID:
+    Description: Route53 Hosted Zone ID of the defined ExternalFQDN.
+      Mandatory if an External FQDN was provided.
+    Type: String
+    Default: 'overwrite-me'
+  ACMExternalCertificateARN:
+    Description: The ARN of the external Certificate stored in AWS Certificate Manager(ACM).
+      If not provided, but External FQDN & External Route53 Zone ID were provided, an external wildcard certificate will be created for you.
+    Type: String
+    Default: ''
+  AOCAuthorBackupSnapshotID:
+    Description: Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.
+    Type: String
+    Default: 'overwrite-me'
+  AOCPublishBackupSnapshotID:
+    Description: Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.
+    Type: String
+    Default: 'overwrite-me'
+  AOCAlarmNotificationEmail:
+    Description: Provode a valid Email address if you want to receive Stack alarm messages.
+    Type: String
+    Default: 'overwrite-me'
+  AOCAlarmNotificationHttpsEndpoint:
+    Description: Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.
+    Type: String
+    Default: 'overwrite-me'
+  CloudfrontPriceClass:
+    Description: Select the price class associated with the maximum price that you
+      want to pay for CloudFront service. If you select a price class other than All,
+      some of your users may experience higher latency.
+    Type: String
+    Default: 'overwrite-me'
+Conditions:
+  AOCAuthorBackupSnapshotIDEmpty: !Equals [ !Ref AOCAuthorBackupSnapshotID , '']
+  AOCAuthorBackupSnapshotIDDefault: !Equals [ !Ref AOCAuthorBackupSnapshotID , 'overwrite-me']
+  AOCPublishBackupSnapshotIDEmpty: !Equals [ !Ref AOCPublishBackupSnapshotID , '']
+  AOCPublishBackupSnapshotIDDefault: !Equals [ !Ref AOCPublishBackupSnapshotID , 'overwrite-me']
+  Route53InternalHostedZoneIDDefaultCondition: !Equals [ !Ref Route53InternalHostedZoneID , '']
+  EnableExternalCertificate: !Not [!Equals [ !Ref ACMExternalCertificateARN, '']]
+  ACMInternalCertificateARNDefaultCondition: !Equals [ !Ref ACMInternalCertificateARN, '']
+  NetworkVPCCIDRDefaultCondition: !Equals [ !Ref NetworkVPCCIDR, '']
+  NetworkRouteTablePrivateSubnet1ADefaultCondition: !Equals [ !Ref NetworkRouteTablePrivateSubnet1A, '']
+  NetworkRouteTablePrivateSubnet2ADefaultCondition: !Equals [ !Ref NetworkRouteTablePrivateSubnet2A, '']
+  NetworkRouteTablePublicSubnetDefaultCondition: !Equals [ !Ref NetworkRouteTablePublicSubnet, '']
+  AOCAemVersionDefaultCondition: !Equals [ !Ref AOCAemVersion, '']
+  AOCAemDispatcherVersionDefaultCondition: !Equals [ !Ref AOCAemDispatcherVersion, '']
+  AOCJavaJDKVersionDefaultCondition: !Equals [ !Ref AOCJavaJDKVersion, '']
+  Route53InternalHostedZoneNameDefaultCondition: !Equals [ !Ref Route53InternalHostedZoneName, '']
+  Route53ExternalFQDNDefaultCondition: !Equals [ !Ref Route53ExternalFQDN, '']
+  Route53ExternalHostedZoneIDDefaultCondition: !Equals [ !Ref Route53ExternalHostedZoneID, '']
+  AOCAuthorBackupSnapshotIDDefaultCondition: !Equals [ !Ref AOCAuthorBackupSnapshotID, '']
+  AOCPublishBackupSnapshotIDDefaultCondition: !Equals [ !Ref AOCPublishBackupSnapshotID, '']
+  AOCAlarmNotificationEmailDefaultCondition: !Equals [ !Ref AOCAlarmNotificationEmail, '']
+  AOCAlarmNotificationHttpsEndpointDefaultCondition: !Equals [ !Ref AOCAlarmNotificationHttpsEndpoint, '']
+  CloudfrontPriceClassDefaultCondition: !Equals [ !Ref CloudfrontPriceClass, '']
+Resources:
+  AOCAemKeystorePasswordParameter:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub ${AOCStackPrefix}-aem-keystore-password
+      Description: Secrets for the AEM Keystore
+      GenerateSecretString:
+        PasswordLength: 20
+        ExcludeCharacters: '"@/\'
+        ExcludePunctuation: true
+        IncludeSpace: false
+  AOCELBCipherSuiteParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/elbcipher
+      Description: External Certificate ARN
+      Type: String
+      Value: 'AOCELBSecurityPolicy-TLS-1-2-2017-01'
+  AOCEC2RootDeviceParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/rootdevice
+      Description: EC2 Root Device
+      Type: String
+      Value: '/dev/xvda'
+  AOCEC2DataDeviceParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/datadevice
+      Description: EC2 Data Device
+      Type: String
+      Value: '/dev/xvdb'
+  ACMExternalCertificateARNParameter:
+    Condition: EnableExternalCertificate
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/cert/external
+      Description: External Certificate ARN
+      Type: String
+      Value: !Ref ACMExternalCertificateARN
+  ACMInternalCertificateARNParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/cert/internal
+      Description: External Certificate ARN
+      Type: String
+      Value:  !If
+        - ACMInternalCertificateARNDefaultCondition
+        - 'overwrite-me'
+        - !Ref ACMInternalCertificateARN
+  AOCAemAwsStackProvisionerVersionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/version/aemawsstackprovisioner
+      Description: AEM AWS Stack Provisioner Version
+      Type: String
+      Value: '4.36.2'
+  AOCAemHealthcheckContentVersionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/version/aemhealthcheckcontent
+      Description: AEM Healthcheck Content Package version
+      Type: String
+      Value: '1.3.3'
+  AOCAemOakRunVersionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/version/aemoakrun
+      Description: AEM Oak Run Version
+      Type: String
+      Value: '1.10.1'
+  AOCAemOrchestratorVersionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/version/aemorchestrator
+      Description: AEM Orchestrator Version
+      Type: String
+      Value: '2.0.1'
+  AOCAemPasswordResetContentVersionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/version/aempasswordresetcontent
+      Description: AEM PasswordReset Content Package Version
+      Type: String
+      Value: '1.1.0'
+  AOCAemDispatcherVersionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/version/aemdispatcher
+      Description: AEM Dispatcher Version
+      Type: String
+      Value: !If
+        - AOCAemDispatcherVersionDefaultCondition
+        - 'overwrite-me'
+        - !Ref AOCAemDispatcherVersion
+  AOCAemVersionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/version/aem
+      Description: AEM Version
+      Type: String
+      Value: !If
+        - AOCAemVersionDefaultCondition
+        - 'overwrite-me'
+        - !Ref AOCAemVersion
+  AOCASGEventQueueNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/sqs/asgeventname
+      Description: AOC ASG Event Queue Name
+      Type: String
+      Value: !Sub '${AOCStackPrefix}-aem-asg-event-queue'
+  AOCASGEventTopicDisplayNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/sns/asgeventdisplayname
+      Description: AOC ASG Event Topic Display Name
+      Type: String
+      Value: !Sub '${AOCStackPrefix} - AEM ASG Event Topic'
+  AOCAEMASGEventTopicNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/sns/asgeventtopicname
+      Description: AOC ASG Event Topic Name
+      Type: String
+      Value: !Sub '${AOCStackPrefix}-aem-asg-event-topic'
+  AOCPrivateSubnetOutboundCidrParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/privateoutboundcidr
+      Description: Private Subnet Outbound Cidr
+      Type: String
+      Value: '0.0.0.0/0'
+  AOCAlarmNotificationEmailParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/notificationemail
+      Description: Alarm notification EMail
+      Type: String
+      Value: !If
+        - AOCAlarmNotificationEmailDefaultCondition
+        - 'overwrite-me'
+        - !Ref AOCAlarmNotificationEmail
+  AOCAlarmNotificationHttpsEndpointParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/notificationhttps
+      Description: Alarm Notification HTTPS Endpoint
+      Type: String
+      Value: !If
+        - AOCAlarmNotificationHttpsEndpointDefaultCondition
+        - 'overwrite-me'
+        - !Ref AOCAlarmNotificationHttpsEndpoint
+  AOCAuthorR53SubDomainNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/r53/subdomainname/author
+      Description: Author SubDomain name
+      Type: String
+      Value: !Sub '${AOCStackPrefix}-author'
+  AOCAuthorLoadBalancerHealthCheckUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/author/elb/healthurl
+      Description: Author-Dispatcher ELB Healthcheck URL
+      Type: String
+      Value: 'HTTPS:5432/system/health?tags=shallow'
+  AOCAuthorRootVolSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/author/rootvolume/size
+      Description: Author-Dispatcher Root Volume Size
+      Type: String
+      Value: '100'
+  AOCAuthorDataVolSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/author/datavolume/size
+      Description: Author-Dispatcher Data Volume Size
+      Type: String
+      Value: '500'
+  UseAuthorDataVolumeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/author/datavolume/usebackup
+      Description: Author Backup Snapshot ID
+      Type: String
+      Value: !If
+        - AOCAuthorBackupSnapshotIDEmpty
+        - 'false'
+        - !If
+          - AOCAuthorBackupSnapshotIDDefault
+          - 'false'
+          - 'true'
+  AOCAuthorBackupSnapshotIDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/author/datavolume/backupid
+      Description: Author Backup Snapshot ID
+      Type: String
+      Value: !If
+        - AOCAuthorBackupSnapshotIDDefaultCondition
+        - 'overwrite-me'
+        - !Ref AOCAuthorBackupSnapshotID
+  AOCAuthorDispatcherLoadBalancerHealthCheckUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/authordispatcher/elb/healthurl
+      Description: Author-Dispatcher ELB Healthcheck URL
+      Type: String
+      Value: 'HTTPS:443/system/health?tags=shallow'
+  AOCAuthorDispatcherELBInboundCidrParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/authordispatcher/elb/inboundcidr
+      Description: Author Dispatcher ELB Inbound CIDR
+      Type: String
+      Value: '0.0.0.0/0'
+  AOCAuthorDispatcherR53SubDomainNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/r53/subdomainname/authordispatcher
+      Description: Author Dispatcher SubDomain name
+      Type: String
+      Value: !Sub '${AOCStackPrefix}-author-dispatcher'
+  AOCAuthorDispatcherRootVolSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/authordispatcher/rootvolume/size
+      Description: Author-Dispatcher Root Volume Size
+      Type: String
+      Value: '100'
+  AOCAuthorDispatcherDataVolSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/authordispatcher/datavolume/size
+      Description: Author-Dispatcher Data Volume Size
+      Type: String
+      Value: '500'
+  AOCAuthorDispatcherUseBackupVolumeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/authordispatcher/datavolume/backupenabled
+      Description: Author-Dispatcher Use Data Volume Backup
+      Type: String
+      Value: 'false'
+  AOCAuthorDispatcherASGMaxSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/authordispatcher/asg/maxsize
+      Description: Author-Dispatcher ASG Max size
+      Type: String
+      Value: '2'
+  AOCAuthorDispatcherASGMinSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/authordispatcher/asg/minsize
+      Description: Author-Dispatcher ASG Min size
+      Type: String
+      Value: '2'
+  AOCAuthorDispatcherASGDesiredCapacityParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/authordispatcher/asg/desiredcapacity
+      Description: Author-Dispatcher ASG Desired Capactity
+      Type: String
+      Value: '2'
+  AOCAuthorDispatcherASGHealthCheckGracePeriodParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/authordispatcher/asg/healthcheckgraceperiod
+      Description: Author-Dispatcher ASG HealthCheck Grace Period time
+      Type: String
+      Value: '900'
+  AOCAuthorDispatcherASGCooldownParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/authordispatcher/asg/cooldown
+      Description: Author-Dispatcher ASG Cooldown time
+      Type: String
+      Value: '480'
+  AOCOrchestratorRootVolSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/orchestrator/rootvolume/size
+      Description: Orchestrator Root Volume Size
+      Type: String
+      Value: '100'
+  AOCOrchestratorDataVolSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/orchestrator/datavolume/size
+      Description: Orchestrator Data Volume Size
+      Type: String
+      Value: '500'
+  AOCPublishDispatcherLoadBalancerHealthCheckUrlParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/elb/healthurl
+      Description: Publish-Dispatcher ELB Healthcheck URL
+      Type: String
+      Value: 'HTTPS:443/system/health?tags=shallow'
+  AOCPublishDispatcherR53SubDomainNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/r53/subdomainname/publishdispatcher
+      Description: Publish-Dispatcher SubDomain name
+      Type: String
+      Value: !Sub '${AOCStackPrefix}-publish-dispatcher'
+  AOCPublishDispatcherELBInboundCidrParameter:
+   Type: AWS::SSM::Parameter
+   Properties:
+     Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/elb/inboundcidr
+     Description: Publish Dispatcher ELB Inbound CIDR
+     Type: String
+     Value: '0.0.0.0/0'
+  AOCPublishDispatcherRootVolSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/rootvolume/size
+      Description: Publish-Dispatcher Root Volume Size
+      Type: String
+      Value: '100'
+  AOCPublishDispatcherDataVolSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/datavolume/size
+      Description: Publish-Dispatcher Data Volume Size
+      Type: String
+      Value: '500'
+  AOCPublishDispatcherUseBackupVolumeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/datavolume/backupenabled
+      Description: Publish-Dispatcher Use Data Volume Backup
+      Type: String
+      Value: 'false'
+  AOCPublishDispatcherASGMaxSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/maxsize
+      Description: Publish-Dispatcher ASG Max size
+      Type: String
+      Value: '4'
+  AOCPublishDispatcherASGMinSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/minsize
+      Description: Publish-Dispatcher ASG Min size
+      Type: String
+      Value: '2'
+  AOCPublishDispatcherASGDesiredCapacityParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/desiredcapacity
+      Description: Publish-Dispatcher ASG Desired Capactity
+      Type: String
+      Value: '2'
+  AOCPublishDispatcherASGHealthCheckGracePeriodParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/healthcheckgraceperiod
+      Description: Publish-Dispatcher ASG HealthCheck Grace Period time
+      Type: String
+      Value: '2400'
+  AOCPublishDispatcherASGCooldownParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/cooldown
+      Description: Publish-Dispatcher ASG Cooldown time
+      Type: String
+      Value: '480'
+  AOCPublishDispatcherASGScalingCpuThresholdParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/scaling/cputhreshold
+      Description: Publish-Dispatcher ASG Scaling CPU alarm Threshold
+      Type: String
+      Value: '49'
+  AOCPublishDispatcherASGScalingCpuHighPeriodParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/scaling/cpuhighperiod
+      Description: Publish-Dispatcher ASG Scaling CPU high Period
+      Type: String
+      Value: '300'
+  AOCPublishDispatcherASGScalingCpuHighEvaluationPeriodParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/scaling/cpuhighevalperiod
+      Description: Publish-Dispatcher ASG Scaling CPU high evaulation period
+      Type: String
+      Value: '1'
+  AOCPublishDispatcherASGScalingCpuLowPeriodParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/scaling/cpulowperiod
+      Description: Publish-Dispatcher ASG Scaling CPU low period
+      Type: String
+      Value: '300'
+  AOCPublishDispatcherASGScalingCpuLowEvaluationPeriodParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/scaling/cpulowevalperiod
+      Description: Publish-Dispatcher ASG Scaling CPU high period
+      Type: String
+      Value: '2'
+  AOCPublishDispatcherASGScalingCpuHighCooldownPeriodParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/scaling/cpuhighcooldown
+      Description: Publish-Dispatcher ASG Scaling CPU high Cooldown time
+      Type: String
+      Value: '2880'
+  AOCPublishDispatcherASGScalingCpuLowCooldownPeriodParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/asg/scaling/cpulowcooldown
+      Description: Publish-Dispatcher ASG Scaling CPU low Cooldown time
+      Type: String
+      Value: '480'
+  AOCPublishRootVolSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publish/rootvolume/size
+      Description: Publish Root Volume Size
+      Type: String
+      Value: '100'
+  AOCPublishDataVolSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publish/datavolume/size
+      Description: Publish Data Volume Size
+      Type: String
+      Value: '500'
+  AOCUsePublishDataVolumeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publish/datavolume/usebackup
+      Description: Publish Backup Snapshot ID
+      Type: String
+      Value: !If
+        - AOCPublishBackupSnapshotIDEmpty
+        - 'false'
+        - !If
+          - AOCPublishBackupSnapshotIDDefault
+          - 'false'
+          - 'true'
+  AOCPublishBackupSnapshotIDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publish/datavolume/backupid
+      Description: Publish Backup Snapshot ID
+      Type: String
+      Value: !If
+        - AOCPublishBackupSnapshotIDDefaultCondition
+        - 'overwrite-me'
+        - !Ref AOCPublishBackupSnapshotID
+  AOCPublishASGMaxSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publish/asg/maxsize
+      Description: Publish ASG Max size
+      Type: String
+      Value: '4'
+  AOCPublishASGMinSizeParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publish/asg/minsize
+      Description: Publish ASG Min size
+      Type: String
+      Value: '2'
+  AOCPublishASGDesiredCapacityParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publish/asg/desiredcapacity
+      Description: Publish ASG Desired Capactity
+      Type: String
+      Value: '2'
+  AOCPublishASGHealthCheckGracePeriodParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publish/asg/healthcheckgraceperiod
+      Description: Publish ASG HealthCheck Grace Period time
+      Type: String
+      Value: '1800'
+  AOCPublishASGCooldownParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/publish/asg/cooldown
+      Description: Publish ASG Cooldown time
+      Type: String
+      Value: '480'
+  AOCJavaJDKVersionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/version/javajdk
+      Description: Java JDK Version
+      Type: String
+      Value: !If
+        - AOCJavaJDKVersionDefaultCondition
+        - 'overwrite-me'
+        - !Ref AOCJavaJDKVersion
+  AOCPackerAemVersionParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/version/packeraem
+      Description: Packer AEM Version
+      Type: String
+      Value: '4.26.0'
+  AOCS3DataBucketNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/s3databucketname
+      Description: S3 Data Bucket name
+      Type: String
+      Value: !Ref AOCS3DataBucketName
+  AOCS3InstallationSourceParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/s3installationsource
+      Description: S3 Installation Source location
+      Type: String
+      Value: !Ref AOCS3InstallationSource
+  CloudfrontPriceClassParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/cloudfront/priceclass
+      Description: Cloudfront Price Class
+      Type: String
+      Value: !If
+        - CloudfrontPriceClassDefaultCondition
+        - 'overwrite-me'
+        - !Ref CloudfrontPriceClass
+  EC2KeyPairNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/ec2/keypairname
+      Description: EC2 KeyPair Name
+      Type: String
+      Value: !Ref EC2KeyPairName
+  NetworkAvailabilityZonesParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/availabilityzones
+      Description: Availability Zones
+      Type: String
+      Value: !Join
+        - ','
+        - !Ref NetworkAvailabilityZones
+  NetworkPrivateSubnet1AIDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/privatesubnet1aid
+      Description: Private Subnet 1 ID
+      Type: String
+      Value: !Ref NetworkPrivateSubnet1AID
+  NetworkPrivateSubnet2AIDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/privatesubnet2aid
+      Description: Private Subnet 2 ID
+      Type: String
+      Value: !Ref NetworkPrivateSubnet2AID
+  NetworkPublicSubnet1IDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/publicsubnet1id
+      Description: Public Subnet 1 ID
+      Type: String
+      Value: !Ref NetworkPublicSubnet1ID
+  NetworkPublicSubnet2IDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/publicsubnet2id
+      Description: Public Subnet 2 ID
+      Type: String
+      Value: !Ref NetworkPublicSubnet2ID
+  NetworkRouteTablePublicSubnetParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/routetablepublicsubnet
+      Description: Route Table ID Public Subnet
+      Type: String
+      Value: !If
+        - NetworkRouteTablePublicSubnetDefaultCondition
+        - 'overwrite-me'
+        - !Ref NetworkRouteTablePublicSubnet
+  NetworkRouteTablePrivateSubnet1AParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/vpccidrroutetableprivatesubnet1a
+      Description: Route table ID Private Subnet 1A
+      Type: String
+      Value: !If
+        - NetworkRouteTablePrivateSubnet1ADefaultCondition
+        - 'overwrite-me'
+        - !Ref NetworkRouteTablePrivateSubnet1A
+  NetworkRouteTablePrivateSubnet2AParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/vpccidrroutetableprivatesubnet2a
+      Description: Route table ID Private Subnet 2A
+      Type: String
+      Value: !If
+        - NetworkRouteTablePrivateSubnet2ADefaultCondition
+        - 'overwrite-me'
+        - !Ref NetworkRouteTablePrivateSubnet2A
+  NetworkVPCCIDRParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/vpccidr
+      Description: VPC ID
+      Type: String
+      Value: !If
+        - NetworkVPCCIDRDefaultCondition
+        - 'overwrite-me'
+        - !Ref NetworkVPCCIDR
+  NetworkVPCIDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/network/vpcid
+      Description: VPC ID
+      Type: String
+      Value: !Ref NetworkVPCID
+  Route53ExternalFQDNParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/r53/external/fqdn
+      Description: R53 External FQDN
+      Type: String
+      Value: !If
+        - Route53ExternalFQDNDefaultCondition
+        - 'overwrite-me'
+        - !Ref Route53ExternalFQDN
+  Route53ExternalHostedZoneIDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/r53/external/zoneid
+      Description: R53 External Hosted Zone ID
+      Type: String
+      Value: !If
+        - Route53ExternalHostedZoneIDDefaultCondition
+        - 'overwrite-me'
+        - !Ref Route53ExternalHostedZoneID
+  Route53InternalDefaultHostedZoneNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/r53/internal/defaultzonename
+      Description: R53 Internal default Zone Name
+      Type: String
+      Value: !Sub '${AWS::Region}.aemopencloud.cms'
+  Route53InternalHostedZoneNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/r53/internal/zonename
+      Description: R53 Internal Zone Name
+      Type: String
+      Value: !If
+        - Route53InternalHostedZoneNameDefaultCondition
+        - 'overwrite-me'
+        - !Ref Route53InternalHostedZoneName
+  Route53InternalHostedZoneIDParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/r53/internal/zoneid
+      Description: R53 Internal Zone ID
+      Type: String
+      Value: !If
+        - Route53InternalHostedZoneIDDefaultCondition
+        - 'overwrite-me'
+        - !Ref Route53InternalHostedZoneID
+
+Outputs:
+  oACMExternalCertificateARN:
+    Description: External Certificate ARN
+    Value: !If
+      - EnableExternalCertificate
+      - !GetAtt ACMExternalCertificateARNParameter.Value
+      - ''
+  oRoute53InternalHostedZoneID:
+    Description: R53 Internal Zone ID
+    Value: !If
+      - Route53InternalHostedZoneIDDefaultCondition
+      - ''
+      - !GetAtt Route53InternalHostedZoneIDParameter.Value
+  oRoute53ExternalFQDN:
+    Description: The Route53 record of the Author-Dispatcher ELB
+    Value: !If
+      - Route53ExternalFQDNDefaultCondition
+      - ''
+      - !Ref Route53ExternalFQDN

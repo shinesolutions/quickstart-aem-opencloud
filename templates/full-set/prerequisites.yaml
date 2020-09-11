@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Conditions:
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
+Description: Overarching CF Template to Create Security Groups and Messaging Resources
+  for AEM Appp Stacks
+Parameters:
+  AOCStackPrefix:
+    Description: The AEM Stack Prerequisite Resources Stack Prefix
+    Type: String
+  QSS3BucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Default: aws-quickstart
+    Description: S3 bucket name for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
+  QSS3BucketRegion:
+    Default: ap-southeast-2
+    Description: The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.
+    Type: String
+  QSS3KeyPrefix:
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: >-
+      AWS Quick Start key prefix can include numbers, lowercase letters, uppercase
+      letters, hyphens (-), and forward slash (/). It cannot start or end with forward
+      slash (/) because they are automatically appended.
+    Default: quickstart-aem-opencloud/
+    Description: >-
+      S3 key prefix for the AWS Quick Start assets.AWS Quick Start key prefix can
+      include numbers, lowercase letters, uppercase letters, hyphens (-), and forward
+      slash (/). It cannot start or end with forward slash (/) because they are automatically
+      appended.
+    Type: String
+Resources:
+  InstanceProfilesStack:
+    Properties:
+      Parameters:
+        AOCStackPrefix:
+          Ref: AOCStackPrefix
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/full-set/instance-profiles.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+    Type: AWS::CloudFormation::Stack
+  MessagingStack:
+    Properties:
+      Parameters:
+        AEMASGEventQueueNameParameter: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/sqs/asgeventname:1}}"
+        AEMASGEventTopicDisplayNameParameter: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/sns/asgeventdisplayname:1}}"
+        AEMASGEventTopicNameParameter: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/sns/asgeventtopicname:1}}"
+        AWSNotificationParameters:
+          Fn::Join:
+          - ','
+          - - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/notificationemail:1}}"
+            - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/notificationhttps:1}}"
+        AOCStackPrefix:
+          Ref: AOCStackPrefix
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/full-set/messaging.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+    Type: AWS::CloudFormation::Stack
+  SecurityGroupsStack:
+    Properties:
+      Parameters:
+        AuthorDispatcherELBSecurityGroupInboundCidrIpParameter: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/authordispatcher/elb/inboundcidr:1}}"
+        AOCStackPrefix:
+          Ref: AOCStackPrefix
+        PrivateSubnetInternetOutboundCidrIpParameter: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/privateoutboundcidr:1}}"
+        PublishDispatcherELBSecurityGroupInboundCidrIpParameter: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/publishdispatcher/elb/inboundcidr:1}}"
+        SecureShellInboundCidrIpParameter: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpccidr:1}}"
+      TemplateURL:
+        !Sub
+          - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/full-set/security-groups.yaml'
+          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
+            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+    Type: AWS::CloudFormation::Stack
+
+  MessagingStackName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub '/${AOCStackPrefix}/messaging/stackname'
+      Description: Messaging Stack Name
+      Type: String
+      Value: !Ref MessagingStack
