@@ -44,27 +44,35 @@ project:
     QSS3BucketRegion: "$[taskcat_current_region]"
     QSS3KeyPrefix: quickstart-aem-opencloud/
 tests:
-  aem63-sp2-cfp2:
+  aem65:
     regions:
       - us-east-1
     template: templates/workload-main.template.yaml
     parameters:
-      AemVersion: '63-SP2-CFP2'
+      AemVersion: '65'
       S3DataBucketName: "$[taskcat_autobucket]"
       S3InstallationSource:  "quickstart-aem-opencloud/library/"
-  aem64-sp8:
-    regions:
-      - us-east-1
-    template: templates/workload-main.template.yaml
-    parameters:
-      AemVersion: '64-SP8'
-      S3DataBucketName: "$[taskcat_autobucket]"
-      S3InstallationSource:  "quickstart-aem-opencloud/library/"
-  aem65-sp4:
-    regions:
-      - us-east-1
-    template: templates/workload-main.template.yaml
-    parameters:
-      AemVersion: '65-SP4'
-      S3DataBucketName: "$[taskcat_autobucket]"
-      S3InstallationSource:  "quickstart-aem-opencloud/library/"
+  # aem63-sp2-cfp2:
+  #   regions:
+  #     - us-east-1
+  #   template: templates/workload-main.template.yaml
+  #   parameters:
+  #     AemVersion: '63-SP2-CFP2'
+  #     S3DataBucketName: "$[taskcat_autobucket]"
+  #     S3InstallationSource:  "quickstart-aem-opencloud/library/"
+  # aem64-sp8:
+  #   regions:
+  #     - us-east-1
+  #   template: templates/workload-main.template.yaml
+  #   parameters:
+  #     AemVersion: '64-SP8'
+  #     S3DataBucketName: "$[taskcat_autobucket]"
+  #     S3InstallationSource:  "quickstart-aem-opencloud/library/"
+  # aem65-sp4:
+  #   regions:
+  #     - us-east-1
+  #   template: templates/workload-main.template.yaml
+  #   parameters:
+  #     AemVersion: '65-SP4'
+  #     S3DataBucketName: "$[taskcat_autobucket]"
+  #     S3InstallationSource:  "quickstart-aem-opencloud/library/"
