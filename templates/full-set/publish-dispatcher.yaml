@@ -5,7 +5,7 @@ Conditions:
     Fn::Equals:
     - Ref: UsePublishDispatcherDataVolSnapshotParameter
     - true
-Description: Create the Compute resources for the AEM Publish Dispatcher
+Description: Create the Compute resources for the AEM Publish Dispatcher (qs-1r4pm2ns5)
 Parameters:
   AemAwsStackProvisionerVersionParameter:
     Description: AEM AWS Stack Provisioner version number

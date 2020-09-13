@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AEM OpenCloud AMI Creation Stack
+Description: AEM OpenCloud AMI Creation Stack (qs-1r4pm2nl7)
 Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:

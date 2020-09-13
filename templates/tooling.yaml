@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Tooling Stack to prepare AEM OpenCloud
+Description: Tooling Stack to prepare AEM OpenCloud (qs-1r4pm2nun)
 Metadata:
   QuickStartDocumentation:
     EntrypointName: "Tooling Stack"

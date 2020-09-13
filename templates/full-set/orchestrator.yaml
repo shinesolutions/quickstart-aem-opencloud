@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Create the Compute resources for the AEM Orchestrator
+Description: Create the Compute resources for the AEM Orchestrator (qs-1r4pm2nr5)
 Parameters:
   AEMASGEventQueueName:
     Default: ''

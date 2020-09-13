@@ -26,7 +26,7 @@ Conditions:
           - 1
           - Ref: AWSNotificationParameters
         - ''
-Description: Create Messaging resources for the AEM Stack Auto Scaling Group Events
+Description: Create Messaging resources for the AEM Stack Auto Scaling Group Events (qs-1r4pm2nqr)
 Parameters:
   AEMASGEventQueueNameParameter:
     Description: The AEM Stack Auto Scaling Group Event Quene Name

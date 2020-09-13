@@ -3,7 +3,7 @@ Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
   UseExternalELBCertificateCondition: !Equals [!Ref UseExternalELBCertificate, 'true']
   UseInternalDefaultELBCertificateCondition: !Equals [!Ref UseInternalDefaultELBCertificate, 'true']
-Description: Overarching CF Template to Create AEM Full-Set Main Resources Stacks
+Description: Overarching CF Template to Create AEM Full-Set Main Resources Stacks (qs-1r4pm2nq7)
 Parameters:
   AuthorDispatcherInstanceTypeParameter:
     Description: The Author Dispatcher Instance Type

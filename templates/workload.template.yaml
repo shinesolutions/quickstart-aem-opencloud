@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Deploy AEM on AWS (Existing VPC) qs-1r4mk17nn.
+Description: Deploy AEM on AWS (Existing VPC) (qs-1r4mk17nn).
 Metadata:
   QuickStartDocumentation:
     EntrypointName: "Launch into an existing VPC"

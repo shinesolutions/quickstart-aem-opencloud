@@ -1,6 +1,6 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: AEM OpenCloud Cloudfront Stack
+Description: AEM OpenCloud Cloudfront Stack (qs-1r4pm2no8)
 Parameters:
   AliasParameter:
     Description: >-

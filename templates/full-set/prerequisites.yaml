@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
-Description: Overarching CF Template to Create Security Groups and Messaging Resources
+Description: Overarching CF Template to Create Security Groups and Messaging Resources (qs-1r4pm2nrm)
   for AEM Appp Stacks
 Parameters:
   AOCStackPrefix:
