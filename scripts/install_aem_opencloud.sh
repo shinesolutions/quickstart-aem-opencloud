@@ -63,6 +63,14 @@ cp $TMP_DIR/local.yaml $TMP_DIR/packer-aem/conf/puppet/hieradata/local.yaml
 cp $TMP_DIR/hiera.yaml $TMP_DIR/packer-aem/conf/puppet/hiera.yaml
 cp $TMP_DIR/hiera3.yaml $TMP_DIR/packer-aem/conf/puppet/hiera3.yaml
 
+#
+# Fix for the dispatcher component to support Instance Types with NVME Devices
+#
+if [ ${COMPONENT} = "dispatcher" ]; then
+  rm -f $TMP_DIR/packer-aem/test/inspec/dispatcher_spec.rb
+  cp $TMP_DIR/dispatcher_spec.rb $TMP_DIR/packer-aem/test/inspec/dispatcher_spec.rb
+fi
+
 set +o errexit
 
 echo "Finished preparing AEM OpenCloud installation"

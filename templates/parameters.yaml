@@ -24,7 +24,8 @@ Metadata:
           default: AEM OpenCloud configuration
         Parameters:
           - AOCS3DataBucketName
-          - AOCS3InstallationSource
+          - AOCS3InstallBucketName
+          - AOCS3InstallKeyPrefix
           - AOCStackPrefix
           - AOCAemVersion
           - AOCAemDispatcherVersion
@@ -74,7 +75,9 @@ Metadata:
         default: EC2 instance KeyPair name
       AOCS3DataBucketName:
         default: AEM OpenCloud S3 Data bucket
-      AOCS3InstallationSource:
+      AOCS3InstallBucketName:
+        default: AEM OpenCloud S3 Installation Bucket
+      AOCS3InstallKeyPrefix:
         default: AEM OpenCloud S3 Installation Source Path
       AOCStackPrefix:
         default: AEM OpenCloud Stack Prefix
@@ -149,14 +152,38 @@ Parameters:
       access to instances.
     Type: 'AWS::EC2::KeyPair::KeyName'
   AOCS3DataBucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Data bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
     Description: >-
-      S3 bucket where the AEM OpenCloud resources are located (installation files, license file, etc.).
-      This Bucket is also used to store the AEM Stack datas.
+      S3 bucket name for the AEM OpenCloud Stack data assets(installation files, license file, etc.). This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
     Type: String
-  AOCS3InstallationSource:
+  AOCS3InstallBucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Installation bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
     Description: >-
-      S3 path within the S3 Data Bucket where the AEM OpenCloud installation resources are located (installation files, license file, etc.).
+      S3 bucket name for the AEM OpenCloud installation assets(installation files, license file, etc.). This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
     Type: String
+  AOCS3InstallKeyPrefix:
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: >-
+      AEM OpenCloud installation key prefix can include numbers, lowercase letters, uppercase
+      letters, hyphens (-), and forward slash (/). It cannot start or end with forward
+      slash (/) because they are automatically appended.
+    Description: >-
+      S3 key prefix for the AEM OpenCloud installation assets(installation files, license file, etc.).AWS Quick Start key prefix can
+      include numbers, lowercase letters, uppercase letters, hyphens (-), and forward
+      slash (/). It cannot start or end with forward slash (/) because they are automatically
+      appended.
+    Type: String
+    Default: 'quickstart-aem-opencloud/library/'
   AOCStackPrefix:
     Description: Stack Prefix used to tag and IDentify the AEM OpenCloud Stack.
     Type: String
@@ -765,13 +792,20 @@ Resources:
       Description: S3 Data Bucket name
       Type: String
       Value: !Ref AOCS3DataBucketName
-  AOCS3InstallationSourceParameter:
+  AOCS3InstallBucketNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub /${AOCStackPrefix}/config/s3installationsource
-      Description: S3 Installation Source location
+      Name: !Sub /${AOCStackPrefix}/config/s3installationbucketname
+      Description: S3 Installation Bucket name
       Type: String
-      Value: !Ref AOCS3InstallationSource
+      Value: !Ref AOCS3InstallBucketName
+  AOCS3InstallKeyPrefixParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub /${AOCStackPrefix}/config/s3installationkeyprefix
+      Description: S3 Installation Source key prefix
+      Type: String
+      Value: !Ref AOCS3InstallKeyPrefix
   CloudfrontPriceClassParameter:
     Type: AWS::SSM::Parameter
     Properties:
