@@ -372,7 +372,13 @@ Resources:
             ls -l /tmp/
             chmod a+x /tmp/shinesolutions/install_aem_opencloud.sh
             /tmp/shinesolutions/install_aem_opencloud.sh author ${AWS::Region}
-            /opt/aws/bin/cfn-signal -e $? -r "Completed AEM OpenCloud installation" '${AuthorAMIWaitHandle}'
+            exit_code=$?
+            if [ $exit_code -eq 0 ]
+            then
+              /opt/aws/bin/cfn-signal -e $exit_code -r "AEM OpenCloud installation finished successfully." '${AuthorAMIWaitHandle}'
+            else
+              /opt/aws/bin/cfn-signal -e $exit_code -r "AEM OpenCloud installation failed. Please login to the EC2 instance and check /var/log/cloud-init.log or /var/log/cloud-init-output.log for more details." '${AuthorAMIWaitHandle}'
+            fi
       Tags:
       - Key: Application Id
         Value: Adobe Experience Manager (AEM)
@@ -494,7 +500,13 @@ Resources:
             ls -l /tmp/
             chmod a+x /tmp/shinesolutions/install_aem_opencloud.sh
             /tmp/shinesolutions/install_aem_opencloud.sh publish ${AWS::Region}
-            /opt/aws/bin/cfn-signal -e $? -r "Completed AEM OpenCloud installation" '${PublishAMIWaitHandle}'
+            exit_code=$?
+            if [ $exit_code -eq 0 ]
+            then
+              /opt/aws/bin/cfn-signal -e $exit_code -r "AEM OpenCloud installation finished successfully." '${PublishAMIWaitHandle}'
+            else
+              /opt/aws/bin/cfn-signal -e $exit_code -r "AEM OpenCloud installation failed. Please login to the EC2 instance and check /var/log/cloud-init.log or /var/log/cloud-init-output.log for more details." '${PublishAMIWaitHandle}'
+            fi
       Tags:
       - Key: Application Id
         Value: Adobe Experience Manager (AEM)
@@ -626,7 +638,13 @@ Resources:
             ls -l /tmp/
             chmod a+x /tmp/shinesolutions/install_aem_opencloud.sh
             /tmp/shinesolutions/install_aem_opencloud.sh dispatcher ${AWS::Region}
-            /opt/aws/bin/cfn-signal -e $? -r "Completed AEM OpenCloud installation" '${DispatcherAMIWaitHandle}'
+            exit_code=$?
+            if [ $exit_code -eq 0 ]
+            then
+              /opt/aws/bin/cfn-signal -e $exit_code -r "AEM OpenCloud installation finished successfully." '${DispatcherAMIWaitHandle}'
+            else
+              /opt/aws/bin/cfn-signal -e $exit_code -r "AEM OpenCloud installation failed. Please login to the EC2 instance and check /var/log/cloud-init.log or /var/log/cloud-init-output.log for more details." '${DispatcherAMIWaitHandle}'
+            fi
       Tags:
       - Key: Application Id
         Value: Adobe Experience Manager (AEM)
@@ -748,7 +766,13 @@ Resources:
             ls -l /tmp/
             chmod a+x /tmp/shinesolutions/install_aem_opencloud.sh
             /tmp/shinesolutions/install_aem_opencloud.sh java ${AWS::Region}
-            /opt/aws/bin/cfn-signal -e $? -r "Completed AEM OpenCloud installation" '${JavaAMIWaitHandle}'
+            exit_code=$?
+            if [ $exit_code -eq 0 ]
+            then
+              /opt/aws/bin/cfn-signal -e $exit_code -r "AEM OpenCloud installation finished successfully." '${JavaAMIWaitHandle}'
+            else
+              /opt/aws/bin/cfn-signal -e $exit_code -r "AEM OpenCloud installation failed. Please login to the EC2 instance and check /var/log/cloud-init.log or /var/log/cloud-init-output.log for more details." '${JavaAMIWaitHandle}'
+            fi
       Tags:
       - Key: Application Id
         Value: Adobe Experience Manager (AEM)
