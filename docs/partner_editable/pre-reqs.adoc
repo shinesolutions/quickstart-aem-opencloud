@@ -15,7 +15,7 @@ license.downloadID=AEM License Key
 . Download the JDK 8 installation rpm e.g. jdk-8u251-linux-x64.rpm
 . Download the AEM Jar file and if necessary the required AEM service pack
 . Upload the AEM license, AEM Dispatcher module, JDK8 rpm installation, AEM Jar & AEM Service-Packs
-to the S3 bucket which will be use for the Quick Start deployment into a prefix of your choice.
+to the S3 installation bucket which will be use for the Quick Start deployment into a prefix of your choice.
 . (optional) Create a certificate for your internal URL in Amazon Certificate Manager (ACM)
 in the Region where you deploy the Quick Start. This certificate must be created as a
 wildcard certificate for your AEM OpenCloud internal domain (for example, *.example.internal).

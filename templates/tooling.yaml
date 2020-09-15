@@ -140,9 +140,9 @@ Resources:
                   - !Join
                       - ""
                       - - "arn:aws:s3:::"
-                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3installationbucketname:1}}"
                         - "/"
-                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3installationsource:1}}"
+                        - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3installationkeyprefix:1}}"
                         - "*"
               - Effect: Allow
                 Action:
@@ -615,7 +615,8 @@ Resources:
       S3SourceBucket: !Ref QSS3BucketName
       S3SourceKey: !Ref QSS3KeyPrefix
       S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
-      S3InstallationSource: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3installationsource:1}}"
+      S3InstallBucketName: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3installationbucketname:1}}"
+      S3InstallKeyPrefix: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3installationkeyprefix:1}}"
       AOCStackPrefix: !Ref AOCStackPrefix
   CleanupSyncLibraries:
     Type: Custom::CleanupSyncLibraries

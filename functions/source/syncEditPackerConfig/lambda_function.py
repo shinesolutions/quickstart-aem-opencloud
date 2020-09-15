@@ -106,8 +106,9 @@ def create(event, _):
     s3_source_bucket = event['ResourceProperties']['S3SourceBucket']
     s3_source_key = event['ResourceProperties']['S3SourceKey']
     s3_data_bucket = event['ResourceProperties']['S3DataBucket']
+    s3_installation_bucket = event['ResourceProperties']['S3InstallBucketName']
     aoc_stack_prefix = event['ResourceProperties']['AOCStackPrefix']
-    s3_installation_source_raw = event['ResourceProperties']['S3InstallationSource']
+    s3_installation_source_raw = event['ResourceProperties']['S3InstallKeyPrefix']
     s3_installation_source = re.sub('/$', '', s3_installation_source_raw)
     aem_keystore_password = get_secret_string(aem_keystore_password_sm_id)
 
@@ -116,7 +117,7 @@ def create(event, _):
     jdk_version = java_jdk_version.split('u')[0]
     jdk_version_update = java_jdk_version.split('u')[1]
 
-    aem_license_body =  get_s3_object_content(s3_data_bucket, s3_installation_source + '/license.properties')
+    aem_license_body =  get_s3_object_content(s3_installation_bucket, s3_installation_source + '/license.properties')
 
     write_parameter(aem_license, aem_license_body)
 
@@ -134,10 +135,10 @@ def create(event, _):
     local_yaml['aem_curator::install_java::jdk_filename'] = "jdk-" + java_jdk_version + "-linux-x64.rpm"
     local_yaml['aem_curator::install_java::jdk_version'] = jdk_version
     local_yaml['aem_curator::install_java::jdk_version_update'] = jdk_version_update
-    local_yaml['aem_curator::install_author::aem_artifacts_base'] = "s3://" + s3_data_bucket + "/" + s3_installation_source
-    local_yaml['aem_curator::install_publish::aem_artifacts_base'] = "s3://" + s3_data_bucket + "/" + s3_installation_source
-    local_yaml['aem_curator::install_dispatcher::apache_module_base_url'] = "s3://" + s3_data_bucket + "/" + s3_installation_source
-    local_yaml['aem_curator::install_java::jdk_base_url'] = "s3://" + s3_data_bucket + "/" + s3_installation_source
+    local_yaml['aem_curator::install_author::aem_artifacts_base'] = "s3://" + s3_installation_bucket + "/" + s3_installation_source
+    local_yaml['aem_curator::install_publish::aem_artifacts_base'] = "s3://" + s3_installation_bucket + "/" + s3_installation_source
+    local_yaml['aem_curator::install_dispatcher::apache_module_base_url'] = "s3://" + s3_installation_bucket + "/" + s3_installation_source
+    local_yaml['aem_curator::install_java::jdk_base_url'] = "s3://" + s3_installation_bucket + "/" + s3_installation_source
     local_yaml['cloudwatchlogs::region'] = region
     local_yaml['config::license::region'] = region
     local_yaml['config::certs::region'] = region

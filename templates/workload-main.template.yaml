@@ -4,6 +4,7 @@ Metadata:
   QuickStartDocumentation:
     EntrypointName: "Launch into a new VPC"
     OptionalParameters:
+      - S3DataBucketName
       - LambdaZipsBucketName
       - InternalRoute53ZoneName
       - InternalRoute53ZoneID
@@ -48,7 +49,8 @@ Metadata:
           default: AEM OpenCloud configuration
         Parameters:
           - S3DataBucketName
-          - S3InstallationSource
+          - S3InstallBucketName
+          - S3InstallKeyPrefix
           - AOCStackPrefix
           - AemVersion
           - AemDispatcherVersion
@@ -116,8 +118,10 @@ Metadata:
         default: Orchestrator instance type
       S3DataBucketName:
         default: AEM OpenCloud S3 Data bucket
-      S3InstallationSource:
-        default: AEM OpenCloud S3 Artifacts Source Path
+      S3InstallBucketName:
+        default: AEM OpenCloud S3 Installation Bucket
+      S3InstallKeyPrefix:
+        default: AEM OpenCloud S3 installation Key Prefix
       AOCStackPrefix:
         default: AEM OpenCloud Stack Prefix
       AemVersion:
@@ -355,17 +359,33 @@ Parameters:
     Description: Amazon EC2 instance type for the Orchestrator instance
     Type: String
   S3DataBucketName:
+    Description: >-
+      (Optional) S3 bucket name for the AEM OpenCloud Stack data assets(installation files, license file, etc.). This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
+    Default: ''
+  S3InstallBucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
-    ConstraintDescription: Data bucket name can include numbers, lowercase
+    ConstraintDescription: Installation bucket name can include numbers, lowercase
       letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
       (-).
     Description: >-
-      S3 bucket where the AEM OpenCloud resources are located (installation files, license file, etc.).
-      This Bucket is also used to store the AEM Stack datas.
+      S3 bucket name for the AEM OpenCloud installation assets(installation files, license file, etc.). This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
     Type: String
-  S3InstallationSource:
+  S3InstallKeyPrefix:
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: >-
+      AEM OpenCloud installation key prefix can include numbers, lowercase letters, uppercase
+      letters, hyphens (-), and forward slash (/). It cannot start or end with forward
+      slash (/) because they are automatically appended.
     Description: >-
-      S3 path within the S3 Data Bucket where the AEM OpenCloud installation resources are located (installation files, license file, etc.).
+      S3 key prefix for the AEM OpenCloud installation assets(installation files, license file, etc.).AWS Quick Start key prefix can
+      include numbers, lowercase letters, uppercase letters, hyphens (-), and forward
+      slash (/). It cannot start or end with forward slash (/) because they are automatically
+      appended.
     Type: String
     Default: 'quickstart-aem-opencloud/library/'
   AOCStackPrefix:
@@ -583,7 +603,8 @@ Resources:
         PublishDispatcherInstanceType: !Ref PublishDispatcherInstanceType
         OrchestratorInstanceType: !Ref OrchestratorInstanceType
         S3DataBucketName: !Ref S3DataBucketName
-        S3InstallationSource: !Ref S3InstallationSource
+        S3InstallBucketName: !Ref S3InstallBucketName
+        S3InstallKeyPrefix: !Ref S3InstallKeyPrefix
         AOCStackPrefix: !Ref AOCStackPrefix
         AemVersion: !Ref AemVersion
         AemDispatcherVersion: !Ref AemDispatcherVersion
