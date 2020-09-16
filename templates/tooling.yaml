@@ -435,6 +435,8 @@ Resources:
               finally:
                   cfnresponse.send(event, context, status, {}, None)
   GenerateAemSslCertificateFunction:
+    DependsOn:
+      - CopyZips
     Type: AWS::Lambda::Function
     Properties:
       Description: Generate AEM SSL Certificate to encrypt internal AEM communication
@@ -447,6 +449,8 @@ Resources:
         S3Bucket: !Ref LambdaZipsBucketName
         S3Key: !Sub "${QSS3KeyPrefix}functions/packages/generateAemSslCertificate/lambda.zip"
   SyncEditStackConfigFunction:
+    DependsOn:
+      - CopyZips
     Type: AWS::Lambda::Function
     Properties:
       Description: Edit AEM OpenCloud Stack config and Sync to the AEM OpenCloud Stack S3 data location
@@ -458,6 +462,8 @@ Resources:
         S3Bucket: !Ref LambdaZipsBucketName
         S3Key: !Sub "${QSS3KeyPrefix}functions/packages/syncEditStackConfig/lambda.zip"
   SyncEditPackerConfigFunction:
+    DependsOn:
+      - CopyZips
     Type: AWS::Lambda::Function
     Properties:
       Description: Edit AEM OpenCloud Packer configiratopm and Sync to the AEM OpenCloud Stack S3 data location
@@ -469,6 +475,8 @@ Resources:
         S3Bucket: !Ref LambdaZipsBucketName
         S3Key: !Sub "${QSS3KeyPrefix}functions/packages/syncEditPackerConfig/lambda.zip"
   SyncEditStackFactsFunction:
+    DependsOn:
+      - CopyZips
     Type: AWS::Lambda::Function
     Properties:
       Description: Edit AEM OpenCloud Stack fact asset and Sync to the AEM OpenCloud Stack S3 data location
