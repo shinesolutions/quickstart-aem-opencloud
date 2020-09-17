@@ -398,46 +398,20 @@ Parameters:
     Description: Stack Prefix used to tag and identify the AEM OpenCloud Stack.
     Type: String
   AemVersion:
-    AllowedValues:
-      - "63"
-      - "63-SP1"
-      - "63-SP2"
-      - "63-SP2-CFP1"
-      - "63-SP2-CFP2"
-      - "64"
-      - "64-SP1"
-      - "64-SP2"
-      - "64-SP3"
-      - "64-SP4"
-      - "64-SP5"
-      - "64-SP6"
-      - "64-SP7"
-      - "64-SP8"
-      - "65"
-      - "65-SP1"
-      - "65-SP2"
-      - "65-SP3"
-      - "65-SP4"
     Default: "65-SP4"
-    Description: AEM Version to install.
+    Description: >-
+      AEM Version to install.
+      Please refer to the deployment guide for other supported versions.
     Type: String
   AemDispatcherVersion:
     Default: '4.3.3'
     Description: AEM Dispatcher version to install.
     Type: String
   JavaJDKVersion:
-    AllowedValues:
-      - 8u171
-      - 8u181
-      - 8u191
-      - 8u201
-      - 8u211
-      - 8u221
-      - 8u231
-      - 8u241
-      - 8u251
     Default: '8u251'
-    Description: Java JDK Version to install and run AEM.
+    Description: >-
+      Java JDK Version to install and run AEM.
+      Please refer to the deployment guide for other supported versions.
     Type: String
   LambdaZipsBucketName:
     Description: '(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.'
