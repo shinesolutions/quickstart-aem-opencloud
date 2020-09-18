@@ -2,13 +2,19 @@ Deploying this Quick Start for a new virtual private cloud (VPC) with
 *default parameters* builds the following _{partner-product-name}_ environment in the
 AWS Cloud.
 
-// Replace this example diagram with your own. Send us your source PowerPoint file. Be sure to follow our guidelines here : http://(we should include these points on our contributors giude)
+// Replace this example diagram with your own. Send us your source PowerPoint file. Be sure to follow our guidelines here : http://(we should include these points on our contributors guide)
+:xrefstyle: short
 [#architecture1]
 .Quick Start architecture for _{partner-product-name}_ on AWS
 [link=images/architecture_diagram.png]
 image::../images/architecture_diagram.png[Architecture,width=648,height=439]
 
-As shown in Figure 1, the Quick Start sets up the following:
+[#architecture2]
+.Quick Start architecture of resources for _{partner-product-name}_ on AWS
+[link=images/architecture_diagram_2.png]
+image::../images/architecture_diagram_2.png[Architecture,width=648,height=439]
+
+As shown in <<architecture1>> and <<architecture2>>, the Quick Start sets up the following:
 
 * A highly available architecture that spans two Availability Zones.*
 * A VPC configured with public and private subnets, according to AWS
