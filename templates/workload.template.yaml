@@ -3,6 +3,7 @@ Description: Deploy AEM on AWS (Existing VPC) (qs-1r4mk17nn).
 Metadata:
   QuickStartDocumentation:
     EntrypointName: "Launch into an existing VPC"
+    Order: "2"
     OptionalParameters:
       - S3DataBucketName
       - LambdaZipsBucketName
