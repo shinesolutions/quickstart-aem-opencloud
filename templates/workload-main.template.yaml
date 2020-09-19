@@ -513,6 +513,16 @@ Parameters:
     Type: String
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
+  CloudFrontEnabled: !Equals [!Ref EnableCloudfront, 'true']
+  CreateExternalRoute53DNSRecordCondition: !And
+    - !Not
+      - !Equals
+        - !Ref 'ExternalFQDN'
+        - ''
+    - !Not
+      - !Equals
+        - !Ref 'ExternalRoute53ZoneID'
+        - ''
 Resources:
   VPCStack:
     Type: AWS::CloudFormation::Stack
@@ -603,3 +613,18 @@ Resources:
         QSS3BucketName: !Ref QSS3BucketName
         QSS3BucketRegion: !Ref QSS3BucketRegion
         QSS3KeyPrefix: !Ref QSS3KeyPrefix
+Outputs:
+  AuthorDispatcherInternalDNSRecord:
+    Description: The Route53 record of the Author-Dispatcher ELB
+    Value: !GetAtt 'AEMOpenCloudStack.Outputs.AuthorDispatcherInternalDNSRecord'
+  PublishDispatcherInternalDNSRecord:
+    Description: The Route53 record of the Publish-Dispatcher ELB
+    Value: !GetAtt 'AEMOpenCloudStack.Outputs.PublishDispatcherInternalDNSRecord'
+  CloudfrontURL:
+    Condition: CloudFrontEnabled
+    Description: Cloudfront Distribution URL
+    Value: !GetAtt 'AEMOpenCloudStack.Outputs.CloudfrontURL'
+  ExternalDNSRecord:
+    Condition: CreateExternalRoute53DNSRecordCondition
+    Description: External URL
+    Value: !GetAtt 'AEMOpenCloudStack.Outputs.ExternalDNSRecord'
