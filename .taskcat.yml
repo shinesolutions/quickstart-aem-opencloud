@@ -51,39 +51,13 @@ tests:
       - ap-southeast-2
       - eu-central-1
       - eu-north-1
-      - eu-west-3
-      - sa-east-1
-      - us-east-1
-      - us-west-2
-      - ca-central-1
     template: templates/workload-main.template.yaml
     parameters:
       AemVersion: '65'
       S3InstallBucketName: "$[taskcat_autobucket]"
       S3InstallKeyPrefix:  "quickstart-aem-opencloud/library/"
-  # aem63-sp2-cfp2:
-  #   regions:
-  #     - us-east-1
-  #   template: templates/workload-main.template.yaml
-  #   parameters:
-  #     AemVersion: '63-SP2-CFP2'
-  #     S3InstallBucketName: "$[taskcat_autobucket]"
-  #     S3InstallKeyPrefix:  "quickstart-aem-opencloud/library/"
-  # aem64-sp8:
-  #   regions:
-  #     - us-east-1
-  #   template: templates/workload-main.template.yaml
-  #   parameters:
-  #     AemVersion: '64-SP8'
-  #     S3InstallBucketName: "$[taskcat_autobucket]"
-  #     S3InstallKeyPrefix:  "quickstart-aem-opencloud/library/"
   aem65-sp4:
     regions:
-      - ap-northeast-1
-      - ap-south-1
-      - ap-southeast-2
-      - eu-central-1
-      - eu-north-1
       - eu-west-3
       - sa-east-1
       - us-east-1
