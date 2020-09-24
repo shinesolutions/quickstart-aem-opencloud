@@ -70,4 +70,6 @@ aem_curator::install_java::jdk_version: <%jdk_version%>
 aem_curator::install_java::jdk_version_update: <%jdk_version_update%>
 
 aem_curator::install_author::aem_healthcheck_version: 1.3.3
+aem_curator::install_author::aem_healthcheck_source: <%s3_path%>
 aem_curator::install_publish::aem_healthcheck_version: 1.3.3
+aem_curator::install_publish::aem_healthcheck_source: <%s3_path%>

@@ -662,7 +662,6 @@ Resources:
             !Ref LambdaZipsBucket,
             !Ref LambdaZipsBucketName,
           ]
-        QSS3BucketName: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
   AmiCreationStack:
     DependsOn:
