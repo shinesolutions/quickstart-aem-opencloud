@@ -96,6 +96,7 @@ def write_yaml_file(dest_file_path, yaml_content):
 def create(event, _):
     aem_dispatcher_version = event['ResourceProperties']['AemDispatcherVersion']
     aem_profile = event['ResourceProperties']['AemInstallationProfile']
+    aem_healthcheck_content_version = event['ResourceProperties']['AemHealthcheckContentVersion']
     aem_keystore_password_sm_id = event['ResourceProperties']['AemKeystorePasswordSmId']
     aem_license = event['ResourceProperties']['AemLicenseSSMParameter']
     java_jdk_version = event['ResourceProperties']['JavaJdkVersion']
@@ -139,6 +140,8 @@ def create(event, _):
     local_yaml['aem_curator::install_publish::aem_artifacts_base'] = "s3://" + s3_installation_bucket + "/" + s3_installation_source
     local_yaml['aem_curator::install_dispatcher::apache_module_base_url'] = "s3://" + s3_installation_bucket + "/" + s3_installation_source
     local_yaml['aem_curator::install_java::jdk_base_url'] = "s3://" + s3_installation_bucket + "/" + s3_installation_source
+    local_yaml['aem_curator::install_author::aem_healthcheck_source'] = "s3://" + s3_data_bucket + "/" + aoc_stack_prefix + '/aem-healthcheck-content-' + aem_healthcheck_content_version + '.zip'
+    local_yaml['aem_curator::install_publish::aem_healthcheck_source'] = "s3://" + s3_data_bucket + "/" + aoc_stack_prefix + '/aem-healthcheck-content-' + aem_healthcheck_content_version + '.zip'
     local_yaml['cloudwatchlogs::region'] = region
     local_yaml['config::license::region'] = region
     local_yaml['config::certs::region'] = region

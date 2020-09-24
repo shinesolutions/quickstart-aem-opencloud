@@ -636,6 +636,7 @@ Resources:
       ServiceToken: !GetAtt 'SyncEditPackerConfigFunction.Arn'
       Version: 1
       AemDispatcherVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aemdispatcher:1}}"
+      AemHealthcheckContentVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aemhealthcheckcontent:1}}"
       AemInstallationProfile: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aem:1}}"
       AemKeystorePasswordSmId: !Sub "${AOCStackPrefix}-aem-keystore-password"
       AemLicenseSSMParameter: !Sub "/${AOCStackPrefix}/aem/license"
