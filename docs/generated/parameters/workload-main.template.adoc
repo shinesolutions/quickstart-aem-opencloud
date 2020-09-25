@@ -1,0 +1,80 @@
+
+.VPC Network configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Availability Zones
+(`AvailabilityZones`)|`**__Requires input__**`|List of Availability Zones to use for the subnets in the VPC. Only two Availability Zones are used for this deployment, and the logical order of your selections is preserved.|VPC CIDR
+(`VPCCIDR`)|`10.2.16.0/21`|CIDR block for the VPC|Private Subnet 1 CIDR
+(`PrivateSubnet1CIDR`)|`10.2.16.0/24`|CIDR block for private subnet 1 located in Availability Zone 1|Private Subnet 2 CIDR
+(`PrivateSubnet2CIDR`)|`10.2.18.0/24`|CIDR block for private subnet 2 located in Availability Zone 2|Public Subnet 1 CIDR
+(`PublicSubnet1CIDR`)|`10.2.20.0/24`|CIDR block for the public (DMZ) subnet 1 located in Availability Zone 1|Public Subnet 2 CIDR
+(`PublicSubnet2CIDR`)|`10.2.22.0/24`|CIDR block for the public (DMZ) subnet 2 located in Availability Zone 2
+|===
+.Bastion Host configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Bastion Instance Type
+(`BastionInstanceType`)|`t3.micro`|Amazon EC2 instance type for the bastion instances|Bastion AMI Operating System
+(`BastionAMIOS`)|`Amazon-Linux2-HVM`|The Linux distribution for the AMI to be used for the bastion instances|Allowed Bastion external access CIDR
+(`RemoteAccessCIDR`)|`**__Requires input__**`|Allowed CIDR block for external SSH access to the bastions
+|===
+.Amazon EC2 configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|EC2 instance KeyPair name
+(`KeyPairName`)|`**__Requires input__**`|Name of an existing Amazon EC2 public/private key pair to enable remote access to instances.|Base AMI SSM Name
+(`BaseAmiImageName`)|`/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2`|SSM Parameter Name of the Base Image Id. Supported OS are AL2 & RHEL7. Default OS is AL2.|Author instance type
+(`AuthorInstanceType`)|`m5.2xlarge`|Amazon EC2 instance type for the AEM Author instance|Publish instance type
+(`PublishInstanceType`)|`m5.2xlarge`|Amazon EC2 instance type for the AEM Publish instance|Author-Dispatcher instance type
+(`AuthorDispatcherInstanceType`)|`t3.small`|Amazon EC2 instance type for the AEM Author-Dispatcher instance|Publish-Dispatcher instance type
+(`PublishDispatcherInstanceType`)|`t3.small`|Amazon EC2 instance type for the AEM Publish-Dispatcher instance|Orchestrator instance type
+(`OrchestratorInstanceType`)|`t3.small`|Amazon EC2 instance type for the Orchestrator instance
+|===
+.AEM OpenCloud configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|AEM OpenCloud S3 Data bucket
+(`S3DataBucketName`)|`**__Blank string__**`|(Optional) S3 bucket name for the AEM OpenCloud Stack data assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|AEM OpenCloud S3 Installation Bucket
+(`S3InstallBucketName`)|`**__Requires input__**`|S3 bucket name for the AEM OpenCloud installation assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|AEM OpenCloud S3 installation Key Prefix
+(`S3InstallKeyPrefix`)|`quickstart-aem-opencloud/library/`|S3 key prefix for the AEM OpenCloud installation assets(installation files, license file, etc.).AWS Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.|AEM OpenCloud Stack Prefix
+(`AOCStackPrefix`)|`aem-opencloud`|Stack Prefix used to tag and identify the AEM OpenCloud Stack.|AEM Version to install
+(`AemVersion`)|`65-SP4`|AEM Version to install. Please refer to the deployment guide for other supported versions.|AEM Dispatcher version to install
+(`AemDispatcherVersion`)|`4.3.3`|AEM Dispatcher version to install.|Java JDK version to install
+(`JavaJDKVersion`)|`8u251`|Java JDK Version to install and run AEM. Please refer to the deployment guide for other supported versions.|Lambda S3 bucket name
+(`LambdaZipsBucketName`)|`**__Blank string__**`|(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.
+|===
+.(optional) AEM OpenCloud Certificate configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Internal Route53 Zone name
+(`InternalRoute53ZoneName`)|`**__Blank string__**`|(Optional) Internal Route53 Zone name. If Left blank, one is generated for you. If you want to use your own Route 53 hosted zone, please provide the hosted zone name.|Internal Route53 Zone Id
+(`InternalRoute53ZoneID`)|`**__Blank string__**`|(Optional) Internal Route53 Zone id of the provided internal Route53 Zone name.|Internal ACM Certificate ARN
+(`InternalCertificateARN`)|`**__Blank string__**`|(Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager, for the provided Internal Route53 Zone name. If not provided, a self-signed certificate will be used for you.|External FQDN
+(`ExternalFQDN`)|`**__Blank string__**`|(Optional) External FQDN for the AEM OpenCloud deployment (e.g., aoc.example.com). If not provided, no external Route53 Record will be created. If provided the External Route53 Zone ID becomes mandatory.|External Route53 Zone Id
+(`ExternalRoute53ZoneID`)|`**__Blank string__**`|(Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN. Mandatory if an External FQDN was provided.|External Certificate ARN
+(`ExternalCertificateARN`)|`**__Blank string__**`|(Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM). If not provided, but External FQDN & External Route53 Zone ID were provided, an external wildcard certificate will be created for you.
+|===
+.(optional) Advanced AEM OpenCloud configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Author Backup EC2 Snapshot id
+(`AuthorBackupSnapshotID`)|`**__Blank string__**`|(Optional) Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.|Publish Backup EC2 Snapshot id
+(`PublishBackupSnapshotID`)|`**__Blank string__**`|(Optional) Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.|Alarm notification E-Mail address
+(`AlarmNotificationEmail`)|`**__Blank string__**`|(Optional) Provode a valid Email address if you want to receive Stack alarm messages.|Alarm notification HTTPS endpoint
+(`AlarmNotificationHttpsEndpoint`)|`**__Blank string__**`|(Optional) Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.
+|===
+.(optional) AWS Cloudfront configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Enable Cloudfront Stack
+(`EnableCloudfront`)|`true`|(Optional) Set to false to disable Cloudfront.|CloudFront PriceClass
+(`CloudfrontPriceClass`)|`PriceClass_All`|(Optional) Select the price class associated with the maximum price that you want to pay for CloudFront service. If you select a price class other than All, some of your users may experience higher latency.
+|===
+.AWS Quick Start configuration
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|Quick Start S3 Bucket name
+(`QSS3BucketName`)|`aws-quickstart`|S3 bucket name for the Quick Start assets. This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|Quick Start S3 bucket region
+(`QSS3BucketRegion`)|`us-east-1`|The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.|Quick Start S3 Key Prefix
+(`QSS3KeyPrefix`)|`quickstart-aem-opencloud/`|S3 key prefix for the AWS Quick Start assets.AWS Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.
+|===

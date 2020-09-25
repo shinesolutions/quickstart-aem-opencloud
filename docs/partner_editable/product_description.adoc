@@ -1,6 +1,8 @@
 // Replace the content in <>
-// Briefly describe the software. Use consistent and clear branding. 
+// Briefly describe the software. Use consistent and clear branding.
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
+
+AEM OpenCloud is an open-source platform for running AEM on AWS. It provides an out of the box solution for provisioning a highly available AEM architecture which implements auto-scaling, auto-recovery, chaos-testing, CDN, multi-level backup, bluegreen deployment, repository upgrade, security, and monitoring capabilities by leveraging a multitude of AWS services.
 
 The {partner-product-name} workloads are deployed on multiple Amazon EC2 instances for improved performance. The content-delivery and content-management web server roles can be scaled for high availability. Other {partner-product-name} roles have restrictions on active/active roles and are designed for active/passive standby. Due to this, other {partner-product-name} roles belong to their own Auto Scaling groups as single instances. Should an instance become unavailable, it’s replaced by a new instance and configured with a {partner-product-name} role of the same type.
 
