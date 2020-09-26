@@ -778,6 +778,9 @@ a img {
 .preview_mode .tableblock {
   background:#ffffb3;
 }
+
+.footer-text{color:rgba(255,255,255,.8);line-height:1.44;background:#1c222a;padding:1.25em;max-width:100%;margin-bottom:unset}
+p.footer-text a{color:#d7d8d8}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
@@ -1788,7 +1791,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 Data bucket
 (<code>S3DataBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) S3 bucket name for the AEM OpenCloud Stack data assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
 </tr>
 <tr>
@@ -1830,7 +1833,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lambda S3 bucket name
 (<code>LambdaZipsBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.</p></td>
 </tr>
 </tbody>
@@ -1853,37 +1856,37 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone name
 (<code>InternalRoute53ZoneName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone name. If Left blank, one is generated for you. If you want to use your own Route 53 hosted zone, please provide the hosted zone name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone Id
 (<code>InternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone id of the provided internal Route53 Zone name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal ACM Certificate ARN
 (<code>InternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager, for the provided Internal Route53 Zone name. If not provided, a self-signed certificate will be used for you.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External FQDN
 (<code>ExternalFQDN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) External FQDN for the AEM OpenCloud deployment (e.g., aoc.example.com). If not provided, no external Route53 Record will be created. If provided the External Route53 Zone ID becomes mandatory.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External Route53 Zone Id
 (<code>ExternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN. Mandatory if an External FQDN was provided.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External Certificate ARN
 (<code>ExternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM). If not provided, but External FQDN &amp; External Route53 Zone ID were provided, an external wildcard certificate will be created for you.</p></td>
 </tr>
 </tbody>
@@ -1906,25 +1909,25 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Author Backup EC2 Snapshot id
 (<code>AuthorBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Publish Backup EC2 Snapshot id
 (<code>PublishBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification E-Mail address
 (<code>AlarmNotificationEmail</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid Email address if you want to receive Stack alarm messages.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification HTTPS endpoint
 (<code>AlarmNotificationHttpsEndpoint</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.</p></td>
 </tr>
 </tbody>
@@ -2150,7 +2153,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 Data bucket
 (<code>S3DataBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) S3 bucket name for the AEM OpenCloud Stack data assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
 </tr>
 <tr>
@@ -2192,7 +2195,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lambda S3 bucket name
 (<code>LambdaZipsBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.</p></td>
 </tr>
 </tbody>
@@ -2215,37 +2218,37 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone name
 (<code>InternalRoute53ZoneName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone name. If Left blank, one is generated for you. If you want to use your own Route 53 hosted zone, please provide the hosted zone name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone ID
 (<code>InternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone ID of the provided internal Route53 Zone name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal ACM Certificate ARN
 (<code>InternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager Private CA, for the provided Internal Route53 Zone name. If not provided, a self-signed certificate will be used for you.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External FQDN
 (<code>ExternalFQDN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) External FQDN for the AEM OpenCloud deployment (e.g., aoc.example.com). If not provided, no external Route53 Record will be created. If provided the External Route53 Zone ID becomes mandatory.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External Route53 Zone ID
 (<code>ExternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN. Mandatory if an External FQDN was provided.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External Certificate ARN
 (<code>ExternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM). If not provided, but External FQDN &amp; External Route53 Zone ID were provided, an external wildcard certificate will be created for you.</p></td>
 </tr>
 </tbody>
@@ -2268,25 +2271,25 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Author Backup EC2 Snapshot ID
 (<code>AuthorBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Publish Backup EC2 Snapshot ID
 (<code>PublishBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification E-Mail address
 (<code>AlarmNotificationEmail</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid Email address if you want to receive Stack alarm messages.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification HTTPS endpoint
 (<code>AlarmNotificationHttpsEndpoint</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.</p></td>
 </tr>
 </tbody>
@@ -2875,9 +2878,6 @@ the templates and scripts for this Quick Start, to post your comments,
 and to share your customizations with others.</p>
 </div>
 <hr>
-<div class="paragraph">
-<p>© 2020, Amazon Web Services Inc., or its affiliates, and Shine Solutions Group. All rights reserved.</p>
-</div>
 </div>
 </div>
 <div class="sect1">
@@ -2892,10 +2892,10 @@ and to share your customizations with others.</p>
 </div>
 </div>
 </div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2020-09-15 17:18:46 +1000
-</div>
-</div>
+<p class="footer-text">
+<!-- We can use document attributes: -->
+<!-- Generated with Asciidoctor v2.0.10. -->
+<a href="https://aws.amazon.com/privacy/">Privacy</a> | <a href="https://aws.amazon.com/terms/">Site terms</a> | &copy; 2020, Amazon Web Services, Inc. or its affiliates and Shine Solutions Group. All rights reserved.
+</p>
 </body>
 </html>
