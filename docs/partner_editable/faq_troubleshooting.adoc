@@ -4,8 +4,7 @@
 
 *Q.* I encountered a *CREATE_FAILED* error when I launched the Quick Start.
 
-*A.* If AWS CloudFormation fails to create the stack, we recommend that you relaunch the template with *Rollback on failure* set to *No*. (This setting is under *Advanced* in the AWS CloudFormation console, *Options* page.) With this setting, the stack’s state is retained and the instance is left running, so you can troubleshoot the issue. (For Windows, look at the log files in %ProgramFiles%\Amazon\EC2ConfigService and C:\cfn\log.)
-// If you’re deploying on Linux instances, provide the location for log files on Linux, or omit this sentence.
+*A.* If AWS CloudFormation fails to create the stack, we recommend that you relaunch the template with *Rollback on failure* set to *No*. (This setting is under *Advanced* in the AWS CloudFormation console, *Options* page.) With this setting, the stack’s state is retained and the instance is left running, so you can troubleshoot the issue.
 
 WARNING: When you set *Rollback on failure* to *Disabled*, you continue to incur AWS charges for this stack. Please make sure to delete the stack when you finish troubleshooting.
 
@@ -15,7 +14,180 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 
 *A.* We recommend that you launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template size limitations. For more information about AWS CloudFormation quotas, see the http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html[AWS documentation^].
 
+*Q.* Where are the deployment logs?
+
+*A.* All resources and logs for deployments are found either in Amazon CloudWatch Logs or in the instances themselves.
+
+* All logfiles of the Lambda functions can be found in Amazon Cloudwatch Logs.
+
+* Installation logfiles of the AEM OpenCloud roles can be found in the EC2 instances at `/var/log/cloud-init.log` & `/var/log/cloud-init-output.log`
+
+* Logfiles of the AEM OpenCloud Main Stack are found either in Amazon Cloudwatch Logs by the AOC Stack Prefix & name of the log file e.g. `aoc-stack-1/var/log/shinesolutions/puppet-stack-init.log` or in the EC2 instances at `/var/log/shinesolutions/puppet-stack-init.log`, `/var/log/cloud-init.log` & `/var/log/cloud-init-output.log`.
+
+*Q.* Where are the AEM System Users Login Credentials stored?
+
+*A.* The login credentials of the AEM System users are stored on S3 in the AEM OpenCloud Stack data directory `s3://S3DataBucketName/AOCStackPrefix/system-users-credentials.json` e.g. `s3://aem-opencloud/aoc-stack-1/system-users-credentials.json`.
+
+*Q.* Which versions of Oracle Java JDK8 are supported by AEM OpenCloud ?
+
+*A.* Supported versions of Oracle Java JDK 8 and their allowed input value for the parameter `JavaJDKVersion` are listed in the table below.
+.Supported Java JDK8 Versions
+[cols=2*,options="header"]
+|===
+|Version
+| Allowed input value
+
+| Java JDK 8u171 | 8u171
+| Java JDK 8u181 | 8u181
+| Java JDK 8u191 | 8u191
+| Java JDK 8u201 | 8u201
+| Java JDK 8u211 | 8u211
+| Java JDK 8u221 | 8u221
+| Java JDK 8u231 | 8u231
+| Java JDK 8u241 | 8u241
+| Java JDK 8u251 | 8u251
+|===
+
+*Q.* What versions of AEM are supported by AEM OpenCloud ?
+
+*A.* Supported versions of AEM and their allowed input value for the parameter `AemVersion` including the expected name of the Service-Packs are listed in the table below.
+.Supported AEM Version
+[cols=3*,options="header"]
+|===
+|Version
+| Allowed input value
+| Service Pack Name
+
+| AEM 63 | 63 | -
+| AEM  63 SP1 | 63-SP1 | AEM-6.3-Service-Pack-1-6.3.SP1.zip
+| AEM  63 SP2 | 63-SP2 | AEM-6.3.2.0-6.3.2.zip
+| AEM  63 SP2-CFP1 | 63-SP2-CFP1 | AEM-6.3.2.0-6.3.2.zip & AEM-CFP-6.3.2.1-1.0.zip
+| AEM  63 SP2-CFP2 | 63-SP2-CFP2 |AEM-6.3.2.0-6.3.2.zip & AEM-CFP-6.3.2.2-2.0.zip
+| AEM 64 | 64 | -
+| AEM 64 SP1 | 64-SP1 | AEM-6.4.1.0-6.4.1.zip
+| AEM 64 SP2 | 64-SP2 | AEM-6.4.2.0-6.4.2.zip
+| AEM 64 SP3 | 64-SP3 | AEM-6.4.3.0-6.4.3.zip
+| AEM 64 SP4 | 64-SP4 | AEM-6.4.4.0-6.4.4.zip
+| AEM 64 SP5 | 64-SP5 | AEM-6.4.5.0-6.4.5.zip
+| AEM 64 SP6 | 64-SP6 | AEM-6.4.6.0-6.4.6.zip
+| AEM 64 SP7 | 64-SP7 | AEM-6.4.7.0-6.4.7.zip
+| AEM 64 SP8 | 64-SP8 | AEM-6.4.8.0-6.4.8.zip
+| AEM 65 | 65 | -
+| AEM 65 SP1 | 65-SP1 | AEM-6.5.1.0-6.5.1.zip
+| AEM 65 SP2 | 65-SP2 | AEM-6.5.2.0-6.5.2.zip
+| AEM 65 SP3 | 65-SP3 | AEM-6.5.3.0-6.5.3.zip
+| AEM 65 SP4 | 65-SP4 | AEM-6.5.4.0-6.5.4.zip
+|===
 
 == Troubleshooting
 
-<Steps for troubleshooting the deployment go here.>
+=== General Troubleshooting notes:
+* If the stack `AmiCreationStack` failed to create, the installation of the AEM OpenCloud roles failed. Start troubleshooting by analysing the log files in the EC2 instances or the Lambda logs in Amazon Cloudwatch Logs.
+
+* The EC2 instances of the stack `AemOpenCloudMainStack` have the EC2 tag `ComponentInitStatus`, which helps to determine the provisioning state of the EC2 instances.
+
+The Tag `ComponentInitStatus` can contain three values:
+
+*InProgress*:
+The provisioning of the AEM OpenCloud role is still in progress.
+
+*Success*:
+The provisioning of the AEM OpenCloud role was successful.
+
+*Failed*:
+The provisioning of the AEM OpenCloud role failed.
+
+[link=images/ec2_tag_componentinitstatus.png]
+image::../images/ec2_tag_componentinitstatus.png[ec2_tag_componentinitstatus,width=648,height=439]
+
+* Amazon Cloudwatch logs contains all important log files of each main AEM OpenCloud role. Some important logs which support you troubleshooting are listed below.
+
+*General Logs:*
+```
+/var/log/shinesolutions/puppet-stack-init.log
+/var/log/cloud-init.log
+/var/log/cloud-init-output.log
+```
+
+*Role specific Logs:*
+```
+/opt/aem/author/crx-quickstart/logs/error.log
+/opt/aem/publish/crx-quickstart/logs/error.log
+
+/var/log/httpd/access_log
+/var/log/httpd/dispatcher.log
+/var/log/httpd/error_log
+
+/opt/shinesolutions/aem-orchestrator/orchestrator.log
+```
+
+=== Troubleshooting by Error messages:
+* ```OrchestratorAutoScalingGroup Received 1 FAILURE signal(s) out of 1.  Unable to satisfy 100% MinSuccessfulInstancesPercent requirement.```
+
+Troubleshooting this error requires you to analyse the Orchestrator role logs on the EC2 instance:
+```
+/var/log/cloud-init-output.log
+/opt/shinesolutions/aem-orchestrator/orchestrator.log
+```
+
+*/var/log/cloud-init-output.log*:
+
+Analyse this log file for the test results of the AEM OpenCloud readiness check.
+
+
+A successful component readiness check:
+```
+inspec exec . --show-progress --controls=\ author-primary-instance-provisioned-successful
+.
+Profile: AEM-AWS InSpec profile (aem-aws)
+Version: 1.10.0
+Target: local://
+ ✔ author-primary-instance-provisioned-successful: Check if Author Primary instance has been provisioned successful
+ ✔ ready is expected to have author primary instance been successful provision
+Profile Summary: 1 successful control, 0 control failures, 0 controls skipped
+Test Summary: 1 successful, 0 failures, 0 skipped
+```
+
+A failed component readiness check:
+```
+inspec exec . --show-progress --controls=\ author-primary-instance-provisioned-successful
+F
+Profile: AEM-AWS InSpec profile (aem-aws)
+Version: 1.10.0
+Target: local://
+   ×  author-primary-instance-provisioned-successful: Check if Author Primary instance has been provisioned successful
+      ×  ready is expected to have author primary instance been successful provision
+   expected #has_author_primary_instance_been_successful_provision? to return true, got false
+Profile Summary: 0 successful controls, 1 control failure, 0 controls skipped
+Test Summary: 0 successful, 1 failure, 0 skipped
+```
+
+A running component readiness check:
+```
+inspec exec . --show-progress --controls=\ author-standby-instance-provisioned-successful
+```
+
+If a readiness check failed for an AEM OpenCloud role, start analysing the deployment logs of the failed role.
+
+
+If the readiness check passed or was still running at the time of the failure start analysing the orchestrator log.
+
+
+
+*/opt/shinesolutions/aem-orchestrator/orchestrator.log*:
+
+The orchestrator log contains all log messages of all orchestration event.
+
+
+This message indicates the Orchestrator was not able to download the `system-users-credentials` file from  S3. Which happens if the file was deleted or if the `S3DataBucket` is not in the same region as where _quickstart-aem-opencloud_ is deployed to.
+```
+DEBUG c.s.a.c.AemConfig$$EnhancerBySpringCGLIB$$56cbacf8 - Reading AEM credentials from S3 bucket
+ERROR c.s.a.c.AemConfig$$EnhancerBySpringCGLIB$$56cbacf8 - Failed to read AEM credentials file from S3 location: s3://aem-opencloud/aoc-stack-1/system-users-credentials.json
+```
+
+If reading the AEM credentials from S3 was successful and the orchestrator log is showing no more log messages after the following log message:
+```
+[main] INFO  c.s.aemorchestrator.AemOrchestrator - Waiting for Author ELB to be in healthy state
+```
+
+It indicates that the provisioning of the Author-Primary role has not finished yet. Follow the guidelines described in the general troubleshooting notes for analysing errors for an AEM OpenCloud Role.
