@@ -1,6 +1,6 @@
 // Include details about the license and how they can sign up. If no license is required, clarify that.
 
-_<license information>This Quick Start requires a license for Adobe Experience Manager. Contact your Adobe sales representative or Adobe partner for a full Adobe AEM On-Premise license.
+This Quick Start requires a license for Adobe Experience Manager. Contact your Adobe sales representative or Adobe partner for a full Adobe AEM On-Premise license.
 When you launch the Quick Start, place the license key in the S3 installation bucket and specify its location._
 
 _If you don’t have a license, the Quick Start deployment will fail._

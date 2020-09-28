@@ -1,17 +1,6 @@
 // Add steps as necessary for accessing the software, post-configuration, and testing. Don’t include full usage instructions for your software, but add links to your product documentation for that information.
 //Should any sections not be applicable, remove them
 
-== Test the deployment
-// If steps are required to test the deployment, add them here. If not, remove the heading
-
-== Post deployment steps
-// If Post-deployment steps are required, add them here. If not, remove the heading
-
-== Best practices for using {partner-product-name} on AWS
-// Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
-
-_Add any best practices for using the software._
-
 == Security
 The login credentials of the AEM system users are stored as json file `system_users_credentials.json` on S3 at the location `s3://S3DataBucketName/AOCStackPrefix/`. `S3DataBucketName` is the name of the provided, or if not provided the name of the generated, S3 Bucket and `AOCStackPrefix` is the provided stack prefix e.g. `s3://aem-opencloud/aoc-stack-1/system-users-credentials.json`.
 
@@ -25,5 +14,3 @@ Please follow the following steps if you decided to change the password of an AE
 * Make sure the same password for the user is set on the AEM Author & AEM Publish EC2 instances.
 * If you change the password of the `orchestrator` user, restart or terminate the AEM Orchestrator EC2 instance and wait until the new one came up successfully by monitoring the EC2 tag `ComponentInitStatus`.
 * If you change the password of the `replicator` user, update all agents on the AEM Author & AEM Publish EC2 instances with the new password. As an alternative, you can also terminate the AEM Publish instances one by one. Before terminating the second AEM Publish instance, verify provisioning of the recovered AEM Publish EC2 instance was successful by monitoring the EC2 tag `ComponentInitStatus`.
-
-== Other useful information

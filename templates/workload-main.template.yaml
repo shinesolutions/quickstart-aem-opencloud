@@ -368,6 +368,7 @@ Parameters:
       numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
       or end with a hyphen (-).
     Type: String
+    Default: ''
   S3InstallBucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
     ConstraintDescription: Installation bucket name can include numbers, lowercase
@@ -416,14 +417,18 @@ Parameters:
   LambdaZipsBucketName:
     Description: '(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.'
     Type: String
+    Default: ''
   InternalRoute53ZoneName:
     Type: String
+    Default: ''
     Description: (Optional) Internal Route53 Zone name. If Left blank, one is generated for you.
       If you want to use your own Route 53 hosted zone, please provide the hosted zone name.
   InternalRoute53ZoneID:
     Type: String
+    Default: ''
     Description: (Optional) Internal Route53 Zone id of the provided internal Route53 Zone name.
   InternalCertificateARN:
+    Default: ''
     Description: >-
       (Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager,
       for the provided Internal Route53 Zone name.
@@ -434,24 +439,31 @@ Parameters:
       If not provided, no external Route53 Record will be created.
       If provided the External Route53 Zone ID becomes mandatory.
     Type: String
+    Default: ''
   ExternalRoute53ZoneID:
     Description: (Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN.
       Mandatory if an External FQDN was provided.
+    Default: ''
     Type: String
   ExternalCertificateARN:
+    Default: ''
     Description: (Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM).
       If not provided, but External FQDN & External Route53 Zone ID were provided, an external wildcard certificate will be created for you.
     Type: String
   AuthorBackupSnapshotID:
+    Default: ''
     Description: (Optional) Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.
     Type: String
   PublishBackupSnapshotID:
+    Default: ''
     Description: (Optional) Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.
     Type: String
   AlarmNotificationEmail:
+    Default: ''
     Description: (Optional) Provode a valid Email address if you want to receive Stack alarm messages.
     Type: String
   AlarmNotificationHttpsEndpoint:
+    Default: ''
     Description: (Optional) Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.
     Type: String
   EnableCloudfront:
