@@ -406,8 +406,8 @@ Parameters:
   ExternalRoute53ZoneID:
     Description: (Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN.
       Mandatory if an External FQDN was provided.
-    Default: ''
     Type: String
+    Default: ''
   ExternalCertificateARN:
     Default: ''
     Description: (Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM).

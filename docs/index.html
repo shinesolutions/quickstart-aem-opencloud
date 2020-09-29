@@ -768,16 +768,19 @@ a img {
     border: 1px solid #A4A4A4;
 }
 
-#preview_mode {
+.preview_mode {
 	border-color:#e0e0dc;
 	-webkit-box-shadow:0 1px 4px #e0e0dc;
 	box-shadow:0 1px 4px #e0e0dc;
   background:#ffffb3;
   padding-bottom: 2rem;
 }
-#preview_mode .tableblock {
+.preview_mode .tableblock {
   background:#ffffb3;
 }
+
+.footer-text{color:rgba(255,255,255,.8);line-height:1.44;background:#1c222a;padding:1.25em;max-width:100%;margin-bottom:unset}
+p.footer-text a{color:#d7d8d8}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
@@ -800,17 +803,24 @@ a img {
 </li>
 <li><a href="#_deployment_steps">Deployment steps</a>
 <ul class="sectlevel2">
-<li><a href="#_launch_into_an_existing_vpc">Launch into an existing VPC</a></li>
+<li><a href="#_sign_in_to_your_aws_account">Sign in to your AWS account</a></li>
+<li><a href="#_launch_the_quick_start">Launch the Quick Start</a></li>
 <li><a href="#_launch_into_a_new_vpc">Launch into a new VPC</a></li>
+<li><a href="#_launch_into_an_existing_vpc">Launch into an existing VPC</a></li>
+</ul>
+</li>
+<li><a href="#_security">Security</a></li>
+<li><a href="#_faq">FAQ</a></li>
+<li><a href="#_troubleshooting">Troubleshooting</a>
+<ul class="sectlevel2">
+<li><a href="#_general_troubleshooting_notes">General Troubleshooting notes:</a></li>
+<li><a href="#_troubleshooting_by_error_messages">Troubleshooting by Error messages:</a></li>
 </ul>
 </li>
 <li><a href="#_send_us_feedback">Send us feedback</a></li>
 <li><a href="#_quick_start_reference_deployments">Quick Start reference deployments</a></li>
-<li><a href="#_github_repository">GitHub repository</a>
-<ul class="sectlevel3">
+<li><a href="#_github_repository">GitHub repository</a></li>
 <li><a href="#_notices">Notices</a></li>
-</ul>
-</li>
 </ul>
 </div>
 </div>
@@ -821,14 +831,14 @@ a img {
 <h2 id="_quick_start_reference_deployment" class="discrete text-left text-center">Quick Start Reference Deployment</h2>
 <div class="imageblock text-center">
 <div class="content">
-<img src="https://aws-quickstart.s3.amazonaws.com/quickstart-aem-opencloud/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="QS" width="80" height="80">
+<img src="images/aws-quickstart-graphic.png" alt="QS" width="80" height="80">
 </div>
 </div>
 <h3 id="_draft_document_unofficial_guidance" class="discrete text-center">DRAFT DOCUMENT / UNOFFICIAL GUIDANCE</h3>
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/__settings</em>.adoc</code></strong>_</p>
 </div>
-<table id="preview_mode" class="tableblock frame-all grid-all stretch">
+<table class="tableblock frame-all grid-all stretch preview_mode">
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
@@ -836,7 +846,7 @@ a img {
 <tr>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph text-center">
 <p><strong>September, 2020</strong><br>
-<em>Cliffano Subagio and Michael Bloch, ShineSolutions</em><br>
+<em>Cliffano Subagio and Michael Bloch, Shine Solutions Group</em><br>
 <em>Tony Bulding, AWS Quick Start team</em></p>
 </div></div></td>
 </tr>
@@ -856,7 +866,7 @@ report bugs, or submit feature ideas for this Quick Start.
 </table>
 </div>
 <div class="paragraph text-left">
-<p>This Quick Start was created by ShineSolutions in collaboration with Amazon Web Services (AWS). <a href="http://aws.amazon.com/quickstart/" target="_blank" rel="noopener">Quick Starts</a> are automated reference deployments that use AWS CloudFormation templates to deploy key technologies on AWS, following AWS best practices.</p>
+<p>This Quick Start was created by Shine Solutions Group in collaboration with Amazon Web Services (AWS). <a href="http://aws.amazon.com/quickstart/" target="_blank" rel="noopener">Quick Starts</a> are automated reference deployments that use AWS CloudFormation templates to deploy key technologies on AWS, following AWS best practices.</p>
 </div>
 </div>
 </div>
@@ -866,7 +876,7 @@ report bugs, or submit feature ideas for this Quick Start.
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/overview_target_and_usage.adoc</code></strong></em></p>
 </div>
-<table id="preview_mode" class="tableblock frame-all grid-all stretch">
+<table class="tableblock frame-all grid-all stretch preview_mode">
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
@@ -876,7 +886,19 @@ report bugs, or submit feature ideas for this Quick Start.
 <p>This Quick Start reference deployment guide provides step-by-step instructions for deploying AEM OpenCloud on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p>This Quick Start is for users who &lt;target audience and usage scenario&gt;</p>
+<p>This Quick Start is for users who want to deploy and manage a high available (HA) AEM infrastructure on the AWS Cloud using the open-source platform AEM OpenCloud.</p>
+</div>
+<div class="paragraph">
+<p>This Quick Start deploys an AEM OpenCloud Full-Set Architecture on the AWS Cloud with enabled HA features like <a href="https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html" target="_blank" rel="noopener">Amazon EC2 Auto Scaling</a>,
+<a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/introduction.html" target="_blank" rel="noopener">Elastic Load Balancing</a> &amp; <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html" target="_blank" rel="noopener">Amazon CloudFront</a>.</p>
+</div>
+<div class="paragraph">
+<p>The AEM OpenCloud Full-Set is deployed with the recommended HA configuration of two Author-Dispatcher, two Publish-Dispatcher and two AEM Publish instances across multiple availability zones in one AWS Region.
+Further Amazon Cloudwatch alarms are configured to monitor the average CPU utilization of the Publish-Dispatcher Auto Scaling group. The alarm is configured to scale out/in by one EC2 instance if the CPU Utilization is above/below 50%, by not exceeding the configured minimum(2) or maximum(4) size of the Publish-Dispatcher Auto Scaling Group.
+The Orchestrator application manages AEM replication and flush agents as instances are getting created and terminated.</p>
+</div>
+<div class="paragraph">
+<p>Other services used by this Quick Start include <a href="https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html" target="_blank" rel="noopener">AWS Certificate Manager</a>, <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html" target="_blank" rel="noopener">Amazon CloudWatch</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html" target="_blank" rel="noopener">AWS Lambda</a>, <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html" target="_blank" rel="noopener">Amazon Route 53</a>, <a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html" target="_blank" rel="noopener">AWS Secrets Manager</a>, <a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html" target="_blank" rel="noopener">Amazon SNS</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html" target="_blank" rel="noopener">Amazon SQS</a>, <a href="https://docs.aws.amazon.com/AmazonS3/latest/gsg/GetStartedWithS3.html" target="_blank" rel="noopener">Amazon S3</a> and <a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html" target="_blank" rel="noopener">AWS Systems Manager</a>.</p>
 </div></div></td>
 </tr>
 </tbody>
@@ -903,17 +925,20 @@ collaborated with AWS on the content of the Quick Start.
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/product_description.adoc</code></strong></em></p>
 </div>
-<table id="preview_mode" class="tableblock frame-all grid-all stretch">
+<table class="tableblock frame-all grid-all stretch preview_mode">
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
+<p>AEM OpenCloud is an open-source platform for running AEM on AWS. It provides an out of the box solution for provisioning a highly available AEM architecture which implements auto-scaling, auto-recovery, chaos-testing, CDN, multi-level backup, bluegreen deployment, repository upgrade, security, and monitoring capabilities by leveraging a multitude of AWS services.</p>
+</div>
+<div class="paragraph">
 <p>The AEM OpenCloud workloads are deployed on multiple Amazon EC2 instances for improved performance. The content-delivery and content-management web server roles can be scaled for high availability. Other AEM OpenCloud roles have restrictions on active/active roles and are designed for active/passive standby. Due to this, other AEM OpenCloud roles belong to their own Auto Scaling groups as single instances. Should an instance become unavailable, it’s replaced by a new instance and configured with a AEM OpenCloud role of the same type.</p>
 </div>
 <div class="paragraph">
-<p>Website content can be deployed to the content-delivery and content-management roles using your choice of deployment process.</p>
+<p>The Website content can be deployed to the content-delivery and content-management roles using your choice of deployment process.</p>
 </div>
 <div class="paragraph">
 <p>Please know that we may share who uses AWS Quick Starts with the AWS Partner Network (APN) Partner that collaborated with AWS on the content of the Quick Start.</p>
@@ -957,26 +982,21 @@ After you deploy the Quick Start, enable the <a href="https://docs.aws.amazon.co
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/licenses.adoc</code></strong></em></p>
 </div>
-<table id="preview_mode" class="tableblock frame-all grid-all stretch">
+<table class="tableblock frame-all grid-all stretch preview_mode">
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>These two paragraphs provide an example of the details you can provide. Provide links as appropriate.</p>
+<p>This Quick Start requires a license for Adobe Experience Manager. Contact your Adobe sales representative or Adobe partner for a full Adobe AEM On-Premise license.
+When you launch the Quick Start, place the license key in the S3 installation bucket and specify its location.</p>
 </div>
 <div class="paragraph">
-<p>Example content below:</p>
+<p><em>If you don’t have a license, the Quick Start deployment will fail.</em></p>
 </div>
 <div class="paragraph">
-<p><em>&lt;license information&gt;This Quick Start requires a license for AEM OpenCloud. To use the Quick Start in your production environment, sign up for a license at &lt;link&gt;. When you launch the Quick Start, place the license key in an S3 bucket and specify its location.</em></p>
-</div>
-<div class="paragraph">
-<p><em>If you don’t have a license, the Quick Start deploys with a trial license. The trial license gives you &lt;n&gt; days of free usage in a non-production environment. After this time, you can upgrade to a production license by following the instructions at &lt;link&gt;.</em></p>
-</div>
-<div class="paragraph">
-<p><em>&lt;AMI information&gt;The Quick Start requires a subscription to the Amazon Machine Image (AMI) for AEM OpenCloud, which is available from <a href="https://aws.amazon.com/marketplace/" target="_blank" rel="noopener">AWS Marketplace</a>. Additional pricing, terms, and conditions may apply. For instructions, see <a href="#step-2.-subscribe-to-the-software-ami">step 2</a> in the deployment section.</em></p>
+<p>This Quick Start launches the Amazon Machine Image (AMI) for the Amazon Linux 2 or Red Hat Enterprise Linux (RHEL) operating system.</p>
 </div></div></td>
 </tr>
 </tbody>
@@ -989,7 +1009,7 @@ After you deploy the Quick Start, enable the <a href="https://docs.aws.amazon.co
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/architecture.adoc</code></strong></em></p>
 </div>
-<table id="preview_mode" class="tableblock frame-all grid-all stretch">
+<table class="tableblock frame-all grid-all stretch preview_mode">
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
@@ -1006,8 +1026,14 @@ AWS Cloud.</p>
 </div>
 <div class="title">Figure 1. Quick Start architecture for <em>AEM OpenCloud</em> on AWS</div>
 </div>
+<div id="architecture2" class="imageblock">
+<div class="content">
+<a class="image" href="images/architecture_diagram_2.png"><img src="images/architecture_diagram_2.png" alt="Architecture" width="648" height="439"></a>
+</div>
+<div class="title">Figure 2. Quick Start architecture of resources for <em>AEM OpenCloud</em> on AWS</div>
+</div>
 <div class="paragraph">
-<p>As shown in Figure 1, the Quick Start sets up the following:</p>
+<p>As shown in <a href="#architecture1">Figure 1</a> and <a href="#architecture2">Figure 2</a>, the Quick Start sets up the following:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -1017,9 +1043,6 @@ AWS Cloud.</p>
 <li>
 <p>A VPC configured with public and private subnets, according to AWS
 best practices, to provide you with your own virtual network on AWS.*</p>
-</li>
-<li>
-<p>Amazon Cloudfront for content delivery.</p>
 </li>
 <li>
 <p>In the public subnets:</p>
@@ -1034,7 +1057,7 @@ internet access for resources in the private subnets.*</p>
 Shell (SSH) access to EC2 instances in public and private subnets.*</p>
 </li>
 <li>
-<p>An internet-facing Classic Load Balancer (ELB) for routing traffic to the instances for content delivery.</p>
+<p>An internet-facing Classic Load Balancer (ELB) for routing traffic to the content delivery web server.</p>
 </li>
 </ul>
 </div>
@@ -1044,56 +1067,66 @@ Shell (SSH) access to EC2 instances in public and private subnets.*</p>
 <div class="ulist">
 <ul>
 <li>
-<p>An internal ELB for content management web server.</p>
-</li>
-<li>
-<p>An internal ELB for content management.</p>
-</li>
-<li>
 <p>Content management EC2 instances are designed for active/passive standby and are not part of an Auto Scaling Group.</p>
 </li>
 <li>
-<p>All other EC2 instances are deployed into their own Auto Scaling group.</p>
+<p>Content delivery EC2 instances are deployed into an Auto Scaling group.</p>
+</li>
+<li>
+<p>Content delivery web server EC2 instances are deployed into an Auto Scaling group.</p>
+</li>
+<li>
+<p>Content management web server EC2 instances are deployed into an Auto Scaling group.</p>
+</li>
+<li>
+<p>Utility EC2 instances are deployed into their own Auto Scaling group.</p>
+</li>
+<li>
+<p>An internal ELB for routing traffic to the active content management server.</p>
+</li>
+<li>
+<p>An internal ELB for routing traffic to the content management web server.</p>
 </li>
 </ul>
 </div>
+</li>
+<li>
+<p>Amazon Cloudfront for content delivery.</p>
 </li>
 <li>
 <p>EC2 Amazon Machine Image (AMI) for each AEM OpenCloud role.</p>
 </li>
 <li>
-<p>AWS Systems Manager to store parameter data.</p>
-</li>
-<li>
-<p>Amazon Simple Storage Service (Amazon S3) artifacts bucket for storing static data.</p>
+<p>AWS Certificate Manager (ACM) for storing SSL certificates.</p>
 </li>
 <li>
 <p>Amazon CloudWatch for monitoring deployed services.</p>
 </li>
 <li>
-<p>AWS Secrets Manager for the AEM Keystore Password &amp; private key of the self-signed certificate.</p>
+<p>AWS Lambda to support provisioning of AEM OpenCloud on AWS.</p>
 </li>
 <li>
-<p>AWS Certificate Manager (ACM) for access control.</p>
+<p>Amazon Route 53 private hosted zone for internal Domain Name System (DNS) lookups.</p>
 </li>
 <li>
-<p>A Lambda function to Generate and import the self-signed certificate into ACM.</p>
+<p>AWS Secrets Manager to store the AEM keystore password &amp; AEM SSL private key.</p>
 </li>
 <li>
-<p>A Lambda function to request an external certificate in ACM.</p>
+<p>Amazon Simple Notification Service (SNS) for receiving Auto scaling group alarm notifications.</p>
 </li>
 <li>
-<p>SNS Topics &amp; SQS Queues.</p>
+<p>Amazon Simple Queue Service (SQS) for forwarding Auto scaling group alarm notifications to Utility EC2 instances.</p>
 </li>
 <li>
-<p>Amazon Route 53 private hosted zone for internal Domain Name System (DNS) lookups within the VPC.</p>
+<p>Amazon Simple Storage Service (Amazon S3) bucket for storing AEM OpenCloud Stack assets.</p>
 </li>
-</ul>
-</div>
-<div class="paragraph">
-<p>*The template that deploys the Quick Start into an existing VPC skips
+<li>
+<p>AWS Systems Manager to store AEM OpenCloud configuration parameters.
+*The template that deploys the Quick Start into an existing VPC skips
 the components marked by asterisks and prompts you for your existing VPC
 configuration.</p>
+</li>
+</ul>
 </div></div></td>
 </tr>
 </tbody>
@@ -1117,14 +1150,14 @@ Cloud.</p>
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/specialized_knowledge.adoc</code></strong></em></p>
 </div>
-<table id="preview_mode" class="tableblock frame-all grid-all stretch">
+<table class="tableblock frame-all grid-all stretch preview_mode">
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>This Quick Start assumes familiarity with &lt;knowledge expectations&gt;.</p>
+<p>This Quick Start assumes familiarity with AWS &amp; AEM.</p>
 </div></div></td>
 </tr>
 </tbody>
@@ -1152,7 +1185,7 @@ Cloud.</p>
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/service_limits.adoc</code></strong></em></p>
 </div>
-<div id="preview_mode">
+<div class="preview_mode">
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1218,6 +1251,10 @@ Cloud.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
 </tr>
 <tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Secrets Manager</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
+</tr>
+<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Systems Manager parameters</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">127</p></td>
 </tr>
@@ -1231,16 +1268,127 @@ Cloud.</p>
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/regions.adoc</code></strong></em></p>
 </div>
 <div id="preview_mode">
-<div class="ulist">
-<ul>
-<li>
-<p><em>us-east-1 (N. Virginia)</em> (EXAMPLE)</p>
-</li>
-<li>
-<p><em>us-east-2 (Ohio)</em> (EXAMPLE)</p>
-</li>
-</ul>
-</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Code</th>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Opt-in Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">us-east-2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">US East (Ohio)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">us-east-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">US East (N. Virginia)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">us-west-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">US West (N. California)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">us-west-2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">US West (Oregon)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">af-south-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Africa (Cape Town)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ap-east-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Asia Pacific (Hong Kong)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ap-south-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Asia Pacific (Mumbai)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ap-northeast-3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Asia Pacific (Osaka-Local)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ap-northeast-2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Asia Pacific (Seoul)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ap-southeast-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Asia Pacific (Singapore)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ap-southeast-2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Asia Pacific (Sydney)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ap-northeast-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Asia Pacific (Tokyo)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">ca-central-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Canada (Central)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eu-central-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Europe (Frankfurt)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eu-west-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Europe (Ireland)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eu-west-2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Europe (London)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eu-south-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Europe (Milan)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eu-west-3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Europe (Paris)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">eu-north-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Europe (Stockholm)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">me-south-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Middle East (Bahrain)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">sa-east-1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">South America (São Paulo)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Not required</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="admonitionblock tip">
 <table>
@@ -1266,7 +1414,7 @@ Certain Regions are available on an opt-in basis. Refer to the AWS Documentation
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/pre-reqs.adoc</code></strong></em></p>
 </div>
-<table id="preview_mode" class="tableblock frame-all grid-all stretch">
+<table class="tableblock frame-all grid-all stretch preview_mode">
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
@@ -1297,30 +1445,36 @@ license.downloadID=AEM License Key</code></pre>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Download the Linux x86_64 AEM Dispatcher module for Apache 2.4 with OpenSSL 1.0 Support as tar.gz file <a href="https://docs.adobe.com/content/help/en/experience-manager-dispatcher/using/getting-started/release-notes.html">AEM Dispatcher Release Notes</a></p>
+<p>Go to <a href="https://docs.adobe.com/content/help/en/experience-manager-dispatcher/using/getting-started/release-notes.html">AEM Dispatcher Release Notes</a> to download the Linux x86_64 AEM Dispatcher module for Apache 2.4 with OpenSSL 1.0 Support as tar.gz file</p>
 </li>
 <li>
-<p>Download the JDK 8 installation rpm e.g. jdk-8u251-linux-x64.rpm</p>
+<p>Go to <a href="https://experience.adobe.com/#/downloads/content/software-distribution/en/aemcloud.html">Adobe Experience Cloud Software Distribution</a> and download the JDK 8 installation rpm e.g. jdk-8u251-linux-x64.rpm. Which JDK8 versions are supported is described in the FAQ.</p>
 </li>
 <li>
-<p>Download the AEM Jar file and if necessary the required AEM service pack</p>
+<p>Go to <a href="https://experience.adobe.com/#/downloads/content/software-distribution/en/aemcloud.html">Adobe Experience Cloud Software Distribution</a> and download the AEM Jar file and if necessary the required AEM service pack. Which AEM versions are supported is described in the FAQ.</p>
 </li>
 <li>
-<p>Upload the AEM license, AEM Dispatcher module, JDK8 rpm installation, AEM Jar &amp; AEM Service-Packs
-to the S3 installation bucket which will be use for the Quick Start deployment into a prefix of your choice.</p>
+<p>Place the AEM license, AEM Dispatcher module, JDK8 rpm installation, AEM Jar &amp; AEM Service-Packs
+to the S3 installation bucket which will be use for the Quick Start deployment into a prefix of your choice.
+:xrefstyle: short</p>
+<div id="s3bucketinstallationcontent" class="imageblock">
+<div class="content">
+<a class="image" href="images/s3_bucket_installation_content.png"><img src="images/s3_bucket_installation_content.png" alt="S3BucketInstallationContent" width="648" height="439"></a>
+</div>
+</div>
 </li>
 <li>
 <p>(optional) Create a certificate for your internal URL in Amazon Certificate Manager (ACM)
 in the Region where you deploy the Quick Start. This certificate must be created as a
 wildcard certificate for your AEM OpenCloud internal domain (for example, *.example.internal).
-Alternatively a Self-Signed Certificate will be used.</p>
+Alternatively a Certificate will be created for you.</p>
 </li>
 <li>
-<p>(optional) Create a certificate for your external URL in Amazon Certificate Manager (ACM)
-in the Region where you deploy the Quick Start. This certificate must be created as a
-wildcard certificate for your AEM OpenCloud domain (for example, *.example.com).
-Alternatively an external Certificate will be created for you.
-y preparation required to complete the product build, such as obtaining licenses or placing files in S3_</p>
+<p>(optional) If you are planning to enable Cloudfront and to use an external FQDN, create a certificate for your external URL in Amazon Certificate Manager (ACM)
+in the Region <code>us-east-1</code>. This certificate must be created as a wildcard certificate for your AEM OpenCloud domain (for example, *.example.com).</p>
+</li>
+<li>
+<p>(optional) If you are planning to disable Cloudfront and to use an external FQDN, create a certificate for your external URL in Amazon Certificate Manager (ACM) in the Region where you deploy the Quick Start. This certificate must be created as a wildcard certificate for your AEM OpenCloud domain (for example, *.example.com). Alternatively an external Certificate will be created for you.</p>
 </li>
 </ol>
 </div></div></td>
@@ -1333,7 +1487,7 @@ y preparation required to complete the product build, such as obtaining licenses
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/deployment_options.adoc</code></strong></em></p>
 </div>
-<table id="preview_mode" class="tableblock frame-all grid-all stretch">
+<table class="tableblock frame-all grid-all stretch preview_mode">
 <colgroup>
 <col style="width: 100%;">
 </colgroup>
@@ -1354,6 +1508,15 @@ y preparation required to complete the product build, such as obtaining licenses
 </div>
 <div class="paragraph">
 <p>The Quick Start provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and AEM OpenCloud settings, as discussed later in this guide.</p>
+</div>
+<div class="sect2">
+<h3 id="_operating_system_for_deployment">Operating System for Deployment</h3>
+<div class="paragraph">
+<p>This Quick Start supports Amazon Linux 2(AL2) or RedHat Enterprise Linux 7(RHEL7) for your AEM OpenCloud installation on AWS. This Quick Start deployment uses AL2.</p>
+</div>
+<div class="paragraph">
+<p>Please note that NVME instance types e.g. <code>m5</code> or <code>t3</code> are <strong>not supported</strong> when you run AEM OpenCloud on <strong>RHEL7</strong>.</p>
+</div>
 </div></div></td>
 </tr>
 </tbody>
@@ -1368,11 +1531,9 @@ y preparation required to complete the product build, such as obtaining licenses
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/deploy_steps.adoc</code></strong></em></p>
 </div>
-<div id="preview_mode" class="openblock">
-<div class="content">
-<div class="paragraph">
-<p>=== Sign in to your AWS account</p>
-</div>
+<div class="preview_mode">
+<div class="sect2">
+<h3 id="_sign_in_to_your_aws_account">Sign in to your AWS account</h3>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
@@ -1383,9 +1544,9 @@ y preparation required to complete the product build, such as obtaining licenses
 </li>
 </ol>
 </div>
-<div class="paragraph">
-<p>=== Launch the Quick Start</p>
 </div>
+<div class="sect2">
+<h3 id="_launch_the_quick_start">Launch the Quick Start</h3>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -1454,7 +1615,6 @@ If you’re deploying AEM OpenCloud into an existing VPC, make sure that your VP
 </ol>
 </div>
 </div>
-</div>
 <div class="paragraph">
 <p>In the following tables, parameters are listed by category and described separately for the deployment options. When you finish reviewing and customizing the parameters, choose <strong>Next</strong>.</p>
 </div>
@@ -1471,10 +1631,384 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </tr>
 </table>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_launch_into_a_new_vpc">Launch into a new VPC</h3>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. VPC Network configuration</caption>
+<colgroup>
+<col style="width: 16%;">
+<col style="width: 11%;">
+<col style="width: 73%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter label (name)</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Availability Zones
+(<code>AvailabilityZones</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">List of Availability Zones to use for the subnets in the VPC. Only two Availability Zones are used for this deployment, and the logical order of your selections is preserved.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">VPC CIDR
+(<code>VPCCIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.2.16.0/21</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the VPC</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private Subnet 1 CIDR
+(<code>PrivateSubnet1CIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.2.16.0/24</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 1 located in Availability Zone 1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private Subnet 2 CIDR
+(<code>PrivateSubnet2CIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.2.18.0/24</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 2 located in Availability Zone 2</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Public Subnet 1 CIDR
+(<code>PublicSubnet1CIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.2.20.0/24</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public (DMZ) subnet 1 located in Availability Zone 1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Public Subnet 2 CIDR
+(<code>PublicSubnet2CIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.2.22.0/24</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public (DMZ) subnet 2 located in Availability Zone 2</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 2. Bastion Host configuration</caption>
+<colgroup>
+<col style="width: 16%;">
+<col style="width: 11%;">
+<col style="width: 73%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter label (name)</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bastion Instance Type
+(<code>BastionInstanceType</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t3.micro</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the bastion instances</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Bastion AMI Operating System
+(<code>BastionAMIOS</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Amazon-Linux2-HVM</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The Linux distribution for the AMI to be used for the bastion instances</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Bastion external access CIDR
+(<code>RemoteAccessCIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed CIDR block for external SSH access to the bastions</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 3. Amazon EC2 configuration</caption>
+<colgroup>
+<col style="width: 16%;">
+<col style="width: 11%;">
+<col style="width: 73%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter label (name)</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 instance KeyPair name
+(<code>KeyPairName</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of an existing Amazon EC2 public/private key pair to enable remote access to instances.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base AMI SSM Name
+(<code>BaseAmiImageName</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">SSM Parameter Name of the Base Image Id. Supported OS are AL2 &amp; RHEL7. Default OS is AL2.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Author instance type
+(<code>AuthorInstanceType</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>m5.2xlarge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the AEM Author instance</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Publish instance type
+(<code>PublishInstanceType</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>m5.2xlarge</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the AEM Publish instance</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Author-Dispatcher instance type
+(<code>AuthorDispatcherInstanceType</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t3.small</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the AEM Author-Dispatcher instance</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Publish-Dispatcher instance type
+(<code>PublishDispatcherInstanceType</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t3.small</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the AEM Publish-Dispatcher instance</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Orchestrator instance type
+(<code>OrchestratorInstanceType</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t3.small</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the Orchestrator instance</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 4. AEM OpenCloud configuration</caption>
+<colgroup>
+<col style="width: 16%;">
+<col style="width: 11%;">
+<col style="width: 73%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter label (name)</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 Data bucket
+(<code>S3DataBucketName</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) S3 bucket name for the AEM OpenCloud Stack data assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 Installation Bucket
+(<code>S3InstallBucketName</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 bucket name for the AEM OpenCloud installation assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 installation Key Prefix
+(<code>S3InstallKeyPrefix</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quickstart-aem-opencloud/library/</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix for the AEM OpenCloud installation assets(installation files, license file, etc.).AWS Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud Stack Prefix
+(<code>AOCStackPrefix</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>aem-opencloud</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Stack Prefix used to tag and identify the AEM OpenCloud Stack.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM Version to install
+(<code>AemVersion</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>65-SP4</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM Version to install. Please refer to the deployment guide for other supported versions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM Dispatcher version to install
+(<code>AemDispatcherVersion</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>4.3.3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM Dispatcher version to install.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK version to install
+(<code>JavaJDKVersion</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>8u251</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK Version to install and run AEM. Please refer to the deployment guide for other supported versions.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Lambda S3 bucket name
+(<code>LambdaZipsBucketName</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 5. (optional) AEM OpenCloud Certificate configuration</caption>
+<colgroup>
+<col style="width: 16%;">
+<col style="width: 11%;">
+<col style="width: 73%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter label (name)</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone name
+(<code>InternalRoute53ZoneName</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone name. If Left blank, one is generated for you. If you want to use your own Route 53 hosted zone, please provide the hosted zone name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone Id
+(<code>InternalRoute53ZoneID</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone id of the provided internal Route53 Zone name.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internal ACM Certificate ARN
+(<code>InternalCertificateARN</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager, for the provided Internal Route53 Zone name. If not provided, a self-signed certificate will be used for you.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External FQDN
+(<code>ExternalFQDN</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) External FQDN for the AEM OpenCloud deployment (e.g., aoc.example.com). If not provided, no external Route53 Record will be created. If provided the External Route53 Zone ID becomes mandatory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External Route53 Zone Id
+(<code>ExternalRoute53ZoneID</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN. Mandatory if an External FQDN was provided.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">External Certificate ARN
+(<code>ExternalCertificateARN</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM). If not provided, but External FQDN &amp; External Route53 Zone ID were provided, an external wildcard certificate will be created for you.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 6. (optional) Advanced AEM OpenCloud configuration</caption>
+<colgroup>
+<col style="width: 16%;">
+<col style="width: 11%;">
+<col style="width: 73%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter label (name)</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Author Backup EC2 Snapshot id
+(<code>AuthorBackupSnapshotID</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Publish Backup EC2 Snapshot id
+(<code>PublishBackupSnapshotID</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification E-Mail address
+(<code>AlarmNotificationEmail</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid Email address if you want to receive Stack alarm messages.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification HTTPS endpoint
+(<code>AlarmNotificationHttpsEndpoint</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 7. (optional) AWS Cloudfront configuration</caption>
+<colgroup>
+<col style="width: 16%;">
+<col style="width: 11%;">
+<col style="width: 73%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter label (name)</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable Cloudfront Stack
+(<code>EnableCloudfront</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Set to false to disable Cloudfront.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CloudFront PriceClass
+(<code>CloudfrontPriceClass</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PriceClass_All</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Select the price class associated with the maximum price that you want to pay for CloudFront service. If you select a price class other than All, some of your users may experience higher latency.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 8. AWS Quick Start configuration</caption>
+<colgroup>
+<col style="width: 16%;">
+<col style="width: 11%;">
+<col style="width: 73%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter label (name)</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 Bucket name
+(<code>QSS3BucketName</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>aws-quickstart</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 bucket name for the Quick Start assets. This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 bucket region
+(<code>QSS3BucketRegion</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>us-east-1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 Key Prefix
+(<code>QSS3KeyPrefix</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quickstart-aem-opencloud/</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix for the AWS Quick Start assets.AWS Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="sect2">
 <h3 id="_launch_into_an_existing_vpc">Launch into an existing VPC</h3>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. Network configuration</caption>
+<caption class="title">Table 9. Network configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1551,7 +2085,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 2. Amazon EC2 Configuration</caption>
+<caption class="title">Table 10. Amazon EC2 Configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1610,7 +2144,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. AEM OpenCloud configuration</caption>
+<caption class="title">Table 11. AEM OpenCloud configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1627,7 +2161,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 Data bucket
 (<code>S3DataBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) S3 bucket name for the AEM OpenCloud Stack data assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
 </tr>
 <tr>
@@ -1652,7 +2186,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM Version to install
 (<code>AemVersion</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>65-SP4</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AEM Version to install.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM Version to install. Please refer to the deployment guide for other supported versions.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM Dispatcher version to install
@@ -1664,385 +2198,12 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK version to install
 (<code>JavaJDKVersion</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>8u251</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK Version to install and run AEM.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK Version to install and run AEM. Please refer to the deployment guide for other supported versions.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lambda S3 bucket name
 (<code>LambdaZipsBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 4. (optional) AEM OpenCloud Certificate configuration</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone name
-(<code>InternalRoute53ZoneName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone name. If Left blank, one is generated for you. If you want to use your own Route 53 hosted zone, please provide the hosted zone name.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone ID
-(<code>InternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone ID of the provided internal Route53 Zone name.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Internal ACM Certificate ARN
-(<code>InternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager Private CA, for the provided Internal Route53 Zone name. If not provided, a self-signed certificate will be used for you.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">External FQDN
-(<code>ExternalFQDN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) External FQDN for the AEM OpenCloud deployment (e.g., aoc.example.com). If not provided, no external Route53 Record will be created. If provided the External Route53 Zone ID becomes mandatory.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">External Route53 Zone ID
-(<code>ExternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN. Mandatory if an External FQDN was provided.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">External Certificate ARN
-(<code>ExternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM). If not provided, but External FQDN &amp; External Route53 Zone ID were provided, an external wildcard certificate will be created for you.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 5. (optional) Advanced AEM OpenCloud configuration</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Author Backup EC2 Snapshot ID
-(<code>AuthorBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Publish Backup EC2 Snapshot ID
-(<code>PublishBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification E-Mail address
-(<code>AlarmNotificationEmail</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid Email address if you want to receive Stack alarm messages.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification HTTPS endpoint
-(<code>AlarmNotificationHttpsEndpoint</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 6. (optional) AWS Cloudfront configuration</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Enable Cloudfront Stack
-(<code>EnableCloudfront</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Set to false to disable Cloudfront.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CloudFront PriceClass
-(<code>CloudfrontPriceClass</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>PriceClass_All</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Select the price class associated with the maximum price that you want to pay for CloudFront service. If you select a price class other than All, some of your users may experience higher latency.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 7. AWS Quick Start configuration</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 Bucket name
-(<code>QSS3BucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>aws-quickstart</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 bucket name for the Quick Start assets. This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 bucket region
-(<code>QSS3BucketRegion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>us-east-1</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 Key Prefix
-(<code>QSS3KeyPrefix</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quickstart-aem-opencloud/</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix for the AWS Quick Start assets.AWS Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_launch_into_a_new_vpc">Launch into a new VPC</h3>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 8. VPC Network configuration</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Availability Zones
-(<code>AvailabilityZones</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">List of Availability Zones to use for the subnets in the VPC. Only two Availability Zones are used for this deployment, and the logical order of your selections is preserved.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VPC CIDR
-(<code>VPCCIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.2.16.0/21</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the VPC</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private Subnet 1 CIDR
-(<code>PrivateSubnet1CIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.2.16.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 1 located in Availability Zone 1</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private Subnet 2 CIDR
-(<code>PrivateSubnet2CIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.2.18.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 2 located in Availability Zone 2</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Public Subnet 1 CIDR
-(<code>PublicSubnet1CIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.2.20.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public (DMZ) subnet 1 located in Availability Zone 1</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Public Subnet 2 CIDR
-(<code>PublicSubnet2CIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.2.22.0/24</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public (DMZ) subnet 2 located in Availability Zone 2</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 9. Bastion Host configuration</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bastion Instance Type
-(<code>BastionInstanceType</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t3.micro</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the bastion instances</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Bastion AMI Operating System
-(<code>BastionAMIOS</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>Amazon-Linux2-HVM</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The Linux distribution for the AMI to be used for the bastion instances</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed Bastion external access CIDR
-(<code>RemoteAccessCIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed CIDR block for external SSH access to the bastions</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 10. Amazon EC2 configuration</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 instance KeyPair name
-(<code>KeyPairName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of an existing Amazon EC2 public/private key pair to enable remote access to instances.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Base AMI SSM Name
-(<code>BaseAmiImageName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SSM Parameter Name of the Base Image Id. Supported OS are AL2 &amp; RHEL7. Default OS is AL2.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Author instance type
-(<code>AuthorInstanceType</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>m5.2xlarge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the AEM Author instance</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Publish instance type
-(<code>PublishInstanceType</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>m5.2xlarge</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the AEM Publish instance</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Author-Dispatcher instance type
-(<code>AuthorDispatcherInstanceType</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t3.small</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the AEM Author-Dispatcher instance</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Publish-Dispatcher instance type
-(<code>PublishDispatcherInstanceType</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t3.small</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the AEM Publish-Dispatcher instance</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Orchestrator instance type
-(<code>OrchestratorInstanceType</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>t3.small</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Amazon EC2 instance type for the Orchestrator instance</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 11. AEM OpenCloud configuration</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 Data bucket
-(<code>S3DataBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) S3 bucket name for the AEM OpenCloud Stack data assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 Installation Bucket
-(<code>S3InstallBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 bucket name for the AEM OpenCloud installation assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 installation Key Prefix
-(<code>S3InstallKeyPrefix</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quickstart-aem-opencloud/library/</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix for the AEM OpenCloud installation assets(installation files, license file, etc.).AWS Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud Stack Prefix
-(<code>AOCStackPrefix</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>aem-opencloud</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Stack Prefix used to tag and identify the AEM OpenCloud Stack.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AEM Version to install
-(<code>AemVersion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>65-SP4</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AEM Version to install.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AEM Dispatcher version to install
-(<code>AemDispatcherVersion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>4.3.3</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">AEM Dispatcher version to install.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK version to install
-(<code>JavaJDKVersion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>8u251</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK Version to install and run AEM.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Lambda S3 bucket name
-(<code>LambdaZipsBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.</p></td>
 </tr>
 </tbody>
@@ -2065,37 +2226,37 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone name
 (<code>InternalRoute53ZoneName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone name. If Left blank, one is generated for you. If you want to use your own Route 53 hosted zone, please provide the hosted zone name.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone Id
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone ID
 (<code>InternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone id of the provided internal Route53 Zone name.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone ID of the provided internal Route53 Zone name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal ACM Certificate ARN
 (<code>InternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager, for the provided Internal Route53 Zone name. If not provided, a self-signed certificate will be used for you.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager Private CA, for the provided Internal Route53 Zone name. If not provided, a self-signed certificate will be used for you.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External FQDN
 (<code>ExternalFQDN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) External FQDN for the AEM OpenCloud deployment (e.g., aoc.example.com). If not provided, no external Route53 Record will be created. If provided the External Route53 Zone ID becomes mandatory.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">External Route53 Zone Id
+<td class="tableblock halign-left valign-top"><p class="tableblock">External Route53 Zone ID
 (<code>ExternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN. Mandatory if an External FQDN was provided.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External Certificate ARN
 (<code>ExternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM). If not provided, but External FQDN &amp; External Route53 Zone ID were provided, an external wildcard certificate will be created for you.</p></td>
 </tr>
 </tbody>
@@ -2116,27 +2277,27 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Author Backup EC2 Snapshot id
+<td class="tableblock halign-left valign-top"><p class="tableblock">Author Backup EC2 Snapshot ID
 (<code>AuthorBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Publish Backup EC2 Snapshot id
+<td class="tableblock halign-left valign-top"><p class="tableblock">Publish Backup EC2 Snapshot ID
 (<code>PublishBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification E-Mail address
 (<code>AlarmNotificationEmail</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid Email address if you want to receive Stack alarm messages.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification HTTPS endpoint
 (<code>AlarmNotificationHttpsEndpoint</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.</p></td>
 </tr>
 </tbody>
@@ -2228,34 +2389,12 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <div class="content">
 <a class="image" href="images/cfn_outputs.png"><img src="images/cfn_outputs.png" alt="cfn_outputs" width="648" height="439"></a>
 </div>
-<div class="title">Figure 2. AEM OpenCloud outputs after successful deployment</div>
+<div class="title">Figure 3. AEM OpenCloud outputs after successful deployment</div>
 </div>
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/additional_info.adoc</code></strong></em></p>
 </div>
-<table id="preview_mode" class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="sect1">
-<h2 id="_test_the_deployment">Test the deployment</h2>
-<div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="_post_deployment_steps">Post deployment steps</h2>
-<div class="sectionbody">
-
-</div>
-</div>
-<div class="sect1">
-<h2 id="_best_practices_for_using_aem_opencloud_on_aws">Best practices for using AEM OpenCloud on AWS</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p><em>Add any best practices for using the software.</em></p>
+<div class="preview_mode">
 </div>
 </div>
 </div>
@@ -2263,38 +2402,47 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <h2 id="_security">Security</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em>Add any security-related information.</em></p>
+<p>The login credentials of the AEM system users are stored as json file <code>system_users_credentials.json</code> on S3 at the location <code>s3://S3DataBucketName/AOCStackPrefix/</code>. <code>S3DataBucketName</code> is the name of the provided, or if not provided the name of the generated, S3 Bucket and <code>AOCStackPrefix</code> is the provided stack prefix e.g. <code>s3://aem-opencloud/aoc-stack-1/system-users-credentials.json</code>.</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_other_useful_information">Other useful information</h2>
-<div class="sectionbody">
 <div class="paragraph">
-<p><em>Add any other details that will help the customer use the software on AWS.</em></p>
+<p>To login to AEM use the credentials for the <code>admin</code> user.</p>
 </div>
+<div class="paragraph">
+<p><em>Changing the password of an AEM System User may cause system instabilities and is therefore not recommended.</em></p>
 </div>
-</div></div></td>
-</tr>
-</tbody>
-</table>
+<div class="paragraph">
+<p>Please follow the following steps if you decided to change the password of an AEM system user:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Update the <code>system_users_credentials.json</code> with the new password.</p>
+</li>
+<li>
+<p>Make sure the same password for the user is set on the AEM Author &amp; AEM Publish EC2 instances.</p>
+</li>
+<li>
+<p>If you change the password of the <code>orchestrator</code> user, restart or terminate the AEM Orchestrator EC2 instance and wait until the new one came up successfully by monitoring the EC2 tag <code>ComponentInitStatus</code>.</p>
+</li>
+<li>
+<p>If you change the password of the <code>replicator</code> user, update all agents on the AEM Author &amp; AEM Publish EC2 instances with the new password. As an alternative, you can also terminate the AEM Publish instances one by one. Before terminating the second AEM Publish instance, verify provisioning of the recovered AEM Publish EC2 instance was successful by monitoring the EC2 tag <code>ComponentInitStatus</code>.</p>
+</li>
+</ul>
+</div>
 <div class="paragraph">
 <p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/faq_troubleshooting.adoc</code></strong></em></p>
 </div>
-<table id="preview_mode" class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="sect1">
+<div class="preview_mode">
+</div>
+</div>
+<div class="sect1">
 <h2 id="_faq">FAQ</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p><strong>Q.</strong> I encountered a <strong>CREATE_FAILED</strong> error when I launched the Quick Start.</p>
 </div>
 <div class="paragraph">
-<p><strong>A.</strong> If AWS CloudFormation fails to create the stack, we recommend that you relaunch the template with <strong>Rollback on failure</strong> set to <strong>No</strong>. (This setting is under <strong>Advanced</strong> in the AWS CloudFormation console, <strong>Options</strong> page.) With this setting, the stack’s state is retained and the instance is left running, so you can troubleshoot the issue. (For Windows, look at the log files in %ProgramFiles%\Amazon\EC2ConfigService and C:\cfn\log.)</p>
+<p><strong>A.</strong> If AWS CloudFormation fails to create the stack, we recommend that you relaunch the template with <strong>Rollback on failure</strong> set to <strong>No</strong>. (This setting is under <strong>Advanced</strong> in the AWS CloudFormation console, <strong>Options</strong> page.) With this setting, the stack’s state is retained and the instance is left running, so you can troubleshoot the issue.</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -2317,19 +2465,374 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <div class="paragraph">
 <p><strong>A.</strong> We recommend that you launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template size limitations. For more information about AWS CloudFormation quotas, see the <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html" target="_blank" rel="noopener">AWS documentation</a>.</p>
 </div>
+<div class="paragraph">
+<p><strong>Q.</strong> Where are the deployment logs?</p>
+</div>
+<div class="paragraph">
+<p><strong>A.</strong> All resources and logs for deployments are found either in Amazon CloudWatch Logs or in the instances themselves.</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>All logfiles of the Lambda functions can be found in Amazon Cloudwatch Logs.</p>
+</li>
+<li>
+<p>Installation logfiles of the AEM OpenCloud roles can be found in the EC2 instances at <code>/var/log/cloud-init.log</code> &amp; <code>/var/log/cloud-init-output.log</code></p>
+</li>
+<li>
+<p>Logfiles of the AEM OpenCloud Main Stack are found either in Amazon Cloudwatch Logs by the AOC Stack Prefix &amp; name of the log file e.g. <code>aoc-stack-1/var/log/shinesolutions/puppet-stack-init.log</code> or in the EC2 instances at <code>/var/log/shinesolutions/puppet-stack-init.log</code>, <code>/var/log/cloud-init.log</code> &amp; <code>/var/log/cloud-init-output.log</code>.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Q.</strong> Where are the AEM System Users Login Credentials stored?</p>
+</div>
+<div class="paragraph">
+<p><strong>A.</strong> The login credentials of the AEM System users are stored on S3 in the AEM OpenCloud Stack data directory <code>s3://S3DataBucketName/AOCStackPrefix/system-users-credentials.json</code> e.g. <code>s3://aem-opencloud/aoc-stack-1/system-users-credentials.json</code>.</p>
+</div>
+<div class="paragraph">
+<p><strong>Q.</strong> Which versions of Oracle Java JDK8 are supported by AEM OpenCloud ?</p>
+</div>
+<div class="paragraph">
+<p><strong>A.</strong> Supported versions of Oracle Java JDK 8 and their allowed input value for the parameter <code>JavaJDKVersion</code> are listed in the table below.
+.Supported Java JDK8 Versions</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Version</th>
+<th class="tableblock halign-left valign-top">Allowed input value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u171</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8u171</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u181</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8u181</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u191</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8u191</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u201</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8u201</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u211</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8u211</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u221</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8u221</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u231</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8u231</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u241</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8u241</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u251</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">8u251</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p><strong>Q.</strong> What versions of AEM are supported by AEM OpenCloud ?</p>
+</div>
+<div class="paragraph">
+<p><strong>A.</strong> Supported versions of AEM and their allowed input value for the parameter <code>AemVersion</code> including the expected name of the Service-Packs are listed in the table below.
+.Supported AEM Version</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 33.3333%;">
+<col style="width: 33.3334%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Version</th>
+<th class="tableblock halign-left valign-top">Allowed input value</th>
+<th class="tableblock halign-left valign-top">Service Pack Name</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 63</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">63</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM  63 SP1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">63-SP1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.3-Service-Pack-1-6.3.SP1.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM  63 SP2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">63-SP2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.3.2.0-6.3.2.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM  63 SP2-CFP1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">63-SP2-CFP1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.3.2.0-6.3.2.zip &amp; AEM-CFP-6.3.2.1-1.0.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM  63 SP2-CFP2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">63-SP2-CFP2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.3.2.0-6.3.2.zip &amp; AEM-CFP-6.3.2.2-2.0.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 64</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 64 SP1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64-SP1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.4.1.0-6.4.1.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 64 SP2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64-SP2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.4.2.0-6.4.2.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 64 SP3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64-SP3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.4.3.0-6.4.3.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 64 SP4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64-SP4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.4.4.0-6.4.4.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 64 SP5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64-SP5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.4.5.0-6.4.5.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 64 SP6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64-SP6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.4.6.0-6.4.6.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 64 SP7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64-SP7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.4.7.0-6.4.7.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 64 SP8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">64-SP8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.4.8.0-6.4.8.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">-</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP1</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.5.1.0-6.5.1.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP2</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.5.2.0-6.5.2.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.5.3.0-6.5.3.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP4</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.5.4.0-6.5.4.zip</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_troubleshooting">Troubleshooting</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_general_troubleshooting_notes">General Troubleshooting notes:</h3>
+<div class="ulist">
+<ul>
+<li>
+<p>If the stack <code>AmiCreationStack</code> failed to create, the installation of the AEM OpenCloud roles failed. Start troubleshooting by analysing the log files in the EC2 instances or the Lambda logs in Amazon Cloudwatch Logs.</p>
+</li>
+<li>
+<p>The EC2 instances of the stack <code>AemOpenCloudMainStack</code> have the EC2 tag <code>ComponentInitStatus</code>, which helps to determine the provisioning state of the EC2 instances.</p>
+</li>
+</ul>
+</div>
 <div class="paragraph">
-<p>&lt;Steps for troubleshooting the deployment go here.&gt;</p>
+<p>The Tag <code>ComponentInitStatus</code> can contain three values:</p>
+</div>
+<div class="paragraph">
+<p><strong>InProgress</strong>:
+The provisioning of the AEM OpenCloud role is still in progress.</p>
+</div>
+<div class="paragraph">
+<p><strong>Success</strong>:
+The provisioning of the AEM OpenCloud role was successful.</p>
+</div>
+<div class="paragraph">
+<p><strong>Failed</strong>:
+The provisioning of the AEM OpenCloud role failed.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<a class="image" href="images/ec2_tag_componentinitstatus.png"><img src="images/ec2_tag_componentinitstatus.png" alt="ec2_tag_componentinitstatus" width="648" height="439"></a>
 </div>
 </div>
-</div></div></td>
-</tr>
-</tbody>
-</table>
+<div class="ulist">
+<ul>
+<li>
+<p>Amazon Cloudwatch logs contains all important log files of each main AEM OpenCloud role. Some important logs which support you troubleshooting are listed below.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>General Logs:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/var/log/shinesolutions/puppet-stack-init.log
+/var/log/cloud-init.log
+/var/log/cloud-init-output.log</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>Role specific Logs:</strong></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/opt/aem/author/crx-quickstart/logs/error.log
+/opt/aem/publish/crx-quickstart/logs/error.log
+
+/var/log/httpd/access_log
+/var/log/httpd/dispatcher.log
+/var/log/httpd/error_log
+
+/opt/shinesolutions/aem-orchestrator/orchestrator.log</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_troubleshooting_by_error_messages">Troubleshooting by Error messages:</h3>
+<div class="ulist">
+<ul>
+<li>
+<p><code><code>OrchestratorAutoScalingGroup Received 1 FAILURE signal(s) out of 1.  Unable to satisfy 100% MinSuccessfulInstancesPercent requirement.</code></code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Troubleshooting this error requires you to analyse the Orchestrator role logs on the EC2 instance:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>/var/log/cloud-init-output.log
+/opt/shinesolutions/aem-orchestrator/orchestrator.log</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><strong>/var/log/cloud-init-output.log</strong>:</p>
+</div>
+<div class="paragraph">
+<p>Analyse this log file for the test results of the AEM OpenCloud readiness check.</p>
+</div>
+<div class="paragraph">
+<p>A successful component readiness check:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>inspec exec . --show-progress --controls=\ author-primary-instance-provisioned-successful
+.
+Profile: AEM-AWS InSpec profile (aem-aws)
+Version: 1.10.0
+Target: local://
+ ✔ author-primary-instance-provisioned-successful: Check if Author Primary instance has been provisioned successful
+ ✔ ready is expected to have author primary instance been successful provision
+Profile Summary: 1 successful control, 0 control failures, 0 controls skipped
+Test Summary: 1 successful, 0 failures, 0 skipped</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A failed component readiness check:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>inspec exec . --show-progress --controls=\ author-primary-instance-provisioned-successful
+F
+Profile: AEM-AWS InSpec profile (aem-aws)
+Version: 1.10.0
+Target: local://
+   ×  author-primary-instance-provisioned-successful: Check if Author Primary instance has been provisioned successful
+      ×  ready is expected to have author primary instance been successful provision
+   expected #has_author_primary_instance_been_successful_provision? to return true, got false
+Profile Summary: 0 successful controls, 1 control failure, 0 controls skipped
+Test Summary: 0 successful, 1 failure, 0 skipped</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A running component readiness check:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>inspec exec . --show-progress --controls=\ author-standby-instance-provisioned-successful</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If a readiness check failed for an AEM OpenCloud role, start analysing the deployment logs of the failed role.</p>
+</div>
+<div class="paragraph">
+<p>If the readiness check passed or was still running at the time of the failure start analysing the orchestrator log.</p>
+</div>
+<div class="paragraph">
+<p><strong>/opt/shinesolutions/aem-orchestrator/orchestrator.log</strong>:</p>
+</div>
+<div class="paragraph">
+<p>The orchestrator log contains all log messages of all orchestration event.</p>
+</div>
+<div class="paragraph">
+<p>This message indicates the Orchestrator was not able to download the <code>system-users-credentials</code> file from  S3. Which happens if the file was deleted or if the <code>S3DataBucket</code> is not in the same region as where <em>quickstart-aem-opencloud</em> is deployed to.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>DEBUG c.s.a.c.AemConfig$$EnhancerBySpringCGLIB$$56cbacf8 - Reading AEM credentials from S3 bucket
+ERROR c.s.a.c.AemConfig$$EnhancerBySpringCGLIB$$56cbacf8 - Failed to read AEM credentials file from S3 location: s3://aem-opencloud/aoc-stack-1/system-users-credentials.json</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If reading the AEM credentials from S3 was successful and the orchestrator log is showing no more log messages after the following log message:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code>[main] INFO  c.s.aemorchestrator.AemOrchestrator - Waiting for Author ELB to be in healthy state</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It indicates that the provisioning of the Author-Primary role has not finished yet. Follow the guidelines described in the general troubleshooting notes for analysing errors for an AEM OpenCloud Role.</p>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -2358,11 +2861,11 @@ the templates and scripts for this Quick Start, to post your comments,
 and to share your customizations with others.</p>
 </div>
 <hr>
-<div class="paragraph">
-<p>© 2020, Amazon Web Services Inc., or its affiliates, and ShineSolutions. All rights reserved.</p>
 </div>
-<div class="sect3">
-<h4 id="_notices">Notices</h4>
+</div>
+<div class="sect1">
+<h2 id="_notices">Notices</h2>
+<div class="sectionbody">
 <div class="paragraph">
 <p>This document is provided for informational purposes only. It represents AWS’s current product offerings and practices as of the date of issue of this document, which are subject to change without notice. Customers are responsible for making their own independent assessment of the information in this document and any use of AWS’s products or services, each of which is provided “as is” without warranty of any kind, whether expressed or implied. This document does not create any warranties, representations, contractual commitments, conditions, or assurances from AWS, its affiliates, suppliers, or licensors. The responsibilities and liabilities of AWS to its customers are controlled by AWS agreements, and this document is not part of, nor does it modify, any agreement between AWS and its customers.</p>
 </div>
@@ -2372,11 +2875,10 @@ and to share your customizations with others.</p>
 </div>
 </div>
 </div>
-</div>
-<div id="footer">
-<div id="footer-text">
-Last updated 2020-09-11 20:58:58 -0500
-</div>
-</div>
+<p class="footer-text">
+<!-- We can use document attributes: -->
+<!-- Generated with Asciidoctor v2.0.10. -->
+<a href="https://aws.amazon.com/privacy/">Privacy</a> | <a href="https://aws.amazon.com/terms/">Site terms</a> | &copy; 2020, Amazon Web Services, Inc. or its affiliates and Shine Solutions Group. All rights reserved.
+</p>
 </body>
 </html>

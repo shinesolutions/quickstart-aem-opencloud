@@ -16,5 +16,6 @@
 |t2.micro instances |1
 |Route53 Hosted Zones |1
 |Route53 Records |3
+|Secrets Manager |2
 |Systems Manager parameters |127
 |===

@@ -1,6 +1,6 @@
 :quickstart-project-name: quickstart-aem-opencloud
 :partner-product-name: AEM OpenCloud
-:partner-company-name: ShineSolutions
+:partner-company-name: Shine Solutions Group
 :doc-month: September
 :doc-year: 2020
 :partner-contributors: Cliffano Subagio and Michael Bloch, {partner-company-name}
