@@ -18,19 +18,20 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 
 *A.* All resources and logs for deployments are found either in Amazon CloudWatch Logs or in the instances themselves.
 
-* All logfiles of the Lambda functions can be found in Amazon Cloudwatch Logs.
+* All log files of the Lambda functions can be found in Amazon CloudWatch Logs.
 
 * Installation logfiles of the AEM OpenCloud roles can be found in the EC2 instances at `/var/log/cloud-init.log` & `/var/log/cloud-init-output.log`
 
-* Logfiles of the AEM OpenCloud Main Stack are found either in Amazon Cloudwatch Logs by the AOC Stack Prefix & name of the log file e.g. `aoc-stack-1/var/log/shinesolutions/puppet-stack-init.log` or in the EC2 instances at `/var/log/shinesolutions/puppet-stack-init.log`, `/var/log/cloud-init.log` & `/var/log/cloud-init-output.log`.
+* Log files of the AEM OpenCloud Main Stack are found either in Amazon Cloudwatch Logs by the AOC Stack Prefix & name of the log file (e.g. `aoc-stack-1/var/log/shinesolutions/puppet-stack-init.log`) or in the EC2 instances at `/var/log/shinesolutions/puppet-stack-init.log`, `/var/log/cloud-init.log`, and `/var/log/cloud-init-output.log`.
 
 *Q.* Where are the AEM System Users Login Credentials stored?
 
-*A.* The login credentials of the AEM System users are stored on S3 in the AEM OpenCloud Stack data directory `s3://S3DataBucketName/AOCStackPrefix/system-users-credentials.json` e.g. `s3://aem-opencloud/aoc-stack-1/system-users-credentials.json`.
+*A.* The login credentials of the AEM System users are stored on S3 in the AEM OpenCloud Stack data directory `s3://S3DataBucketName/AOCStackPrefix/system-users-credentials.json` (e.g. `s3://aem-opencloud/aoc-stack-1/system-users-credentials.json`.)
 
-*Q.* Which versions of Oracle Java JDK8 are supported by AEM OpenCloud ?
+*Q.* Which versions of Oracle Java JDK8 are supported by AEM OpenCloud?
 
 *A.* Supported versions of Oracle Java JDK 8 and their allowed input value for the parameter `JavaJDKVersion` are listed in the table below.
+
 .Supported Java JDK8 Versions
 [cols=2*,options="header"]
 |===
@@ -48,9 +49,10 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 | Java JDK 8u251 | 8u251
 |===
 
-*Q.* What versions of AEM are supported by AEM OpenCloud ?
+*Q.* What versions of AEM are supported by AEM OpenCloud?
 
 *A.* Supported versions of AEM and their allowed input value for the parameter `AemVersion` including the expected name of the Service-Packs are listed in the table below.
+
 .Supported AEM Version
 [cols=3*,options="header"]
 |===
@@ -82,7 +84,7 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 == Troubleshooting
 
 === General Troubleshooting notes:
-* If the stack `AmiCreationStack` failed to create, the installation of the AEM OpenCloud roles failed. Start troubleshooting by analysing the log files in the EC2 instances or the Lambda logs in Amazon Cloudwatch Logs.
+* If the stack `AmiCreationStack` failed to create, the installation of the AEM OpenCloud roles failed. Start troubleshooting by analyzing the log files in the EC2 instances or the Lambda logs in Amazon CloudWatch Logs.
 
 * The EC2 instances of the stack `AemOpenCloudMainStack` have the EC2 tag `ComponentInitStatus`, which helps to determine the provisioning state of the EC2 instances.
 
@@ -100,7 +102,7 @@ The provisioning of the AEM OpenCloud role failed.
 [link=images/ec2_tag_componentinitstatus.png]
 image::../images/ec2_tag_componentinitstatus.png[ec2_tag_componentinitstatus,width=648,height=439]
 
-* Amazon Cloudwatch logs contains all important log files of each main AEM OpenCloud role. Some important logs which support you troubleshooting are listed below.
+* Amazon CloudWatch Logs contains all important log files of each main AEM OpenCloud role. Some important logs which support you troubleshooting are listed below.
 
 *General Logs:*
 ```
@@ -178,8 +180,7 @@ If the readiness check passed or was still running at the time of the failure st
 
 The orchestrator log contains all log messages of all orchestration event.
 
-
-This message indicates the Orchestrator was not able to download the `system-users-credentials` file from  S3. Which happens if the file was deleted or if the `S3DataBucket` is not in the same region as where _quickstart-aem-opencloud_ is deployed to.
+This message indicates that the Orchestrator was unable to download the `system-users-credentials` file from S3. This happens if the `system-users-credentials` file was deleted or if the `S3DataBucket` is not in the same Region in which the AEM OpenCloud Quick Start is deployed.
 ```
 DEBUG c.s.a.c.AemConfig$$EnhancerBySpringCGLIB$$56cbacf8 - Reading AEM credentials from S3 bucket
 ERROR c.s.a.c.AemConfig$$EnhancerBySpringCGLIB$$56cbacf8 - Failed to read AEM credentials file from S3 location: s3://aem-opencloud/aoc-stack-1/system-users-credentials.json
@@ -190,4 +191,4 @@ If reading the AEM credentials from S3 was successful and the orchestrator log i
 [main] INFO  c.s.aemorchestrator.AemOrchestrator - Waiting for Author ELB to be in healthy state
 ```
 
-It indicates that the provisioning of the Author-Primary role has not finished yet. Follow the guidelines described in the general troubleshooting notes for analysing errors for an AEM OpenCloud Role.
+It indicates that the provisioning of the Author-Primary role has not finished yet. Follow the guidelines described in the general troubleshooting notes for analyzing errors for an AEM OpenCloud Role.

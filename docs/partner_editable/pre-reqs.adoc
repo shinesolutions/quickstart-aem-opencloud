@@ -23,6 +23,7 @@ license.downloadID=AEM License Key
 [link=images/s3_bucket_installation_content.png]
 image::../images/s3_bucket_installation_content.png[S3BucketInstallationContent,width=648,height=439]
 
+[start=7]
 . (Optional) Create a certificate for your internal URL in Amazon Certificate Manager (ACM)
 in the Region where you deploy the Quick Start. This certificate must be created as a
 wildcard certificate for your AEM OpenCloud internal domain (for example, *.example.internal).
