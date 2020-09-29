@@ -1,7 +1,7 @@
 // Include details about the license and how they can sign up. If no license is required, clarify that.
 
-This Quick Start requires a license for Adobe Experience Manager. Contact your Adobe sales representative or Adobe partner for a full Adobe AEM On-Premise license. When you launch the Quick Start, place the license key in the S3 installation bucket and specify its location.
+This Quick Start requires a license for Adobe Experience Manager. Contact your Adobe sales representative or Adobe partner for a full Adobe AEM on-premise license. When you launch the Quick Start, place the license key in the S3 installation bucket and specify its location.
 
-WARNING: If you don’t have a license, the Quick Start deployment will fail.
+WARNING: If you don’t have a full Adobe AEM on-premise license, the Quick Start deployment will fail.
 
 This Quick Start launches the Amazon Machine Image (AMI) for the Amazon Linux 2 or Red Hat Enterprise Linux (RHEL) operating system.

@@ -13,8 +13,8 @@ license.downloadID=AEM License Key
 ```
 [start=3]
 . Go to https://docs.adobe.com/content/help/en/experience-manager-dispatcher/using/getting-started/release-notes.html[AEM Dispatcher Release Notes] to download the Linux x86_64 AEM Dispatcher module for Apache 2.4 with OpenSSL 1.0 Support as the tar.gz file
-. Go to https://experience.adobe.com/#/downloads/content/software-distribution/en/aemcloud.html[Adobe Experience Cloud Software Distribution] and download the JDK 8 installation rpm e.g. jdk-8u251-linux-x64.rpm. Which JDK8 versions are supported is described in the link:#_FAQ[FAQ].
-. Go to https://experience.adobe.com/#/downloads/content/software-distribution/en/aemcloud.html[Adobe Experience Cloud Software Distribution] and download the AEM Jar file and if necessary the required AEM service pack. Which AEM versions are supported is described in the FAQ.
+. Go to https://experience.adobe.com/#/downloads/content/software-distribution/en/aemcloud.html[Adobe Experience Cloud Software Distribution] and download the JDK 8 installation rpm e.g. jdk-8u251-linux-x64.rpm. Which JDK8 versions are supported is described in the link:#_faq[FAQ].
+. Go to https://experience.adobe.com/#/downloads/content/software-distribution/en/aemcloud.html[Adobe Experience Cloud Software Distribution] and download the AEM Jar file and if necessary the required AEM service pack. Which AEM versions are supported is described in the link:#_faq[FAQ].
 . Place the AEM license, AEM Dispatcher module, JDK8 rpm installation, AEM Jar & AEM Service-Packs to the S3 installation bucket which will be use for the Quick Start deployment into a prefix of your choice.
 
 :xrefstyle: short

@@ -12,7 +12,7 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 
 *Q.* I encountered a size limitation error when I deployed the AWS CloudFormation templates.
 
-*A.* We recommend that you launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template size limitations. For more information about AWS CloudFormation quotas, see the http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html[AWS documentation^].
+*A.* We recommend that you launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template size limitations. For more information about AWS CloudFormation quotas, see http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html[AWS CloudFormation quotas^].
 
 *Q.* Where are the deployment logs?
 
@@ -20,13 +20,13 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 
 * All log files of the Lambda functions can be found in Amazon CloudWatch Logs.
 
-* Installation logfiles of the AEM OpenCloud roles can be found in the EC2 instances at `/var/log/cloud-init.log` & `/var/log/cloud-init-output.log`
+* Installation logfiles of the AEM OpenCloud roles can be found in the EC2 instances at `/var/log/cloud-init.log` and `/var/log/cloud-init-output.log`.
 
-* Log files of the AEM OpenCloud Main Stack are found either in Amazon Cloudwatch Logs by the AOC Stack Prefix & name of the log file (e.g. `aoc-stack-1/var/log/shinesolutions/puppet-stack-init.log`) or in the EC2 instances at `/var/log/shinesolutions/puppet-stack-init.log`, `/var/log/cloud-init.log`, and `/var/log/cloud-init-output.log`.
+* Log files of the AEM OpenCloud Main Stack are found either in Amazon Cloudwatch Logs by the AOC Stack Prefix & name of the log file (e.g., `aoc-stack-1/var/log/shinesolutions/puppet-stack-init.log`) or in the EC2 instances at `/var/log/shinesolutions/puppet-stack-init.log`, `/var/log/cloud-init.log`, and `/var/log/cloud-init-output.log`.
 
 *Q.* Where are the AEM System Users Login Credentials stored?
 
-*A.* The login credentials of the AEM System users are stored on S3 in the AEM OpenCloud Stack data directory `s3://S3DataBucketName/AOCStackPrefix/system-users-credentials.json` (e.g. `s3://aem-opencloud/aoc-stack-1/system-users-credentials.json`.)
+*A.* The login credentials of the AEM System users are stored on S3 in the AEM OpenCloud Stack data directory `s3://S3DataBucketName/AOCStackPrefix/system-users-credentials.json` (e.g., `s3://aem-opencloud/aoc-stack-1/system-users-credentials.json`.)
 
 *Q.* Which versions of Oracle Java JDK8 are supported by AEM OpenCloud?
 

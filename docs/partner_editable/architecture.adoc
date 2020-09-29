@@ -43,6 +43,7 @@ Shell (SSH) access to EC2 instances in public and private subnets.*
 * Amazon Simple Queue Service (SQS) for forwarding Auto scaling group alarm notifications to Utility EC2 instances.
 * Amazon Simple Storage Service (Amazon S3) bucket for storing AEM OpenCloud Stack assets.
 * AWS Systems Manager to store AEM OpenCloud configuration parameters.
+
 *The template that deploys the Quick Start into an existing VPC skips
 the components marked by asterisks and prompts you for your existing VPC
 configuration.
