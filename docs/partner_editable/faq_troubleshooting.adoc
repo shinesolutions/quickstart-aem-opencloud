@@ -84,7 +84,7 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 == Troubleshooting
 
 === General Troubleshooting notes:
-* If the stack `AmiCreationStack` failed to create, the installation of the AEM OpenCloud roles failed. Start troubleshooting by analyzing the log files in the EC2 instances or the Lambda logs in Amazon CloudWatch Logs.
+* If the stack `AmiCreationStack` failed to create, the installation of the AEM OpenCloud roles failed. Start troubleshooting by analysing the log files in the EC2 instances or the Lambda logs in Amazon CloudWatch Logs.
 
 * The EC2 instances of the stack `AemOpenCloudMainStack` have the EC2 tag `ComponentInitStatus`, which helps to determine the provisioning state of the EC2 instances.
 
@@ -191,4 +191,4 @@ If reading the AEM credentials from S3 was successful and the orchestrator log i
 [main] INFO  c.s.aemorchestrator.AemOrchestrator - Waiting for Author ELB to be in healthy state
 ```
 
-It indicates that the provisioning of the Author-Primary role has not finished yet. Follow the guidelines described in the general troubleshooting notes for analyzing errors for an AEM OpenCloud Role.
+It indicates that the provisioning of the Author-Primary role has not finished yet. Follow the guidelines described in the general troubleshooting notes for analysing errors for an AEM OpenCloud Role.
