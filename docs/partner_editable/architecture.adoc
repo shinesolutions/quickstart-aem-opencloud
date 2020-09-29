@@ -1,5 +1,5 @@
 Deploying this Quick Start for a new virtual private cloud (VPC) with
-*default parameters* builds the following _{partner-product-name}_ environment in the
+*default parameters* builds the following {partner-product-name} environment in the
 AWS Cloud.
 
 :xrefstyle: short
@@ -32,7 +32,7 @@ Shell (SSH) access to EC2 instances in public and private subnets.*
 ** Utility EC2 instances are deployed into their own Auto Scaling group.
 ** An internal ELB for routing traffic to the active content management server.
 ** An internal ELB for routing traffic to the content management web server.
-* Amazon Cloudfront for content delivery.
+* Amazon CloudFront for content delivery.
 * EC2 Amazon Machine Image (AMI) for each AEM OpenCloud role.
 * AWS Certificate Manager (ACM) for storing SSL certificates.
 * Amazon CloudWatch for monitoring deployed services.
@@ -43,6 +43,7 @@ Shell (SSH) access to EC2 instances in public and private subnets.*
 * Amazon Simple Queue Service (SQS) for forwarding Auto scaling group alarm notifications to Utility EC2 instances.
 * Amazon Simple Storage Service (Amazon S3) bucket for storing AEM OpenCloud Stack assets.
 * AWS Systems Manager to store AEM OpenCloud configuration parameters.
+
 *The template that deploys the Quick Start into an existing VPC skips
 the components marked by asterisks and prompts you for your existing VPC
 configuration.
