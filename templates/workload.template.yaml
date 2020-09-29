@@ -662,7 +662,6 @@ Resources:
             !Ref LambdaZipsBucket,
             !Ref LambdaZipsBucketName,
           ]
-        QSS3BucketName: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
         QSS3KeyPrefix: !Ref 'QSS3KeyPrefix'
   AmiCreationStack:
     DependsOn:
@@ -790,14 +789,10 @@ Outputs:
     Description: The Route53 record of the Publish-Dispatcher ELB
     Value: !GetAtt 'AemOpenCloudMainStack.Outputs.PublishDispatcherDNSRecord'
   CloudfrontURL:
+    Condition: CloudFrontEnabled
     Description: Cloudfront Distribution URL
-    Value: !If
-        - CloudFrontEnabled
-        - !GetAtt 'CloudFrontStack.Outputs.CDNDistributionUrl'
-        - ''
+    Value: !GetAtt 'CloudFrontStack.Outputs.CDNDistributionUrl'
   ExternalDNSRecord:
+    Condition: CreateExternalRoute53DNSRecordCondition
     Description: External URL
-    Value: !If
-        - CreateExternalRoute53DNSRecordCondition
-        - !Ref 'ExternalRoute53Record'
-        - ''
+    Value: !Ref 'ExternalRoute53Record'

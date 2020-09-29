@@ -245,6 +245,8 @@ Resources:
                   - s3:DeleteObject
                 Resource: !Sub 'arn:${AWS::Partition}:s3:::${LambdaZipsBucketName}/${QSS3KeyPrefix}*'
   CopyZipsFunction:
+    DependsOn:
+      - CleanupSyncLibrariesFunction
     Type: AWS::Lambda::Function
     Properties:
       Description: Copies objects from a source S3 bucket to a destination
@@ -287,6 +289,8 @@ Resources:
               finally:
                   cfnresponse.send(event, context, status, {}, None)
   SyncLibrariesFunction:
+    DependsOn:
+      - CleanupSyncLibrariesFunction
     Type: AWS::Lambda::Function
     Properties:
       Description: Sync libraries for AEM OpenCloud to the AEM OpenCloud Stack S3 data location
@@ -359,6 +363,8 @@ Resources:
               print(err)
               cfnresponse.send(event, context, cfnresponse.FAILED, {})
   SyncArtifactsFunction:
+    DependsOn:
+      - CleanupSyncLibrariesFunction
     Type: AWS::Lambda::Function
     Properties:
       Description: Sync Artifacts for AEM OpenCloud to the AEM OpenCloud Stack S3 data location
@@ -395,6 +401,8 @@ Resources:
               finally:
                   cfnresponse.send(event, context, status, {}, None)
   SyncGeneratedSystemUsersCredentialsFunction:
+    DependsOn:
+      - CleanupSyncLibrariesFunction
     Type: AWS::Lambda::Function
     Properties:
       Description: Generate AEM System Users Credentials and Sync to the AEM OpenCloud Stack S3 data location
@@ -528,6 +536,8 @@ Resources:
               else:
                   cfnresponse.send(event, context, cfnresponse.SUCCESS, {})
   CopyZips:
+    DependsOn:
+      - CleanupSyncLibraries
     Type: Custom::CopyZips
     Properties:
       ServiceToken: !GetAtt 'CopyZipsFunction.Arn'
@@ -541,6 +551,8 @@ Resources:
       - functions/packages/syncEditStackConfig/lambda.zip
       - functions/packages/syncEditStackFacts/lambda.zip
   SyncLibraries:
+    DependsOn:
+      - CleanupSyncLibraries
     Type: Custom::SyncLibraries
     DeletionPolicy: Delete
     Properties:
@@ -555,6 +567,8 @@ Resources:
       S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
       AOCStackPrefix: !Ref AOCStackPrefix
   SyncArtifacts:
+    DependsOn:
+      - CleanupSyncLibraries
     Type: Custom::Artifacts
     DeletionPolicy: Delete
     Properties:
@@ -567,6 +581,8 @@ Resources:
       Objects:
       - stack-init.sh
   SyncGeneratedSystemUsersCredentialsStackAsset:
+    DependsOn:
+      - CleanupSyncLibraries
     Type: Custom::SyncGeneratedSystemUsersCredentialsStackAsset
     DeletionPolicy: Delete
     Properties:
@@ -575,6 +591,8 @@ Resources:
       S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
       AOCStackPrefix: !Ref AOCStackPrefix
   SyncEditStackConfigStackAssets:
+    DependsOn:
+      - CleanupSyncLibraries
     Type: Custom::SyncEditStackConfigStackAssets
     DeletionPolicy: Delete
     Properties:
@@ -587,6 +605,8 @@ Resources:
       S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
       AOCStackPrefix: !Ref AOCStackPrefix
   SyncEditStackFactsStackAssets:
+    DependsOn:
+      - CleanupSyncLibraries
     Type: Custom::SyncEditStackFactsStackAssets
     DeletionPolicy: Delete
     Properties:
@@ -598,6 +618,8 @@ Resources:
       S3DataBucket: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
       AOCStackPrefix: !Ref AOCStackPrefix
   GenerateAemSslCertificate:
+    DependsOn:
+      - CleanupSyncLibraries
     Type: AWS::CloudFormation::CustomResource
     Properties:
       ServiceToken: !GetAtt 'GenerateAemSslCertificateFunction.Arn'
@@ -606,12 +628,15 @@ Resources:
       SSLCertFQDN: !Sub "{{resolve:ssm:/${AOCStackPrefix}/r53/internal/defaultzonename:1}}"
       PrivateKeySecretsManagerName: !Sub "${AOCStackPrefix}-aemssl-private-key"
   SyncEditPackerConfigFunctionStackAssets:
+    DependsOn:
+      - CleanupSyncLibraries
     Type: Custom::SyncEditPackerConfigFunctionStackAssets
     DeletionPolicy: Delete
     Properties:
       ServiceToken: !GetAtt 'SyncEditPackerConfigFunction.Arn'
       Version: 1
       AemDispatcherVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aemdispatcher:1}}"
+      AemHealthcheckContentVersion: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aemhealthcheckcontent:1}}"
       AemInstallationProfile: !Sub "{{resolve:ssm:/${AOCStackPrefix}/version/aem:1}}"
       AemKeystorePasswordSmId: !Sub "${AOCStackPrefix}-aem-keystore-password"
       AemLicenseSSMParameter: !Sub "/${AOCStackPrefix}/aem/license"

@@ -94,6 +94,9 @@ aem_curator::action_deploy_artifact::retries_max_sleep_seconds: 5
 # AEM Reconfiguration Parameters
 aem_curator::config_author_primary::aem_reconfiguration_run_modes:
 aem_curator::config_publish::aem_reconfiguration_run_modes:
+# Set to true, as reinstallation of the AEM HealthCheck is not required
+aem_curator::config_author_primary::enable_aem_reconfiguratiton_clean_directories: true
+aem_curator::config_publish::enable_aem_reconfiguratiton_clean_directories: true
 common::aem_healthcheck_version: 1.3.3
 common::enable_aem_reconfiguration: False
 common::enable_truststore_removal: False
