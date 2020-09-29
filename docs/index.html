@@ -886,7 +886,19 @@ report bugs, or submit feature ideas for this Quick Start.
 <p>This Quick Start reference deployment guide provides step-by-step instructions for deploying AEM OpenCloud on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p>This Quick Start is for users who &lt;target audience and usage scenario&gt;</p>
+<p>This Quick Start is for users who want to deploy and manage a high available (HA) AEM infrastructure on the AWS Cloud using the open-source platform AEM OpenCloud.</p>
+</div>
+<div class="paragraph">
+<p>This Quick Start deploys an AEM OpenCloud Full-Set Architecture on the AWS Cloud with enabled HA features like <a href="https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html" target="_blank" rel="noopener">Amazon EC2 Auto Scaling</a>,
+<a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/introduction.html" target="_blank" rel="noopener">Elastic Load Balancing</a> &amp; <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html" target="_blank" rel="noopener">Amazon CloudFront</a>.</p>
+</div>
+<div class="paragraph">
+<p>The AEM OpenCloud Full-Set is deployed with the recommended HA configuration of two Author-Dispatcher, two Publish-Dispatcher and two AEM Publish instances across multiple availability zones in one AWS Region.
+Further Amazon Cloudwatch alarms are configured to monitor the average CPU utilization of the Publish-Dispatcher Auto Scaling group. The alarm is configured to scale out/in by one EC2 instance if the CPU Utilization is above/below 50%, by not exceeding the configured minimum(2) or maximum(4) size of the Publish-Dispatcher Auto Scaling Group.
+The Orchestrator application manages AEM replication and flush agents as instances are getting created and terminated.</p>
+</div>
+<div class="paragraph">
+<p>Other services used by this Quick Start include <a href="https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html" target="_blank" rel="noopener">AWS Certificate Manager</a>, <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html" target="_blank" rel="noopener">Amazon CloudWatch</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html" target="_blank" rel="noopener">AWS Lambda</a>, <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html" target="_blank" rel="noopener">Amazon Route 53</a>, <a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html" target="_blank" rel="noopener">AWS Secrets Manager</a>, <a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html" target="_blank" rel="noopener">Amazon SNS</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html" target="_blank" rel="noopener">Amazon SQS</a>, <a href="https://docs.aws.amazon.com/AmazonS3/latest/gsg/GetStartedWithS3.html" target="_blank" rel="noopener">Amazon S3</a> and <a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html" target="_blank" rel="noopener">AWS Systems Manager</a>.</p>
 </div></div></td>
 </tr>
 </tbody>
@@ -926,7 +938,7 @@ collaborated with AWS on the content of the Quick Start.
 <p>The AEM OpenCloud workloads are deployed on multiple Amazon EC2 instances for improved performance. The content-delivery and content-management web server roles can be scaled for high availability. Other AEM OpenCloud roles have restrictions on active/active roles and are designed for active/passive standby. Due to this, other AEM OpenCloud roles belong to their own Auto Scaling groups as single instances. Should an instance become unavailable, it’s replaced by a new instance and configured with a AEM OpenCloud role of the same type.</p>
 </div>
 <div class="paragraph">
-<p>Website content can be deployed to the content-delivery and content-management roles using your choice of deployment process.</p>
+<p>The Website content can be deployed to the content-delivery and content-management roles using your choice of deployment process.</p>
 </div>
 <div class="paragraph">
 <p>Please know that we may share who uses AWS Quick Starts with the AWS Partner Network (APN) Partner that collaborated with AWS on the content of the Quick Start.</p>
@@ -977,8 +989,8 @@ After you deploy the Quick Start, enable the <a href="https://docs.aws.amazon.co
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p><em>&lt;license information&gt;This Quick Start requires a license for Adobe Experience Manager. Contact your Adobe sales representative or Adobe partner for a full Adobe AEM On-Premise license.
-When you launch the Quick Start, place the license key in the S3 installation bucket and specify its location.</em></p>
+<p>This Quick Start requires a license for Adobe Experience Manager. Contact your Adobe sales representative or Adobe partner for a full Adobe AEM On-Premise license.
+When you launch the Quick Start, place the license key in the S3 installation bucket and specify its location.</p>
 </div>
 <div class="paragraph">
 <p><em>If you don’t have a license, the Quick Start deployment will fail.</em></p>
@@ -1787,7 +1799,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 Data bucket
 (<code>S3DataBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) S3 bucket name for the AEM OpenCloud Stack data assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
 </tr>
 <tr>
@@ -1829,7 +1841,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lambda S3 bucket name
 (<code>LambdaZipsBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.</p></td>
 </tr>
 </tbody>
@@ -1852,37 +1864,37 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone name
 (<code>InternalRoute53ZoneName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone name. If Left blank, one is generated for you. If you want to use your own Route 53 hosted zone, please provide the hosted zone name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone Id
 (<code>InternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone id of the provided internal Route53 Zone name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal ACM Certificate ARN
 (<code>InternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager, for the provided Internal Route53 Zone name. If not provided, a self-signed certificate will be used for you.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External FQDN
 (<code>ExternalFQDN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) External FQDN for the AEM OpenCloud deployment (e.g., aoc.example.com). If not provided, no external Route53 Record will be created. If provided the External Route53 Zone ID becomes mandatory.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External Route53 Zone Id
 (<code>ExternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN. Mandatory if an External FQDN was provided.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External Certificate ARN
 (<code>ExternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM). If not provided, but External FQDN &amp; External Route53 Zone ID were provided, an external wildcard certificate will be created for you.</p></td>
 </tr>
 </tbody>
@@ -1905,25 +1917,25 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Author Backup EC2 Snapshot id
 (<code>AuthorBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Publish Backup EC2 Snapshot id
 (<code>PublishBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification E-Mail address
 (<code>AlarmNotificationEmail</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid Email address if you want to receive Stack alarm messages.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification HTTPS endpoint
 (<code>AlarmNotificationHttpsEndpoint</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.</p></td>
 </tr>
 </tbody>
@@ -2149,7 +2161,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM OpenCloud S3 Data bucket
 (<code>S3DataBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) S3 bucket name for the AEM OpenCloud Stack data assets(installation files, license file, etc.). This string can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
 </tr>
 <tr>
@@ -2191,7 +2203,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Lambda S3 bucket name
 (<code>LambdaZipsBucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.</p></td>
 </tr>
 </tbody>
@@ -2214,37 +2226,37 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone name
 (<code>InternalRoute53ZoneName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone name. If Left blank, one is generated for you. If you want to use your own Route 53 hosted zone, please provide the hosted zone name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal Route53 Zone ID
 (<code>InternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Internal Route53 Zone ID of the provided internal Route53 Zone name.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Internal ACM Certificate ARN
 (<code>InternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the Amazon Resource Name (ARN) of the private certificate created in Amazon Certificate Manager Private CA, for the provided Internal Route53 Zone name. If not provided, a self-signed certificate will be used for you.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External FQDN
 (<code>ExternalFQDN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) External FQDN for the AEM OpenCloud deployment (e.g., aoc.example.com). If not provided, no external Route53 Record will be created. If provided the External Route53 Zone ID becomes mandatory.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External Route53 Zone ID
 (<code>ExternalRoute53ZoneID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Conditional) Route53 Hosted Zone ID of the defined ExternalFQDN. Mandatory if an External FQDN was provided.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">External Certificate ARN
 (<code>ExternalCertificateARN</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) The ARN of the external Certificate stored in AWS Certificate Manager(ACM). If not provided, but External FQDN &amp; External Route53 Zone ID were provided, an external wildcard certificate will be created for you.</p></td>
 </tr>
 </tbody>
@@ -2267,25 +2279,25 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Author Backup EC2 Snapshot ID
 (<code>AuthorBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Author backup, to recreate a new Environment based on a backup.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Publish Backup EC2 Snapshot ID
 (<code>PublishBackupSnapshotID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provide the AWS EC2 Snapshot ID of an AEM Publish backup, to recreate a new Environment based on a backup.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification E-Mail address
 (<code>AlarmNotificationEmail</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid Email address if you want to receive Stack alarm messages.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Alarm notification HTTPS endpoint
 (<code>AlarmNotificationHttpsEndpoint</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><em>Optional</em></code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Blank string</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">(Optional) Provode a valid HTTPS Endpoint address if you want to receive Stack alarm messages.</p></td>
 </tr>
 </tbody>
