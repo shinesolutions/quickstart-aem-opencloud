@@ -1,7 +1,0 @@
-.DS_Store
-*.pyc
-.taskcat
-taskcat_outputs
-.taskcat_overrides.yml
-library/
-docs/index.html

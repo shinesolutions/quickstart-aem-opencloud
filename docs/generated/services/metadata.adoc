@@ -1,1 +1,7 @@
-// placeholder
+
+:template_aws_cloudformation_stack:
+:template_aws_route53_recordset:
+:template_aws_s3_bucket:
+:template_cloudformation:
+:template_route53:
+:template_s3:
