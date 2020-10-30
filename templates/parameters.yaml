@@ -292,7 +292,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/config/elbcipher
       Description: External Certificate ARN
       Type: String
-      Value: 'AOCELBSecurityPolicy-TLS-1-2-2017-01'
+      Value: 'ELBSecurityPolicy-TLS-1-2-2017-01'
   AOCEC2RootDeviceParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -441,7 +441,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/config/author/elb/healthurl
       Description: Author-Dispatcher ELB Healthcheck URL
       Type: String
-      Value: 'HTTPS:5432/system/health?tags=shallow'
+      Value: '/system/health?tags=shallow'
   AOCAuthorRootVolSizeParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -485,7 +485,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/config/authordispatcher/elb/healthurl
       Description: Author-Dispatcher ELB Healthcheck URL
       Type: String
-      Value: 'HTTPS:443/system/health?tags=shallow'
+      Value: '/system/health?tags=shallow'
   AOCAuthorDispatcherELBInboundCidrParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -576,7 +576,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/elb/healthurl
       Description: Publish-Dispatcher ELB Healthcheck URL
       Type: String
-      Value: 'HTTPS:443/system/health?tags=shallow'
+      Value: '/system/health?tags=shallow'
   AOCPublishDispatcherR53SubDomainNameParameter:
     Type: AWS::SSM::Parameter
     Properties:

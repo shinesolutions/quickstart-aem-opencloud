@@ -1,6 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Conditions:
-  CreateSSLELBListenerCondition: !Not [!Equals [ !Ref SSLCertificateARNParameter , '']]
   UsePublishDispatcherDataVolSnapshotCondition:
     Fn::Equals:
     - Ref: UsePublishDispatcherDataVolSnapshotParameter
@@ -53,7 +52,6 @@ Parameters:
     Type: String
   SSLCertificateARNParameter:
     Description: SSL Certificate ARN
-    Default: ''
     Type: String
 Resources:
   PublishDispatcherAutoScalingGroup:
@@ -66,8 +64,8 @@ Resources:
       HealthCheckType: ELB
       LaunchConfigurationName:
         Ref: PublishDispatcherLaunchConfiguration
-      LoadBalancerNames:
-      - Ref: PublishDispatcherLoadBalancer
+      TargetGroupARNs:
+        - Ref: PublishDispatcherLoadBalancerTargetGroup
       MaxSize: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/publishdispatcher/asg/maxsize:1}}"
       MetricsCollection:
       - Granularity: 1Minute
@@ -236,220 +234,7 @@ Resources:
     Type: AWS::AutoScaling::LaunchConfiguration
   PublishDispatcherLoadBalancer:
     Properties:
-      ConnectionDrainingPolicy:
-        Enabled: true
-        Timeout: 300
-      CrossZone: true
-      HealthCheck:
-        HealthyThreshold: '2'
-        Interval: '30'
-        Target: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/publishdispatcher/elb/healthurl:1}}"
-        Timeout: '5'
-        UnhealthyThreshold: '10'
-      Policies:
-      - PolicyName: AOCELBSecurityPolicy-TLS-1-2-2017-01
-        PolicyType: SSLNegotiationPolicyType
-        Attributes:
-        - Name: Protocol-SSLv3
-          Value: "false"
-        - Name: Protocol-TLSv1
-          Value: "false"
-        - Name: Protocol-TLSv1.1
-          Value: "false"
-        - Name: Protocol-TLSv1.2
-          Value: "true"
-        - Name: Server-Defined-Cipher-Order
-          Value: "true"
-        - Name: ECDHE-ECDSA-AES128-GCM-SHA256
-          Value: "true"
-        - Name: ECDHE-RSA-AES128-GCM-SHA256
-          Value: "true"
-        - Name: ECDHE-ECDSA-AES128-SHA256
-          Value: "true"
-        - Name: ECDHE-RSA-AES128-SHA256
-          Value: "true"
-        - Name: ECDHE-ECDSA-AES128-SHA
-          Value: "false"
-        - Name: ECDHE-RSA-AES128-SHA
-          Value: "false"
-        - Name: DHE-RSA-AES128-SHA
-          Value: "false"
-        - Name: ECDHE-ECDSA-AES256-GCM-SHA384
-          Value: "true"
-        - Name: ECDHE-RSA-AES256-GCM-SHA384
-          Value: "true"
-        - Name: ECDHE-ECDSA-AES256-SHA384
-          Value: "true"
-        - Name: ECDHE-RSA-AES256-SHA384
-          Value: "true"
-        - Name: ECDHE-RSA-AES256-SHA
-          Value: "false"
-        - Name: ECDHE-ECDSA-AES256-SHA
-          Value: "false"
-        - Name: AES128-GCM-SHA256
-          Value: "true"
-        - Name: AES128-SHA256
-          Value: "true"
-        - Name: AES128-SHA
-          Value: "false"
-        - Name: AES256-GCM-SHA384
-          Value: "true"
-        - Name: AES256-SHA256
-          Value: "true"
-        - Name: AES256-SHA
-          Value: "false"
-        - Name: DHE-DSS-AES128-SHA
-          Value: "false"
-        - Name: CAMELLIA128-SHA
-          Value: "false"
-        - Name: EDH-RSA-DES-CBC3-SHA
-          Value: "false"
-        - Name: DES-CBC3-SHA
-          Value: "false"
-        - Name: ECDHE-RSA-RC4-SHA
-          Value: "false"
-        - Name: RC4-SHA
-          Value: "false"
-        - Name: ECDHE-ECDSA-RC4-SHA
-          Value: "false"
-        - Name: DHE-DSS-AES256-GCM-SHA384
-          Value: "false"
-        - Name: DHE-RSA-AES256-GCM-SHA384
-          Value: "false"
-        - Name: DHE-RSA-AES256-SHA256
-          Value: "false"
-        - Name: DHE-DSS-AES256-SHA256
-          Value: "false"
-        - Name: DHE-RSA-AES256-SHA
-          Value: "false"
-        - Name: DHE-DSS-AES256-SHA
-          Value: "false"
-        - Name: DHE-RSA-CAMELLIA256-SHA
-          Value: "false"
-        - Name: DHE-DSS-CAMELLIA256-SHA
-          Value: "false"
-        - Name: CAMELLIA256-SHA
-          Value: "false"
-        - Name: EDH-DSS-DES-CBC3-SHA
-          Value: "false"
-        - Name: DHE-DSS-AES128-GCM-SHA256
-          Value: "false"
-        - Name: DHE-RSA-AES128-GCM-SHA256
-          Value: "false"
-        - Name: DHE-RSA-AES128-SHA256
-          Value: "false"
-        - Name: DHE-DSS-AES128-SHA256
-          Value: "false"
-        - Name: DHE-RSA-CAMELLIA128-SHA
-          Value: "false"
-        - Name: DHE-DSS-CAMELLIA128-SHA
-          Value: "false"
-        - Name: ADH-AES128-GCM-SHA256
-          Value: "false"
-        - Name: ADH-AES128-SHA
-          Value: "false"
-        - Name: ADH-AES128-SHA256
-          Value: "false"
-        - Name: ADH-AES256-GCM-SHA384
-          Value: "false"
-        - Name: ADH-AES256-SHA
-          Value: "false"
-        - Name: ADH-AES256-SHA256
-          Value: "false"
-        - Name: ADH-CAMELLIA128-SHA
-          Value: "false"
-        - Name: ADH-CAMELLIA256-SHA
-          Value: "false"
-        - Name: ADH-DES-CBC3-SHA
-          Value: "false"
-        - Name: ADH-DES-CBC-SHA
-          Value: "false"
-        - Name: ADH-RC4-MD5
-          Value: "false"
-        - Name: ADH-SEED-SHA
-          Value: "false"
-        - Name: DES-CBC-SHA
-          Value: "false"
-        - Name: DHE-DSS-SEED-SHA
-          Value: "false"
-        - Name: DHE-RSA-SEED-SHA
-          Value: "false"
-        - Name: EDH-DSS-DES-CBC-SHA
-          Value: "false"
-        - Name: EDH-RSA-DES-CBC-SHA
-          Value: "false"
-        - Name: IDEA-CBC-SHA
-          Value: "false"
-        - Name: RC4-MD5
-          Value: "false"
-        - Name: SEED-SHA
-          Value: "false"
-        - Name: DES-CBC3-MD5
-          Value: "false"
-        - Name: DES-CBC-MD5
-          Value: "false"
-        - Name: RC2-CBC-MD5
-          Value: "false"
-        - Name: PSK-AES256-CBC-SHA
-          Value: "false"
-        - Name: PSK-3DES-EDE-CBC-SHA
-          Value: "false"
-        - Name: KRB5-DES-CBC3-SHA
-          Value: "false"
-        - Name: KRB5-DES-CBC3-MD5
-          Value: "false"
-        - Name: PSK-AES128-CBC-SHA
-          Value: "false"
-        - Name: PSK-RC4-SHA
-          Value: "false"
-        - Name: KRB5-RC4-SHA
-          Value: "false"
-        - Name: KRB5-RC4-MD5
-          Value: "false"
-        - Name: KRB5-DES-CBC-SHA
-          Value: "false"
-        - Name: KRB5-DES-CBC-MD5
-          Value: "false"
-        - Name: EXP-EDH-RSA-DES-CBC-SHA
-          Value: "false"
-        - Name: EXP-EDH-DSS-DES-CBC-SHA
-          Value: "false"
-        - Name: EXP-ADH-DES-CBC-SHA
-          Value: "false"
-        - Name: EXP-DES-CBC-SHA
-          Value: "false"
-        - Name: EXP-RC2-CBC-MD5
-          Value: "false"
-        - Name: EXP-KRB5-RC2-CBC-SHA
-          Value: "false"
-        - Name: EXP-KRB5-DES-CBC-SHA
-          Value: "false"
-        - Name: EXP-KRB5-RC2-CBC-MD5
-          Value: "false"
-        - Name: EXP-KRB5-DES-CBC-MD5
-          Value: "false"
-        - Name: EXP-ADH-RC4-MD5
-          Value: "false"
-        - Name: EXP-RC4-MD5
-          Value: "false"
-        - Name: EXP-KRB5-RC4-SHA
-          Value: "false"
-        - Name: EXP-KRB5-RC4-MD5
-          Value: "false"
-      Listeners:
-      - InstancePort: '80'
-        LoadBalancerPort: '80'
-        Protocol: HTTP
-      - !If
-        - CreateSSLELBListenerCondition
-        - InstancePort: '443'
-          InstanceProtocol: HTTPS
-          LoadBalancerPort: '443'
-          Protocol: HTTPS
-          SSLCertificateId: !Ref SSLCertificateARNParameter
-          PolicyNames:
-            - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/elbcipher:1}}"
-        - !Ref AWS::NoValue
+      Type: application
       Scheme:
         Ref: PublishDispatcherLoadBalancerSchemeParameter
       SecurityGroups:
@@ -463,7 +248,40 @@ Resources:
       - Key: StackPrefix
         Value:
           Ref: AOCStackPrefix
-    Type: AWS::ElasticLoadBalancing::LoadBalancer
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+  PublishDispatcherLoadBalancerTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      HealthCheckIntervalSeconds: 30
+      HealthCheckPath: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/publishdispatcher/elb/healthurl:1}}"
+      HealthCheckPort: 443
+      HealthyThresholdCount: 2
+      HealthCheckTimeoutSeconds: 5
+      UnhealthyThresholdCount: 10
+      HealthCheckProtocol: HTTPS
+      Port: 443
+      Protocol: 'HTTPS'
+      VpcId: !Sub "{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}"
+      Tags:
+      - Key: Name
+        Value: AEM Publish Dispatcher Load Balancer TargetGroup
+      - Key: StackPrefix
+        Value:
+          Ref: AOCStackPrefix
+  PublishDispatcherLoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      Certificates:
+      - CertificateArn: !Ref SSLCertificateARNParameter
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn:
+          Ref: PublishDispatcherLoadBalancerTargetGroup
+      LoadBalancerArn:
+        Ref: PublishDispatcherLoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      SslPolicy: !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/elbcipher:1}}"
   PublishDispatcherScaleDownPolicy:
     Properties:
       AdjustmentType: ChangeInCapacity
