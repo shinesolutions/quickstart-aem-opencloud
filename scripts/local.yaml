@@ -112,7 +112,7 @@ aem_curator::config_author_primary::enable_crxde: True
 aem_curator::config_author_primary::enable_default_passwords: False
 aem_curator::config_author_primary::jvm_mem_opts: -Xss4m -Xms2048m -Xmx8192m
 aem_curator::config_author_primary::jmxremote_port: 5982
-aem_curator::config_author_primary::jvm_opts: -Dkey=value
+aem_curator::config_author_primary::jvm_opts: "-XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -XX:+HeapDumpOnOutOfMemoryError"
 aem_curator::config_author_primary::author_timeout: 1200
 author::aem_system_users:
   admin:
@@ -155,7 +155,7 @@ author::aem_system_users:
 aem_curator::config_author_standby::aem_version: '6.5'
 aem_curator::config_author_standby::jvm_mem_opts: -Xss4m -Xms2048m -Xmx8192m
 aem_curator::config_author_standby::jmxremote_port: 5982
-aem_curator::config_author_standby::jvm_opts: -Dkey=value
+aem_curator::config_author_standby::jvm_opts: "-XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -XX:+HeapDumpOnOutOfMemoryError"
 aem_curator::action_promote_author_standby_to_primary::aem_version: '6.5'
 ### End author-standby configuration
 
@@ -166,7 +166,7 @@ aem_curator::config_publish::enable_crxde: True
 aem_curator::config_publish::enable_default_passwords: False
 aem_curator::config_publish::jvm_mem_opts: -Xss4m -Xms2048m -Xmx8192m
 aem_curator::config_publish::jmxremote_port: 5983
-aem_curator::config_publish::jvm_opts: -Dkey=value
+aem_curator::config_publish::jvm_opts: "-XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -XX:+HeapDumpOnOutOfMemoryError"
 aem_curator::config_publish::publish_timeout: 1200
 publish::aem_system_users:
   admin:

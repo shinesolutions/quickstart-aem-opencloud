@@ -44,7 +44,8 @@ aem_curator::install_author::aem_jvm_opts:
 - '-XX:+HeapDumpOnOutOfMemoryError'
 
 aem_curator::install_author::data_volume_device: /dev/xvdb
-
+aem_curator::install_author::aem_ssl_method: jetty
+aem_curator::install_publish::aem_ssl_method: jetty
 aem_curator::install_publish::aem_profile: <%aem_installation_profile%>
 aem_curator::install_publish::aem_keystore_password: <%aem_keystore_password%>
 aem_curator::install_publish::aem_artifacts_base: <%s3_path%>
@@ -68,6 +69,8 @@ aem_curator::install_java::jdk_base_url: <%s3_path%>
 aem_curator::install_java::jdk_filename: <%jdk_filename%>
 aem_curator::install_java::jdk_version: <%jdk_version%>
 aem_curator::install_java::jdk_version_update: <%jdk_version_update%>
+aem_curator::install_aem_java::jdk_base_url: "%{lookup('aem_curator::install_java::jdk_base_url')}"
+aem_curator::install_aem_java::jdk_filename: "%{lookup('aem_curator::install_java::jdk_filename')}"
 
 aem_curator::install_author::aem_healthcheck_version: 1.3.3
 aem_curator::install_author::aem_healthcheck_source: <%s3_path%>
