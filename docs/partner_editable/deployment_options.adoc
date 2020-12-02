@@ -11,5 +11,3 @@ The Quick Start provides separate templates for these options. It also lets you 
 === Operating System for Deployment
 
 This Quick Start supports Amazon Linux 2(AL2) or RedHat Enterprise Linux 7(RHEL7) for your AEM OpenCloud installation on AWS. This Quick Start deployment uses AL2.
-
-Please note that NVME instance types e.g. `m5` or `t3` are *not supported* when you run AEM OpenCloud on *RHEL7*.

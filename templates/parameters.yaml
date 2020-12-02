@@ -292,7 +292,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/config/elbcipher
       Description: External Certificate ARN
       Type: String
-      Value: 'AOCELBSecurityPolicy-TLS-1-2-2017-01'
+      Value: 'ELBSecurityPolicy-TLS-1-2-2017-01'
   AOCEC2RootDeviceParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -331,7 +331,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/version/aemawsstackprovisioner
       Description: AEM AWS Stack Provisioner Version
       Type: String
-      Value: '4.36.2'
+      Value: '5.0.0'
   AOCAemHealthcheckContentVersionParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -352,7 +352,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/version/aemorchestrator
       Description: AEM Orchestrator Version
       Type: String
-      Value: '2.0.1'
+      Value: '3.0.1'
   AOCAemPasswordResetContentVersionParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -441,7 +441,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/config/author/elb/healthurl
       Description: Author-Dispatcher ELB Healthcheck URL
       Type: String
-      Value: 'HTTPS:5432/system/health?tags=shallow'
+      Value: '/system/health?tags=shallow'
   AOCAuthorRootVolSizeParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -485,7 +485,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/config/authordispatcher/elb/healthurl
       Description: Author-Dispatcher ELB Healthcheck URL
       Type: String
-      Value: 'HTTPS:443/system/health?tags=shallow'
+      Value: '/system/health?tags=shallow'
   AOCAuthorDispatcherELBInboundCidrParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -576,7 +576,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/config/publishdispatcher/elb/healthurl
       Description: Publish-Dispatcher ELB Healthcheck URL
       Type: String
-      Value: 'HTTPS:443/system/health?tags=shallow'
+      Value: '/system/health?tags=shallow'
   AOCPublishDispatcherR53SubDomainNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -784,7 +784,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/version/packeraem
       Description: Packer AEM Version
       Type: String
-      Value: '4.26.0'
+      Value: '5.0.2'
   AOCS3DataBucketNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
