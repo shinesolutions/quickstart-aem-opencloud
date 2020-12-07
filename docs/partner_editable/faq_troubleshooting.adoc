@@ -30,24 +30,7 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 
 *Q.* Which versions of Oracle Java JDK8 are supported by AEM OpenCloud?
 
-*A.* Supported versions of Oracle Java JDK 8 and their allowed input value for the parameter `JavaJDKVersion` are listed in the table below.
-
-.Supported Java JDK8 Versions
-[cols=2*,options="header"]
-|===
-|Version
-| Allowed input value
-
-| Java JDK 8u171 | 8u171
-| Java JDK 8u181 | 8u181
-| Java JDK 8u191 | 8u191
-| Java JDK 8u201 | 8u201
-| Java JDK 8u211 | 8u211
-| Java JDK 8u221 | 8u221
-| Java JDK 8u231 | 8u231
-| Java JDK 8u241 | 8u241
-| Java JDK 8u251 | 8u251
-|===
+*A.* All versions of Oracle Java JDK8 are supported. You just need to provide the version e.g. `8u271` as input value for the parameter `JavaJDKVersion`
 
 *Q.* What versions of AEM are supported by AEM OpenCloud?
 
@@ -79,6 +62,8 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 | AEM 65 SP2 | 65-SP2 | AEM-6.5.2.0-6.5.2.zip
 | AEM 65 SP3 | 65-SP3 | AEM-6.5.3.0-6.5.3.zip
 | AEM 65 SP4 | 65-SP4 | AEM-6.5.4.0-6.5.4.zip
+| AEM 65 SP5 | 65-SP5 | AEM-6.5.4.0-6.5.5.zip
+| AEM 65 SP6 | 65-SP6 | AEM-6.5.4.0-6.5.6.zip
 |===
 
 == Troubleshooting

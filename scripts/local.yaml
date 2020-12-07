@@ -112,7 +112,7 @@ aem_curator::config_author_primary::enable_crxde: True
 aem_curator::config_author_primary::enable_default_passwords: False
 aem_curator::config_author_primary::jvm_mem_opts: -Xss4m -Xms2048m -Xmx8192m
 aem_curator::config_author_primary::jmxremote_port: 5982
-aem_curator::config_author_primary::jvm_opts: -Dkey=value
+aem_curator::config_author_primary::jvm_opts: "-XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -XX:+HeapDumpOnOutOfMemoryError"
 aem_curator::config_author_primary::author_timeout: 1200
 author::aem_system_users:
   admin:
@@ -155,7 +155,7 @@ author::aem_system_users:
 aem_curator::config_author_standby::aem_version: '6.5'
 aem_curator::config_author_standby::jvm_mem_opts: -Xss4m -Xms2048m -Xmx8192m
 aem_curator::config_author_standby::jmxremote_port: 5982
-aem_curator::config_author_standby::jvm_opts: -Dkey=value
+aem_curator::config_author_standby::jvm_opts: "-XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -XX:+HeapDumpOnOutOfMemoryError"
 aem_curator::action_promote_author_standby_to_primary::aem_version: '6.5'
 ### End author-standby configuration
 
@@ -166,7 +166,7 @@ aem_curator::config_publish::enable_crxde: True
 aem_curator::config_publish::enable_default_passwords: False
 aem_curator::config_publish::jvm_mem_opts: -Xss4m -Xms2048m -Xmx8192m
 aem_curator::config_publish::jmxremote_port: 5983
-aem_curator::config_publish::jvm_opts: -Dkey=value
+aem_curator::config_publish::jvm_opts: "-XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+PrintGCDateStamps -XX:+PrintTenuringDistribution -XX:+PrintGCApplicationStoppedTime -XX:+HeapDumpOnOutOfMemoryError"
 aem_curator::config_publish::publish_timeout: 1200
 publish::aem_system_users:
   admin:
@@ -203,7 +203,7 @@ aem_orchestrator::application_properties::aws_device_name: /dev/xvdb
 aem_orchestrator::application_properties::aem_reverse_replication_enable: 'True'
 aem_orchestrator::application_properties::alarm_content_health_check_terminate_instance_enable: 'False'
 aem_orchestrator::jarfile_checksum_value: 133ad0f9a6c083701b2531b677a4458ebe021af88b3ea0eba87374fb9b12dc94
-orchestrator::aem_orchestrator_version: '2.0.1'
+orchestrator::aem_orchestrator_version: '3.0.1'
 orchestrator::stack_manager_stack_name: '-aem-stack-manager-main-stack'
 orchestrator::enable_cloudwatch_s3_stream: False
 chaos_monkey::include_stack: False
