@@ -22,15 +22,15 @@ best practices, to provide you with your own virtual network on AWS.*
 internet access for resources in the private subnets.*
 ** A Linux bastion host in an Auto Scaling group to allow inbound Secure
 Shell (SSH) access to EC2 instances in public and private subnets.*
-** An internet-facing Classic Load Balancer (ELB) for routing traffic to the content delivery web server.
+** An internet-facing Application Load Balancer (ALB) for routing traffic to the content delivery web server.
 * In the private subnets:
 ** Content management EC2 instances are designed for active/passive standby and are not part of an Auto Scaling Group.
 ** Content delivery EC2 instances are deployed into an Auto Scaling group.
 ** Content delivery web server EC2 instances are deployed into an Auto Scaling group.
 ** Content management web server EC2 instances are deployed into an Auto Scaling group.
 ** Utility EC2 instances are deployed into their own Auto Scaling group.
-** An internal ELB for routing traffic to the active content management server.
-** An internal ELB for routing traffic to the content management web server.
+** An internal ALB for routing traffic to the active content management server.
+** An internal ALB for routing traffic to the content management web server.
 * Amazon CloudFront for content delivery.
 * EC2 Amazon Machine Image (AMI) for each AEM OpenCloud role.
 * AWS Certificate Manager (ACM) for storing SSL certificates.
