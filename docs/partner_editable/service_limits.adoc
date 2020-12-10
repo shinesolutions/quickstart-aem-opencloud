@@ -8,7 +8,7 @@
 |IAM roles |13
 |ACM Certificates |1
 |Cloudfront Distributions |1
-|Classic Load Balancers |3
+|Application Load Balancers |3
 |Cloudfront Distributions |1
 |Lambda Functions |13
 |m5.2xlarge instances |4
