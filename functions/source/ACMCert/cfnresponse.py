@@ -14,7 +14,7 @@ FAILED = "FAILED"
 def send(event, context, responseStatus, responseData, physicalResourceId, reason=None):
     responseUrl = event['ResponseURL']
 
-    print responseUrl
+    print(responseUrl)
 
     responseBody = {}
     responseBody['Status'] = responseStatus
@@ -29,18 +29,18 @@ def send(event, context, responseStatus, responseData, physicalResourceId, reaso
     responseBody['Data'] = responseData
 
     json_responseBody = json.dumps(responseBody)
-   
-    print "Response body:\n" + json_responseBody
+
+    print("Response body:\n" + json_responseBody)
 
     headers = {
-        'content-type' : '', 
+        'content-type' : '',
         'content-length' : str(len(json_responseBody))
     }
-    
+
     try:
         response = requests.put(responseUrl,
                                 data=json_responseBody,
                                 headers=headers)
-        print "Status code: " + response.reason
+        print("Status code: " + response.reason)
     except Exception as e:
-        print "send(..) failed executing requests.put(..): " + str(e)
+        print("send(..) failed executing requests.put(..): " + str(e))
