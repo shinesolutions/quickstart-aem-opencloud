@@ -194,6 +194,12 @@ Resources:
             Ref: DefaultCacheBehaviorViewerProtocolPolicyParameter
         DefaultRootObject:  !If [DefaultRootObjectEnabled, !Ref DefaultRootObjectParameter, !Ref 'AWS::NoValue']
         Enabled: true
+        Logging:
+          Bucket:
+            Fn::Sub: "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+          IncludeCookies: false
+          Prefix:
+            Fn::Sub: "${AOCStackPrefix}/logs/cloudfront/"
         Origins:
           - DomainName: !Sub "{{resolve:ssm:/${AOCStackPrefix}/publishdispatcher/elbdns:1}}"
             Id: !Sub CDNOrigin-${AOCStackPrefix}

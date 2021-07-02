@@ -142,7 +142,14 @@ Resources:
             \ ${AemAwsStackProvisionerVersionParameter}\n"
     Type: AWS::AutoScaling::LaunchConfiguration
   AuthorDispatcherLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      LoadBalancerAttributes:
+        - access_logs.s3.enabled: true
+        - access_logs.s3.bucket:
+            Fn::Sub: "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
+        - access_logs.s3.prefix:
+            Fn::Sub: "${AOCStackPrefix}/logs/elb/author-dispatcher/"
       Type: application
       Scheme: internal
       SecurityGroups:
@@ -156,7 +163,6 @@ Resources:
       - Key: StackPrefix
         Value:
           Ref: AOCStackPrefix
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
   AuthorDispatcherLoadBalancerTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
@@ -199,8 +205,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: At least one Author Dispatcher is Unhealthy
-      AlarmName:
-        Fn::Sub: ${AOCStackPrefix}-Warning-AuthorDispatcher-AtLeastOneUnHealthyAlarm
       ComparisonOperator: GreaterThanOrEqualToThreshold
       Dimensions:
       - Name: LoadBalancerName
@@ -221,8 +225,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: More than one Author Dispatcher is Unhealthy
-      AlarmName:
-        Fn::Sub: ${AOCStackPrefix}-Critical-AuthorDispatcher-MoreThanOneUnHealthyAlarm
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
       - Name: LoadBalancerName
@@ -243,11 +245,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: Memory Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-AuthorDispatcher-MemoryHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -268,11 +265,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: Memory Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-AuthorDispatcher-MemoryHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -293,11 +285,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: Disk Space Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-AuthorDispatcher-RootDiskSpaceHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -322,11 +309,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: Disk Space Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-AuthorDispatcher-RootDiskSpaceHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -351,11 +333,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: Disk Space Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-AuthorDispatcher-DataDiskSpaceHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -380,11 +357,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: Disk Space Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-AuthorDispatcher-DataDiskSpaceHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -409,11 +381,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: CPU Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-AuthorDispatcher-CPUHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -434,11 +401,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: CPU Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-AuthorDispatcher-CPUHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"

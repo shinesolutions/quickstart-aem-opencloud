@@ -68,13 +68,7 @@ Resources:
                   - acm:RequestCertificate
                   - acm:DescribeCertificate
                   - acm:DeleteCertificate
-                Resource:
-                  - "*"
-              - Effect: Allow
-                Action:
-                  - lambda:InvokeFunction
-                Resource:
-                  - "*"
+                Resource: !Sub "arn:${AWS::Partition}:acm:${AWS::Region}:${AWS::AccountId}:certificate/* "
               - Effect: Allow
                 Action:
                   - route53:ChangeResourceRecordSets
@@ -86,10 +80,14 @@ Resources:
               - Effect: Allow
                 Action:
                   - logs:FilterLogEvents
-                Resource:
-                  - "*"
+                Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:*"
   ACMExternalCertificateLambda:
     Type: AWS::Lambda::Function
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+        - id: W58
+          reason: "Skip IAM permission check forLambda functions require permission to write CloudWatch Logs"
     Properties:
       Description: Creates and verifies an ACM certificate using DNS validation and route53
       Handler: lambda_function.handler

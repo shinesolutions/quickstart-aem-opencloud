@@ -142,11 +142,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: Memory Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-Publish-MemoryHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: AutoScalingGroupName
@@ -167,11 +162,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: Memory Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-Publish-MemoryHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: AutoScalingGroupName
@@ -192,11 +182,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: Disk Space Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-Publish-RootDiskSpaceHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: AutoScalingGroupName
@@ -221,11 +206,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: Disk Space Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-Publish-RootDiskSpaceHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: AutoScalingGroupName
@@ -250,11 +230,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: Disk Space Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-Publish-DataDiskSpaceHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: AutoScalingGroupName
@@ -279,11 +254,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: Disk Space Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-Publish-DataDiskSpaceHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: AutoScalingGroupName
@@ -308,11 +278,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: CPU Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-Publish-CPUHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: AutoScalingGroupName
@@ -333,11 +298,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: CPU Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-Publish-CPUHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: AutoScalingGroupName

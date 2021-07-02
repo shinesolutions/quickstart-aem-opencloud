@@ -154,20 +154,30 @@ Conditions:
 Resources:
   AmiCreationSecurityGroup:
     Type: AWS::EC2::SecurityGroup
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+        - id: W5
+          reason: "Skip egress cidr rule check"
+        - id: W9
+          reason: "Skip ingress cidr rule check"
     Properties:
       GroupDescription: App Server Security Group (AWS Quick Start)
       VpcId: !Sub '{{resolve:ssm:/${AOCStackPrefix}/network/vpcid:1}}'
       SecurityGroupIngress:
-      - IpProtocol: tcp
+      - Description: Allow incoming SSH connections.
+        IpProtocol: tcp
         FromPort: 22
         ToPort: 22
         CidrIp: !Sub '{{resolve:ssm:/${AOCStackPrefix}/network/vpccidr:1}}'
       SecurityGroupEgress:
-      - IpProtocol: tcp
+      - Description: Allow Outgoing HTTP connections for installation
+        IpProtocol: tcp
         FromPort: 80
         ToPort: 80
         CidrIp: 0.0.0.0/0
-      - IpProtocol: tcp
+      - Description: Allow Outgoing HTTPS connections for installation
+        IpProtocol: tcp
         FromPort: 443
         ToPort: 443
         CidrIp: 0.0.0.0/0
@@ -183,14 +193,12 @@ Resources:
           Action:
           - sts:AssumeRole
       Path: /
+      ManagedPolicyArns:
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/CloudWatchAgentServerPolicy
       Policies:
         - PolicyName: aoc-ami-creation
           PolicyDocument:
             Statement:
-              - Effect: Allow
-                Action:
-                  - iam:PassRole
-                Resource: '*'
               - Effect: Allow
                 Action:
                   - s3:GetObject*
@@ -208,11 +216,6 @@ Resources:
                       - - "arn:aws:s3:::"
                         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/config/s3databucketname:1}}"
                         - !Sub "/${AOCStackPrefix}/*"
-              - Effect: Allow
-                Action:
-                  - 'logs:*'
-                Resource:
-                  - 'arn:aws:logs:*:*:*'
               - Effect: Allow
                 Action:
                   - ssm:GetParametersByPath
@@ -790,6 +793,11 @@ Resources:
         Value: AEM OpenCloud
   AMIInfoFunctionExecutionRole:
     Type: AWS::IAM::Role
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+        - id: W11
+          reason: "Skip IAM Resource permission check for IAM Role"
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -808,11 +816,18 @@ Resources:
           Statement:
           - Effect: Allow
             Action:
-            - ec2:Describe*
+            - ec2:DescribeImages
+            - ec2:DescribeInstances
+            Resource: '*'
+          - Effect: Allow
+            Action:
             - ec2:StopInstances
+            Resource: !Sub "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
+          - Effect: Allow
+            Action:
             - ec2:CreateImage
             - ec2:DeregisterImage
-            Resource: '*'
+            Resource: !Sub "arn:${AWS::Partition}:ec2:${AWS::Region}:${AWS::AccountId}:image/*"
       ManagedPolicyArns:
       - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
   AMIInfoFunction:

@@ -154,8 +154,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: No Orchestrator Instance in Service
-      AlarmName:
-        Fn::Sub: ${AOCStackPrefix}-Critical-Orchestrator-NoInstanceAlarm
       ComparisonOperator: LessThanThreshold
       Dimensions:
       - Name: AutoScalingGroupName
@@ -177,11 +175,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: Memory Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-Orchestrator-MemoryHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -202,11 +195,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: Memory Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-Orchestrator-MemoryHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -227,11 +215,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: Disk Space Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-Orchestrator-RootDiskSpaceHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -256,11 +239,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: Disk Space Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-Orchestrator-RootDiskSpaceHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -285,11 +263,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/warningalarmnotificationtopic:1}}"
       AlarmDescription: CPU Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Warning-Orchestrator-CPUHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"
@@ -310,11 +283,6 @@ Resources:
       AlarmActions:
         - !Sub "{{resolve:ssm:/${AOCStackPrefix}/messaging/criticalalarmnotificationtopic:1}}"
       AlarmDescription: CPU Utilization is high
-      AlarmName:
-        Fn::Sub:
-          - "${AOCStackPrefix}-Critical-Orchestrator-CPUHighAlarm"
-          - AOCStackPrefix:
-              Ref: 'AOCStackPrefix'
       ComparisonOperator: GreaterThanThreshold
       Dimensions:
         - Name: "AutoScalingGroupName"

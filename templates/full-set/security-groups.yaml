@@ -23,6 +23,7 @@ Parameters:
 Resources:
   AuthorDipatcherELBSecurityGroupEgress0:
     Properties:
+      Description: "ELB to Author-Dispatcher via HTTPS"
       DestinationSecurityGroupId:
         Ref: AuthorDispatcherSecurityGroup
       FromPort: 443
@@ -33,6 +34,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   AuthorDipatcherSecurityGroupEgress0:
     Properties:
+      Description: "Author-Dispatcher to ELB via HTTPS"
       DestinationSecurityGroupId:
         Ref: AuthorELBSecurityGroup
       FromPort: 443
@@ -43,6 +45,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   AuthorDipatcherSecurityGroupEgress1:
     Properties:
+      Description: "Author-Dispatcher to Private Subnet via HTTPS"
       CidrIp:
         Ref: PrivateSubnetInternetOutboundCidrIpParameter
       FromPort: 443
@@ -64,6 +67,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
   AuthorDispatcherELBSecurityGroupIngress0:
     Properties:
+      Description: "Author-Dispatcher ELB HTTPS Ingress from Inbound CIDR"
       CidrIp:
         Ref: AuthorDispatcherELBSecurityGroupInboundCidrIpParameter
       FromPort: 443
@@ -85,6 +89,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
   AuthorDispatcherSecurityGroupIngress0:
     Properties:
+      Description: "Author-Dispatcher HTTPS Ingress from ELB"
       FromPort: 443
       GroupId:
         Ref: AuthorDispatcherSecurityGroup
@@ -95,6 +100,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   AuthorDispatcherSecurityGroupIngress1:
     Properties:
+      Description: "Author-Dispatcher AEM Ingress from AEM Author"
       FromPort: 5432
       GroupId:
         Ref: AuthorDispatcherSecurityGroup
@@ -105,6 +111,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   AuthorDispatcherSecurityGroupIngress2:
     Properties:
+      Description: "Author-Dispatcher SSH Ingress from Secure Shell Inbound Cidr"
       CidrIp:
         Ref: SecureShellInboundCidrIpParameter
       FromPort: 22
@@ -126,6 +133,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
   AuthorELBSecurityGroupEgress0:
     Properties:
+      Description: "Author ELB AEM Egress to AEM Author"
       DestinationSecurityGroupId:
         Ref: AuthorSecurityGroup
       FromPort: 5432
@@ -136,6 +144,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   AuthorELBSecurityGroupIngress0:
     Properties:
+      Description: "Author ELB HTTPS Ingress From Author-Dispatcher"
       FromPort: 443
       GroupId:
         Ref: AuthorELBSecurityGroup
@@ -146,6 +155,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   AuthorELBSecurityGroupIngress1:
     Properties:
+      Description: "Author ELB HTTPS Ingress From Orchestrator"
       FromPort: 443
       GroupId:
         Ref: AuthorELBSecurityGroup
@@ -167,6 +177,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
   AuthorSecurityGroupEgress0:
     Properties:
+      Description: "Author AEM Egress to AEM Publish"
       DestinationSecurityGroupId:
         Ref: PublishSecurityGroup
       FromPort: 5433
@@ -177,6 +188,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   AuthorSecurityGroupEgress1:
     Properties:
+      Description: "Author AEM Egress to AEM Author"
       DestinationSecurityGroupId:
         Ref: AuthorSecurityGroup
       FromPort: 5432
@@ -187,6 +199,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   AuthorSecurityGroupEgress2:
     Properties:
+      Description: "Author Cold-Standby Sync Egress to AEM Author"
       DestinationSecurityGroupId:
         Ref: AuthorSecurityGroup
       FromPort: 8023
@@ -197,6 +210,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   AuthorSecurityGroupEgress3:
     Properties:
+      Description: "Author HTTPS Egress to Author Dispatcher"
       DestinationSecurityGroupId:
         Ref: AuthorDispatcherSecurityGroup
       FromPort: 443
@@ -207,6 +221,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   AuthorSecurityGroupEgress4:
     Properties:
+      Description: "Author HTTPS Egress to Inbound CIDR"
       CidrIp:
         Ref: PrivateSubnetInternetOutboundCidrIpParameter
       FromPort: 443
@@ -217,6 +232,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   AuthorSecurityGroupIngress0:
     Properties:
+      Description: "Author AEM Ingress from Author ELB"
       FromPort: 5432
       GroupId:
         Ref: AuthorSecurityGroup
@@ -227,6 +243,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   AuthorSecurityGroupIngress1:
     Properties:
+      Description: "Author AEM Ingress from AEM Author"
       FromPort: 5432
       GroupId:
         Ref: AuthorSecurityGroup
@@ -237,6 +254,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   AuthorSecurityGroupIngress4:
     Properties:
+      Description: "Author Cold-Standby Sync Ingress from AEM Author"
       FromPort: 8023
       GroupId:
         Ref: AuthorSecurityGroup
@@ -247,6 +265,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   AuthorSecurityGroupIngress5:
     Properties:
+      Description: "Author SSH Ingress from Secure Shell Inbound Cidr"
       CidrIp:
         Ref: SecureShellInboundCidrIpParameter
       FromPort: 22
@@ -268,6 +287,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
   OrchestratorSecurityGroupEgress0:
     Properties:
+      Description: "Orchestrator HTTPS Egress to Author ELB"
       DestinationSecurityGroupId:
         Ref: AuthorELBSecurityGroup
       FromPort: 443
@@ -278,6 +298,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   OrchestratorSecurityGroupEgress1:
     Properties:
+      Description: "Orchestrator HTTPS Egress to Internet Outbound Cidr"
       CidrIp:
         Ref: PrivateSubnetInternetOutboundCidrIpParameter
       FromPort: 443
@@ -288,6 +309,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   OrchestratorSecurityGroupEgress2:
     Properties:
+      Description: "Orchestrator AEM Egress to AEM Publish"
       DestinationSecurityGroupId:
         Ref: PublishSecurityGroup
       FromPort: 5433
@@ -298,6 +320,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   OrchestratorSecurityGroupIngress0:
     Properties:
+      Description: "Orchestrator SSH Ingress from Secure Shell Inbound Cidr"
       CidrIp:
         Ref: SecureShellInboundCidrIpParameter
       FromPort: 22
@@ -319,6 +342,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
   PublishDispatcherELBSecurityGroupEgress0:
     Properties:
+      Description: "PublishDispatcher ELB HTTPS Egress to PublishDispatcher"
       DestinationSecurityGroupId:
         Ref: PublishDispatcherSecurityGroup
       FromPort: 443
@@ -329,6 +353,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   PublishDispatcherELBSecurityGroupIngress1:
     Properties:
+      Description: "PublishDispatcher ELB HTTPS Ingress from Inbound Cidr"
       CidrIp:
         Ref: PublishDispatcherELBSecurityGroupInboundCidrIpParameter
       FromPort: 443
@@ -350,6 +375,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
   PublishDispatcherSecurityGroupEgress0:
     Properties:
+      Description: "PublishDispatcher AEM Egress to AEM Publish"
       DestinationSecurityGroupId:
         Ref: PublishSecurityGroup
       FromPort: 5433
@@ -360,6 +386,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   PublishDispatcherSecurityGroupEgress1:
     Properties:
+      Description: "PublishDispatcher HTTPS Egress to Internet outbound Cidr"
       CidrIp:
         Ref: PrivateSubnetInternetOutboundCidrIpParameter
       FromPort: 443
@@ -370,6 +397,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   PublishDispatcherSecurityGroupIngress0:
     Properties:
+      Description: "PublishDispatcher HTTPS Ingress from PublishDispatcher ELB"
       FromPort: 443
       GroupId:
         Ref: PublishDispatcherSecurityGroup
@@ -380,6 +408,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   PublishDispatcherSecurityGroupIngress1:
     Properties:
+      Description: "PublishDispatcher HTTPS Ingress from AEM Publish"
       FromPort: 443
       GroupId:
         Ref: PublishDispatcherSecurityGroup
@@ -390,6 +419,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   PublishDispatcherSecurityGroupIngress2:
     Properties:
+      Description: "PublishDispatcher SSH Ingress from Secure Shell inbound Cidr"
       CidrIp:
         Ref: SecureShellInboundCidrIpParameter
       FromPort: 22
@@ -411,6 +441,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
   PublishSecurityGroupEgress0:
     Properties:
+      Description: "Publish HTTPS Egress to Publish Dispatcher"
       DestinationSecurityGroupId:
         Ref: PublishDispatcherSecurityGroup
       FromPort: 443
@@ -421,6 +452,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   PublishSecurityGroupEgress1:
     Properties:
+      Description: "Publish HTTPS Egress to Private Subnet Inernet Outbound Cidr"
       CidrIp:
         Ref: PrivateSubnetInternetOutboundCidrIpParameter
       FromPort: 443
@@ -431,6 +463,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupEgress
   PublishSecurityGroupIngress0:
     Properties:
+      Description: "Publish AEM Ingress from Publish Dispatcher"
       FromPort: 5433
       GroupId:
         Ref: PublishSecurityGroup
@@ -441,6 +474,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   PublishSecurityGroupIngress1:
     Properties:
+      Description: "Publish AEM Ingress from AEM Publisher"
       FromPort: 5433
       GroupId:
         Ref: PublishSecurityGroup
@@ -451,6 +485,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   PublishSecurityGroupIngress2:
     Properties:
+      Description: "Publish SSH Ingress from Secure Shell inbound Cidr"
       CidrIp:
         Ref: SecureShellInboundCidrIpParameter
       FromPort: 22
@@ -461,6 +496,7 @@ Resources:
     Type: AWS::EC2::SecurityGroupIngress
   PublishSecurityGroupIngress3:
     Properties:
+      Description: "Publish AEM Ingress from Orchestrator"
       FromPort: 5433
       GroupId:
         Ref: PublishSecurityGroup

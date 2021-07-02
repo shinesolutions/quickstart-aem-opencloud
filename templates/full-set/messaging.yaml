@@ -59,7 +59,8 @@ Resources:
                 Ref: AEMASGEventTopic
           Effect: Allow
           Principal:
-            AWS: '*'
+            AWS:
+              - !Ref AWS::AccountId
           Resource:
           - Fn::GetAtt:
             - AEMAutoScalingGroupEventQueue
