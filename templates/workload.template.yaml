@@ -560,6 +560,16 @@ Mappings:
       installationprofile: 'aem65_sp3'
     "65-SP4":
       installationprofile: 'aem65_sp4'
+    "65-SP5":
+      installationprofile: 'aem65_sp5'
+    "65-SP6":
+      installationprofile: 'aem65_sp6'
+    "65-SP7":
+      installationprofile: 'aem65_sp7'
+    "65-SP8":
+      installationprofile: 'aem65_sp8'
+    "65-SP9":
+      installationprofile: 'aem65_sp9'
 Resources:
   AOCStackDataBucket:
     Type: AWS::S3::Bucket
