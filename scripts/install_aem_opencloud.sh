@@ -28,9 +28,9 @@ translate_puppet_exit_code() {
 COMPONENT=$1
 AWS_REGION=$2
 
-PUPPET_MAJOR_VERSION=5
-PUPPET_MINOR_VERSION=5
-PUPPET_PATCH_VERSION=22
+PUPPET_MAJOR_VERSION=7
+PUPPET_MINOR_VERSION=9
+PUPPET_PATCH_VERSION=0
 PUPPET_AGENT_VERSION="${PUPPET_MAJOR_VERSION}.${PUPPET_MINOR_VERSION}.${PUPPET_PATCH_VERSION}"
 ARCH_TYPE=x86_64
 OS_TYPE=el
@@ -62,6 +62,7 @@ cd $TMP_DIR/packer-aem
 cp $TMP_DIR/local.yaml $TMP_DIR/packer-aem/conf/puppet/hieradata/local.yaml
 cp $TMP_DIR/hiera.yaml $TMP_DIR/packer-aem/conf/puppet/hiera.yaml
 cp $TMP_DIR/hiera3.yaml $TMP_DIR/packer-aem/conf/puppet/hiera3.yaml
+cp $TMP_DIR/hiera3.yaml $TMP_DIR/packer-aem/hiera3.yaml
 
 #
 # Fix for the dispatcher component to support Instance Types with NVME Devices

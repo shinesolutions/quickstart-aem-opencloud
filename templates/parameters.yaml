@@ -331,7 +331,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/version/aemawsstackprovisioner
       Description: AEM AWS Stack Provisioner Version
       Type: String
-      Value: '5.3.0'
+      Value: '5.9.3'
   AOCAemHealthcheckContentVersionParameter:
     Type: AWS::SSM::Parameter
     Properties:
@@ -784,7 +784,7 @@ Resources:
       Name: !Sub /${AOCStackPrefix}/version/packeraem
       Description: Packer AEM Version
       Type: String
-      Value: '5.5.1'
+      Value: '5.15.1'
   AOCS3DataBucketNameParameter:
     Type: AWS::SSM::Parameter
     Properties:

@@ -67,6 +67,9 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 | AEM 65 SP7 | 65-SP7 | aem-service-pkg-6.5.7.zip
 | AEM 65 SP8 | 65-SP8 | aem-service-pkg-6.5.8.zip
 | AEM 65 SP9 | 65-SP9 | aem-service-pkg-6.5.9.zip
+| AEM 65 SP10 | 65-SP10 | aem-service-pkg-6.5.10.zip
+| AEM 65 SP11 | 65-SP11 | aem-service-pkg-6.5.11.zip
+| AEM 65 SP13 | 65-SP13 | aem-service-pkg-6.5.13.zip
 |===
 
 *Q.* What version of OpenSSL is supported by AEM OpenCloud?

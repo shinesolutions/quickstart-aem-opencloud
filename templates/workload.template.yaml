@@ -368,7 +368,7 @@ Parameters:
       Please refer to the deployment guide for other supported versions.
     Type: String
   AemDispatcherVersion:
-    Default: '4.3.3'
+    Default: '4.3.5'
     Description: AEM Dispatcher version to install.
     Type: String
   JavaJDKVersion:
@@ -570,6 +570,12 @@ Mappings:
       installationprofile: 'aem65_sp8'
     "65-SP9":
       installationprofile: 'aem65_sp9'
+    "65-SP10":
+      installationprofile: 'aem65_sp10'
+    "65-SP11":
+      installationprofile: 'aem65_sp11'
+    "65-SP13":
+      installationprofile: 'aem65_sp13'
 Resources:
   AOCStackDataBucket:
     Type: AWS::S3::Bucket
