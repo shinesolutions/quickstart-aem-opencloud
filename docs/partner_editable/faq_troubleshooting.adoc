@@ -69,6 +69,14 @@ For additional information, see https://docs.aws.amazon.com/AWSCloudFormation/la
 | AEM 65 SP9 | 65-SP9 | aem-service-pkg-6.5.9.zip
 |===
 
+*Q.* What version of OpenSSL is supported by AEM OpenCloud?
+
+*A.* AEM OpenCloud supports OpenSSL 1.1
+
+*Q.* What versions of AEM Dispatcher are supported by AEM OpenCloud?
+
+*A.* AEM OpenCloud supports all versions of the AEM Dispatcher with OpenSSL 1.1 support
+
 == Troubleshooting
 
 === General Troubleshooting notes:
