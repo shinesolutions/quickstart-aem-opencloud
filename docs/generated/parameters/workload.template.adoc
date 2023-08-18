@@ -35,7 +35,7 @@
 (`S3InstallKeyPrefix`)|`quickstart-aem-opencloud/library/`|S3 key prefix for the AEM OpenCloud installation assets(installation files, license file, etc.).AWS Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/). It cannot start or end with forward slash (/) because they are automatically appended.|AEM OpenCloud Stack Prefix
 (`AOCStackPrefix`)|`aem-opencloud`|Stack Prefix used to tag and IDentify the AEM OpenCloud Stack.|AEM Version to install
 (`AemVersion`)|`65-SP4`|AEM Version to install. Please refer to the deployment guide for other supported versions.|AEM Dispatcher version to install
-(`AemDispatcherVersion`)|`4.3.3`|AEM Dispatcher version to install.|Java JDK version to install
+(`AemDispatcherVersion`)|`4.3.6`|AEM Dispatcher version to install.|Java JDK version to install
 (`JavaJDKVersion`)|`8u251`|Java JDK Version to install and run AEM. Please refer to the deployment guide for other supported versions.|Lambda S3 bucket name
 (`LambdaZipsBucketName`)|`**__Blank string__**`|(Optional) The name of the S3 bucket where the Lambda zip files should be placed. If you leave this parameter blank, an S3 bucket will be created.
 |===

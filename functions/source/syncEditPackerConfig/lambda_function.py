@@ -131,7 +131,7 @@ def create(event, _):
     local_yaml['aem_curator::install_author::aem_profile'] = aem_profile
     local_yaml['aem_curator::install_author::aem_keystore_password'] = aem_keystore_password
     local_yaml['aem_curator::install_publish::aem_keystore_password'] = aem_keystore_password
-    local_yaml['aem_curator::install_dispatcher::apache_module_tarball'] = "dispatcher-apache2.4-linux-x86_64-ssl1.0-" + aem_dispatcher_version + ".tar.gz"
+    local_yaml['aem_curator::install_dispatcher::apache_module_tarball'] = "dispatcher-apache2.4-linux-x86_64-ssl1.1-" + aem_dispatcher_version + ".tar.gz"
     local_yaml['aem_curator::install_dispatcher::apache_module_filename'] = "dispatcher-apache2.4-" + aem_dispatcher_version + ".so"
     local_yaml['aem_curator::install_java::jdk_filename'] = "jdk-" + java_jdk_version + "-linux-x64.rpm"
     local_yaml['aem_curator::install_java::jdk_version'] = jdk_version

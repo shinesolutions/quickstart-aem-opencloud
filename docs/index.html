@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="generator" content="Asciidoctor 2.0.10">
+<meta name="generator" content="Asciidoctor 2.0.17">
 <title>AEM OpenCloud on the AWS Cloud</title>
 <style>
 
@@ -182,7 +182,7 @@ p a>code:hover{color:rgba(0,0,0,.9)}
   padding-top:0;
   overflow:hidden;
   background:#283e5b;
-  border-bottom: 4px solid #435c7c;
+  /* border-bottom: 4px solid #435c7c; */
   width:320px;
   height:154px;
   top:0;
@@ -411,7 +411,7 @@ span.icon>.fa{cursor:default}
 a span.icon>.fa{cursor:inherit}
 .admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
 .admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
-.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";color: rgb(3, 87, 21);}
 .admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
 .admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
 .admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
@@ -747,8 +747,43 @@ p {
   font-weight  : 300 !important;
 }
 
-#toc.toc2 #toctitle{
-  background-image: url('images/AWS-Logo.svg');
+/* image layout */
+#toc.toc2 #toctitle {
+  background-image: url("images/AWS-Logo.svg");
+  background-repeat: no-repeat;
+  background-size: 50%;
+  background-position: center;
+  width: auto;
+  height: 15%;
+}
+
+/* Left Navbar size */
+#toc.toc2 {
+  width: 17%;
+  min-width: 15em;
+}
+
+/* auto width for main page */
+body.toc2 {
+  padding-left: 22%;
+  padding-right: 2%;
+}
+
+/* hide left nav bar if page size is smaller than 767px */
+@media screen and (max-width: 767px) {
+  #toc {
+      display: none !important;
+  }
+  body.toc2 {
+    padding-left: 1%;
+    padding-right: 1%;
+    position: relative;
+  }
+
+  #content {
+    padding-left: 2%;
+    padding-right: 2%;
+  }
 }
 
 /* QS Tables */
@@ -791,7 +826,7 @@ p.footer-text a{color:#d7d8d8}
 <ul class="sectlevel1">
 <li><a href="#_overview">Overview</a></li>
 <li><a href="#_aem_opencloud_on_aws">AEM OpenCloud on AWS</a></li>
-<li><a href="#_cost">Cost</a></li>
+<li><a href="#_aws_costs">AWS costs</a></li>
 <li><a href="#_software_licenses">Software licenses</a></li>
 <li><a href="#_architecture">Architecture</a></li>
 <li><a href="#_planning_the_deployment">Planning the deployment</a>
@@ -799,6 +834,7 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_specialized_knowledge">Specialized knowledge</a></li>
 <li><a href="#_aws_account">AWS account</a></li>
 <li><a href="#_technical_requirements">Technical requirements</a></li>
+<li><a href="#_operating_system_for_deployment">Operating System for Deployment</a></li>
 </ul>
 </li>
 <li><a href="#_deployment_steps">Deployment steps</a>
@@ -831,28 +867,15 @@ p.footer-text a{color:#d7d8d8}
 <h2 id="_quick_start_reference_deployment" class="discrete text-left text-center">Quick Start Reference Deployment</h2>
 <div class="imageblock text-center">
 <div class="content">
-<img src="images/aws-quickstart-graphic.png" alt="QS" width="80" height="80">
+<img src="https://aws-quickstart.s3.amazonaws.com/quickstart-aem-opencloud/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="QS" width="80" height="80">
 </div>
 </div>
-<h3 id="_draft_document_unofficial_guidance" class="discrete text-center">DRAFT DOCUMENT / UNOFFICIAL GUIDANCE</h3>
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/__settings</em>.adoc</code></strong>_</p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph text-center">
-<p><strong>September, 2020</strong><br>
+<div class="paragraph text-center">
+<p><strong>September 2020</strong><br>
 <em>Cliffano Subagio and Michael Bloch, Shine Solutions Group</em><br>
 <em>Tony Bulding, AWS Quick Start team</em></p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock tip">
+</div>
+<div class="admonitionblock tip text-left">
 <table>
 <tr>
 <td class="icon">
@@ -874,35 +897,18 @@ report bugs, or submit feature ideas for this Quick Start.
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/overview_target_and_usage.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
 <p>This Quick Start reference deployment guide provides step-by-step instructions for deploying AEM OpenCloud on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p>This Quick Start is for users who want to deploy and manage a high available (HA) AEM infrastructure on the AWS Cloud using the open-source platform AEM OpenCloud.</p>
+<p>This Quick Start deploys an AEM OpenCloud architecture on the AWS Cloud with high availability features including <a href="https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html" target="_blank" rel="noopener">Amazon EC2 Auto Scaling</a>,
+<a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html" target="_blank" rel="noopener">Elastic Load Balancing</a> &amp; <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html" target="_blank" rel="noopener">Amazon CloudFront</a>.</p>
 </div>
 <div class="paragraph">
-<p>This Quick Start deploys an AEM OpenCloud Full-Set Architecture on the AWS Cloud with enabled HA features like <a href="https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html" target="_blank" rel="noopener">Amazon EC2 Auto Scaling</a>,
-<a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/classic/introduction.html" target="_blank" rel="noopener">Elastic Load Balancing</a> &amp; <a href="https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html" target="_blank" rel="noopener">Amazon CloudFront</a>.</p>
+<p>The AEM OpenCloud Full-Set is deployed with the recommended highly-available configuration of two Author-Dispatcher, two Publish-Dispatcher and two AEM Publish instances across multiple availability zones in one AWS Region. Further Amazon Cloudwatch alarms are configured to monitor the average CPU utilization of the Publish-Dispatcher Auto Scaling group. The alarm is configured to scale out/in by one EC2 instance if the CPU Utilization is above/below 50%, by not exceeding the configured minimum (2) or maximum (4) size of the Publish-Dispatcher Auto Scaling Group. The Orchestrator application manages AEM replication and flush agents as instances are  created and terminated.</p>
 </div>
 <div class="paragraph">
-<p>The AEM OpenCloud Full-Set is deployed with the recommended HA configuration of two Author-Dispatcher, two Publish-Dispatcher and two AEM Publish instances across multiple availability zones in one AWS Region.
-Further Amazon Cloudwatch alarms are configured to monitor the average CPU utilization of the Publish-Dispatcher Auto Scaling group. The alarm is configured to scale out/in by one EC2 instance if the CPU Utilization is above/below 50%, by not exceeding the configured minimum(2) or maximum(4) size of the Publish-Dispatcher Auto Scaling Group.
-The Orchestrator application manages AEM replication and flush agents as instances are getting created and terminated.</p>
+<p>Other services used by this Quick Start include <a href="https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html" target="_blank" rel="noopener">AWS Certificate Manager</a>, <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html" target="_blank" rel="noopener">Amazon CloudWatch</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html" target="_blank" rel="noopener">AWS Lambda</a>, <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html" target="_blank" rel="noopener">Amazon Route 53</a>, <a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html" target="_blank" rel="noopener">AWS Secrets Manager</a>, <a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html" target="_blank" rel="noopener">Amazon Simple Notification Service (Amazon SNS)</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html" target="_blank" rel="noopener">Amazon Simple Queue Service (Amazon SQS)</a>, <a href="https://docs.aws.amazon.com/AmazonS3/latest/gsg/GetStartedWithS3.html" target="_blank" rel="noopener">Amazon Simple Storage Service (Amazon S3)</a> and <a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html" target="_blank" rel="noopener">AWS Systems Manager</a>.</p>
 </div>
-<div class="paragraph">
-<p>Other services used by this Quick Start include <a href="https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html" target="_blank" rel="noopener">AWS Certificate Manager</a>, <a href="https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html" target="_blank" rel="noopener">Amazon CloudWatch</a>, <a href="https://docs.aws.amazon.com/lambda/latest/dg/welcome.html" target="_blank" rel="noopener">AWS Lambda</a>, <a href="https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html" target="_blank" rel="noopener">Amazon Route 53</a>, <a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html" target="_blank" rel="noopener">AWS Secrets Manager</a>, <a href="https://docs.aws.amazon.com/sns/latest/dg/welcome.html" target="_blank" rel="noopener">Amazon SNS</a>, <a href="https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html" target="_blank" rel="noopener">Amazon SQS</a>, <a href="https://docs.aws.amazon.com/AmazonS3/latest/gsg/GetStartedWithS3.html" target="_blank" rel="noopener">Amazon S3</a> and <a href="https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html" target="_blank" rel="noopener">AWS Systems Manager</a>.</p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -910,9 +916,7 @@ The Orchestrator application manages AEM replication and flush agents as instanc
 <i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-Amazon may share who uses AWS
-Quick Starts with the AWS Partner Network (APN) Partner that
-collaborated with AWS on the content of the Quick Start.
+Amazon may share user-deployment information with the AWS Partner that collaborated with AWS on the Quick Start.
 </td>
 </tr>
 </table>
@@ -923,41 +927,28 @@ collaborated with AWS on the content of the Quick Start.
 <h2 id="_aem_opencloud_on_aws">AEM OpenCloud on AWS</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/product_description.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>AEM OpenCloud is an open-source platform for running AEM on AWS. It provides an out of the box solution for provisioning a highly available AEM architecture which implements auto-scaling, auto-recovery, chaos-testing, CDN, multi-level backup, bluegreen deployment, repository upgrade, security, and monitoring capabilities by leveraging a multitude of AWS services.</p>
+<p>AEM OpenCloud is an open-source platform for running AEM on AWS. It provides an out of the box solution for provisioning a highly available AEM architecture which implements auto-scaling, auto-recovery, chaos-testing, CDN, multi-level backup, blue-green deployment, repository upgrade, security, and monitoring capabilities by leveraging a multitude of AWS services.</p>
 </div>
 <div class="paragraph">
-<p>The AEM OpenCloud workloads are deployed on multiple Amazon EC2 instances for improved performance. The content-delivery and content-management web server roles can be scaled for high availability. Other AEM OpenCloud roles have restrictions on active/active roles and are designed for active/passive standby. Due to this, other AEM OpenCloud roles belong to their own Auto Scaling groups as single instances. Should an instance become unavailable, it’s replaced by a new instance and configured with a AEM OpenCloud role of the same type.</p>
+<p>The AEM OpenCloud workloads are deployed on multiple Amazon EC2 instances for improved performance. The content-delivery and content-management web server roles can be scaled for high availability. Other AEM OpenCloud roles have restrictions on active/active roles and are designed for active/passive standby. Due to this, other AEM OpenCloud roles belong to their own Auto Scaling groups as single instances. Should an instance become unavailable, it will be replaced by a new instance and configured with a AEM OpenCloud role of the same type.</p>
 </div>
 <div class="paragraph">
 <p>The Website content can be deployed to the content-delivery and content-management roles using your choice of deployment process.</p>
 </div>
 <div class="paragraph">
 <p>Please know that we may share who uses AWS Quick Starts with the AWS Partner Network (APN) Partner that collaborated with AWS on the content of the Quick Start.</p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
+</div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_cost">Cost</h2>
+<h2 id="_aws_costs">AWS costs</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You are responsible for the cost of the AWS services used while running
-this Quick Start. There is no additional cost for
+<p>You are responsible for the cost of the AWS services and any third-party licenses used while running this Quick Start. There is no additional cost for
 using the Quick Start.</p>
 </div>
 <div class="paragraph">
-<p>The AWS CloudFormation template for this Quick Start includes
+<p>The AWS CloudFormation templates for Quick Starts include
 configuration parameters that you can customize. Some of the settings,
 such as the instance type, affect the cost of deployment. For cost estimates,
 see the pricing pages for each AWS service you use. Prices are subject to change.</p>
@@ -969,7 +960,7 @@ see the pricing pages for each AWS service you use. Prices are subject to change
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-After you deploy the Quick Start, enable the <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html" target="_blank" rel="noopener">AWS Cost and Usage Report</a> to deliver billing metrics to an Amazon Simple Storage Service (Amazon S3) bucket in your account. It provides cost estimates based on usage throughout each month and aggregates the data at the end of the month. For more information about the report, see the <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-costusage.html" target="_blank" rel="noopener">AWS documentation</a>.
+After you deploy the Quick Start, create <a href="https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-reports-gettingstarted-turnonreports.html" target="_blank" rel="noopener">AWS Cost and Usage Reports</a> to deliver billing metrics to an Amazon Simple Storage Service (Amazon S3) bucket in your account. These reports provide cost estimates based on usage throughout each month and aggregate the data at the end of the month. For more information, see <a href="https://docs.aws.amazon.com/cur/latest/userguide/what-is-cur.html" target="_blank" rel="noopener">What are AWS Cost and Usage Reports?</a>
 </td>
 </tr>
 </table>
@@ -980,45 +971,31 @@ After you deploy the Quick Start, enable the <a href="https://docs.aws.amazon.co
 <h2 id="_software_licenses">Software licenses</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/licenses.adoc</code></strong></em></p>
+<p>This Quick Start requires a license for Adobe Experience Manager. Contact your Adobe sales representative or Adobe partner for a full Adobe AEM on-premise license. When you launch the Quick Start, place the license key in the S3 installation bucket and specify its location.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
+<div class="admonitionblock warning">
+<table>
 <tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>This Quick Start requires a license for Adobe Experience Manager. Contact your Adobe sales representative or Adobe partner for a full Adobe AEM On-Premise license.
-When you launch the Quick Start, place the license key in the S3 installation bucket and specify its location.</p>
-</div>
-<div class="paragraph">
-<p><em>If you don’t have a license, the Quick Start deployment will fail.</em></p>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+If you don’t have a full Adobe AEM on-premise license, the Quick Start deployment will fail.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>This Quick Start launches the Amazon Machine Image (AMI) for the Amazon Linux 2 or Red Hat Enterprise Linux (RHEL) operating system.</p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_architecture">Architecture</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/architecture.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
 <p>Deploying this Quick Start for a new virtual private cloud (VPC) with
-<strong>default parameters</strong> builds the following <em>AEM OpenCloud</em> environment in the
-AWS Cloud.</p>
+default parameters builds the following AEM OpenCloud environment in the AWS Cloud.</p>
 </div>
 <div id="architecture1" class="imageblock">
 <div class="content">
@@ -1038,7 +1015,7 @@ AWS Cloud.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>A highly available architecture that spans two Availability Zones.*</p>
+<p>A highly-available architecture that spans two Availability Zones.*</p>
 </li>
 <li>
 <p>A VPC configured with public and private subnets, according to AWS
@@ -1057,7 +1034,7 @@ internet access for resources in the private subnets.*</p>
 Shell (SSH) access to EC2 instances in public and private subnets.*</p>
 </li>
 <li>
-<p>An internet-facing Classic Load Balancer (ELB) for routing traffic to the content delivery web server.</p>
+<p>An internet-facing Application Load Balancer (ALB) for routing traffic to the content delivery web server.</p>
 </li>
 </ul>
 </div>
@@ -1082,16 +1059,16 @@ Shell (SSH) access to EC2 instances in public and private subnets.*</p>
 <p>Utility EC2 instances are deployed into their own Auto Scaling group.</p>
 </li>
 <li>
-<p>An internal ELB for routing traffic to the active content management server.</p>
+<p>An internal ALB for routing traffic to the active content management server.</p>
 </li>
 <li>
-<p>An internal ELB for routing traffic to the content management web server.</p>
+<p>An internal ALB for routing traffic to the content management web server.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p>Amazon Cloudfront for content delivery.</p>
+<p>Amazon CloudFront for content delivery.</p>
 </li>
 <li>
 <p>EC2 Amazon Machine Image (AMI) for each AEM OpenCloud role.</p>
@@ -1121,16 +1098,15 @@ Shell (SSH) access to EC2 instances in public and private subnets.*</p>
 <p>Amazon Simple Storage Service (Amazon S3) bucket for storing AEM OpenCloud Stack assets.</p>
 </li>
 <li>
-<p>AWS Systems Manager to store AEM OpenCloud configuration parameters.
-*The template that deploys the Quick Start into an existing VPC skips
-the components marked by asterisks and prompts you for your existing VPC
-configuration.</p>
+<p>AWS Systems Manager to store AEM OpenCloud configuration parameters.</p>
 </li>
 </ul>
-</div></div></td>
-</tr>
-</tbody>
-</table>
+</div>
+<div class="paragraph">
+<p>*The template that deploys the Quick Start into an existing VPC skips
+the components marked by asterisks and prompts you for your existing VPC
+configuration.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1139,29 +1115,14 @@ configuration.</p>
 <div class="sect2">
 <h3 id="_specialized_knowledge">Specialized knowledge</h3>
 <div class="paragraph">
-<p>This deployment guide requires a moderate level of familiarity with
-AWS services. If you’re new to AWS, visit the
-<a href="https://aws.amazon.com/getting-started/" target="_blank" rel="noopener">Getting Started Resource Center</a>
-and the <a href="https://aws.amazon.com/training/">AWS Training and Certification
-website</a>. These sites provide materials for learning how to design,
-deploy, and operate your infrastructure and applications on the AWS
-Cloud.</p>
+<p>This deployment requires a moderate level of familiarity with
+AWS services. If you’re new to AWS, see <a href="https://aws.amazon.com/getting-started/" target="_blank" rel="noopener">Getting Started Resource Center</a>
+and <a href="https://aws.amazon.com/training/" target="_blank" rel="noopener">AWS Training and Certification</a>. These sites provide materials for learning how to design,
+deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/specialized_knowledge.adoc</code></strong></em></p>
+<p>This Quick Start assumes familiarity with AWS and AEM.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>This Quick Start assumes familiarity with AWS &amp; AEM.</p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="sect2">
 <h3 id="_aws_account">AWS account</h3>
@@ -1175,17 +1136,13 @@ Cloud.</p>
 <div class="sect2">
 <h3 id="_technical_requirements">Technical requirements</h3>
 <div class="paragraph">
-<p>Before you launch the Quick Start, your account must be configured as specified in the following table. Otherwise, deployment might fail.</p>
+<p>Before you launch the Quick Start, review the following information and ensure that your account is properly configured. Otherwise, deployment might fail.</p>
 </div>
 <div class="sect3">
-<h4 id="_resource_limits">Resource limits</h4>
+<h4 id="_resource_quotas">Resource quotas</h4>
 <div class="paragraph">
-<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources, and this Quick Start deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, see the <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">AWS documentation</a>.</p>
+<p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, see <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html" target="_blank" rel="noopener">AWS service quotas</a>.</p>
 </div>
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/service_limits.adoc</code></strong></em></p>
-</div>
-<div class="preview_mode">
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1219,7 +1176,7 @@ Cloud.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Classic Load Balancers</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Application Load Balancers</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
 </tr>
 <tr>
@@ -1261,13 +1218,8 @@ Cloud.</p>
 </tbody>
 </table>
 </div>
-</div>
 <div class="sect3">
 <h4 id="_supported_regions">Supported Regions</h4>
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/regions.adoc</code></strong></em></p>
-</div>
-<div id="preview_mode">
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 33.3333%;">
@@ -1389,7 +1341,6 @@ Cloud.</p>
 </tr>
 </tbody>
 </table>
-</div>
 <div class="admonitionblock tip">
 <table>
 <tr>
@@ -1397,7 +1348,7 @@ Cloud.</p>
 <i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
-Certain Regions are available on an opt-in basis. Refer to the AWS Documentation on <a href="https://docs.aws.amazon.com/general/latest/gr/rande-manage.html" target="_blank" rel="noopener">Managing Regions</a> for more information.
+Certain Regions are available on an opt-in basis. For more information, see <a href="https://docs.aws.amazon.com/general/latest/gr/rande-manage.html" target="_blank" rel="noopener">Managing AWS Regions</a>.
 </td>
 </tr>
 </table>
@@ -1406,28 +1357,15 @@ Certain Regions are available on an opt-in basis. Refer to the AWS Documentation
 <div class="sect3">
 <h4 id="_iam_permissions">IAM permissions</h4>
 <div class="paragraph">
-<p>Before launching the Quick Start, you must log in to the AWS Management Console with <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html" target="_blank" rel="noopener">IAM permissions</a> for the resources and actions the templates deploy.</p>
+<p>Before launching the Quick Start, you must sign in to the AWS Management Console with IAM permissions for the resources that the templates deploy. The <em>AdministratorAccess</em> managed policy within IAM provides sufficient permissions, although your organization may choose to use a custom policy with more restrictions. For more information, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html" target="_blank" rel="noopener">AWS managed policies for job functions</a>.</p>
 </div>
 <div class="paragraph">
-<p>The <em>AdministratorAccess</em> managed policy within IAM provides sufficient permissions, although your organization may choose to use a custom policy with more restrictions.</p>
-</div>
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/pre-reqs.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>This Quick Start requires that you have access to <a href="https://experience.adobe.com/">Adobe Experience Cloud</a> to obtain the AEM
-resource files.</p>
+<p>This Quick Start requires that you have access to <a href="https://experience.adobe.com/">Adobe Experience Cloud</a> to obtain the AEM resource files.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Contact your Adobe sales representative or Adobe partner for a full Adobe AEM On-Premise license.</p>
+<p>Contact your Adobe sales representative or Adobe partner for a full Adobe AEM on-premises license.</p>
 </li>
 <li>
 <p>Name the license file "license.properties" and prepare the content of the license file as follows:</p>
@@ -1443,57 +1381,48 @@ license.downloadID=AEM License Key</code></pre>
 </div>
 </div>
 <div class="olist arabic">
-<ol class="arabic">
+<ol class="arabic" start="3">
 <li>
-<p>Go to <a href="https://docs.adobe.com/content/help/en/experience-manager-dispatcher/using/getting-started/release-notes.html">AEM Dispatcher Release Notes</a> to download the Linux x86_64 AEM Dispatcher module for Apache 2.4 with OpenSSL 1.0 Support as tar.gz file</p>
+<p>Go to <a href="https://docs.adobe.com/content/help/en/experience-manager-dispatcher/using/getting-started/release-notes.html">AEM Dispatcher Release Notes</a> to download the Linux x86_64 AEM Dispatcher module for Apache 2.4 with OpenSSL 1.0 Support as the tar.gz file</p>
 </li>
 <li>
-<p>Go to <a href="https://experience.adobe.com/#/downloads/content/software-distribution/en/aemcloud.html">Adobe Experience Cloud Software Distribution</a> and download the JDK 8 installation rpm e.g. jdk-8u251-linux-x64.rpm. Which JDK8 versions are supported is described in the FAQ.</p>
+<p>Go to <a href="https://experience.adobe.com/#/downloads/content/software-distribution/en/aemcloud.html">Adobe Experience Cloud Software Distribution</a> and download the JDK 8 installation rpm e.g. jdk-8u251-linux-x64.rpm. Which JDK8 versions are supported is described in the <a href="#_faq">FAQ</a>.</p>
 </li>
 <li>
-<p>Go to <a href="https://experience.adobe.com/#/downloads/content/software-distribution/en/aemcloud.html">Adobe Experience Cloud Software Distribution</a> and download the AEM Jar file and if necessary the required AEM service pack. Which AEM versions are supported is described in the FAQ.</p>
+<p>Go to <a href="https://experience.adobe.com/#/downloads/content/software-distribution/en/aemcloud.html">Adobe Experience Cloud Software Distribution</a> and download the AEM Jar file and if necessary the required AEM service pack. Which AEM versions are supported is described in the <a href="#_faq">FAQ</a>.</p>
 </li>
 <li>
-<p>Place the AEM license, AEM Dispatcher module, JDK8 rpm installation, AEM Jar &amp; AEM Service-Packs
-to the S3 installation bucket which will be use for the Quick Start deployment into a prefix of your choice.
-:xrefstyle: short</p>
+<p>Place the AEM license, AEM Dispatcher module, JDK8 rpm installation, AEM Jar &amp; AEM Service-Packs to the S3 installation bucket which will be use for the Quick Start deployment into a prefix of your choice.</p>
+</li>
+</ol>
+</div>
 <div id="s3bucketinstallationcontent" class="imageblock">
 <div class="content">
 <a class="image" href="images/s3_bucket_installation_content.png"><img src="images/s3_bucket_installation_content.png" alt="S3BucketInstallationContent" width="648" height="439"></a>
 </div>
+<div class="title">Figure 3. S3 installation bucket</div>
 </div>
-</li>
+<div class="olist arabic">
+<ol class="arabic" start="7">
 <li>
-<p>(optional) Create a certificate for your internal URL in Amazon Certificate Manager (ACM)
+<p>(Optional) Create a certificate for your internal URL in Amazon Certificate Manager (ACM)
 in the Region where you deploy the Quick Start. This certificate must be created as a
 wildcard certificate for your AEM OpenCloud internal domain (for example, *.example.internal).
 Alternatively a Certificate will be created for you.</p>
 </li>
 <li>
-<p>(optional) If you are planning to enable Cloudfront and to use an external FQDN, create a certificate for your external URL in Amazon Certificate Manager (ACM)
+<p>(Optional) If you are planning to enable Cloudfront and to use an external FQDN, create a certificate for your external URL in Amazon Certificate Manager (ACM)
 in the Region <code>us-east-1</code>. This certificate must be created as a wildcard certificate for your AEM OpenCloud domain (for example, *.example.com).</p>
 </li>
 <li>
-<p>(optional) If you are planning to disable Cloudfront and to use an external FQDN, create a certificate for your external URL in Amazon Certificate Manager (ACM) in the Region where you deploy the Quick Start. This certificate must be created as a wildcard certificate for your AEM OpenCloud domain (for example, *.example.com). Alternatively an external Certificate will be created for you.</p>
+<p>(Optional) If you are planning to disable Cloudfront and to use an external FQDN, create a certificate for your external URL in Amazon Certificate Manager (ACM) in the Region where you deploy the Quick Start. This certificate must be created as a wildcard certificate for your AEM OpenCloud domain (for example, *.example.com). Alternatively an external Certificate will be created for you.</p>
 </li>
 </ol>
-</div></div></td>
-</tr>
-</tbody>
-</table>
+</div>
 </div>
 <div class="sect3">
 <h4 id="_deployment_options">Deployment options</h4>
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/deployment_options.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
 <p>This Quick Start provides two deployment options:</p>
 </div>
 <div class="ulist">
@@ -1509,18 +1438,12 @@ in the Region <code>us-east-1</code>. This certificate must be created as a wild
 <div class="paragraph">
 <p>The Quick Start provides separate templates for these options. It also lets you configure Classless Inter-Domain Routing (CIDR) blocks, instance types, and AEM OpenCloud settings, as discussed later in this guide.</p>
 </div>
+</div>
+</div>
 <div class="sect2">
 <h3 id="_operating_system_for_deployment">Operating System for Deployment</h3>
 <div class="paragraph">
 <p>This Quick Start supports Amazon Linux 2(AL2) or RedHat Enterprise Linux 7(RHEL7) for your AEM OpenCloud installation on AWS. This Quick Start deployment uses AL2.</p>
-</div>
-<div class="paragraph">
-<p>Please note that NVME instance types e.g. <code>m5</code> or <code>t3</code> are <strong>not supported</strong> when you run AEM OpenCloud on <strong>RHEL7</strong>.</p>
-</div>
-</div></div></td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 </div>
@@ -1528,10 +1451,6 @@ in the Region <code>us-east-1</code>. This certificate must be created as a wild
 <div class="sect1">
 <h2 id="_deployment_steps">Deployment steps</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/deploy_steps.adoc</code></strong></em></p>
-</div>
-<div class="preview_mode">
 <div class="sect2">
 <h3 id="_sign_in_to_your_aws_account">Sign in to your AWS account</h3>
 <div class="olist arabic">
@@ -1572,10 +1491,10 @@ You are responsible for the cost of the AWS services used while running this Qui
 </colgroup>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://qs_launch_link" target="_blank" rel="noopener">Deploy AEM OpenCloud into a new VPC on AWS</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://fwd.aws/NEGre" target="_blank" rel="noopener">Deploy AEM OpenCloud into a new VPC on AWS</a></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="http://qs_launch_link" target="_blank" rel="noopener">Deploy AEM OpenCloud into an existing VPC on AWS</a></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><a href="https://fwd.aws/MmJn4" target="_blank" rel="noopener">Deploy AEM OpenCloud into an existing VPC on AWS</a></p></td>
 </tr>
 </tbody>
 </table>
@@ -1610,26 +1529,20 @@ If you’re deploying AEM OpenCloud into an existing VPC, make sure that your VP
 <p>On the <strong>Create stack</strong> page, keep the default setting for the template URL, and then choose <strong>Next</strong>.</p>
 </li>
 <li>
-<p>On the <strong>Specify stack details</strong> page, change the stack name if needed. Review the parameters for the template. Provide values for the parameters that require input. For all other parameters, review the default settings and customize them as necessary.</p>
+<p>On the <strong>Specify stack details</strong> page, change the stack name if needed. Review the parameters for the template. Provide values for the parameters that require input. For all other parameters, review the default settings and customize them as necessary. (Deployment steps are continued after the parameter tables.)</p>
 </li>
 </ol>
 </div>
+<div class="paragraph">
+<p>+
+In the following tables, parameters are listed by category and described separately for the deployment options. When you finish reviewing and customizing the parameters, choose <strong>Next</strong>.</p>
 </div>
 <div class="paragraph">
-<p>In the following tables, parameters are listed by category and described separately for the deployment options. When you finish reviewing and customizing the parameters, choose <strong>Next</strong>.</p>
+<p>+
+NOTE: Unless you are customizing the Quick Start templates for your own deployment projects, keep the default settings for the parameters <strong>Quick Start S3 bucket name</strong>, <strong>Quick Start S3 bucket Region</strong>, and <strong>Quick Start S3 key prefix</strong>. Changing these settings automatically updates code references to point to a new Quick Start location. For more information, see the <a href="https://aws-quickstart.github.io/option1.html" target="_blank" rel="noopener">AWS Quick Start Contributor’s Guide</a>.</p>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-Unless you are customizing the Quick Start templates for your own deployment projects, we recommend that you keep the default settings for the parameters labeled <code>Quick Start S3 bucket name</code>, <code>Quick Start S3 bucket
-Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parameter settings automatically updates code references to point to a new Quick Start location. For more information, see the <a href="https://aws-quickstart.github.io/option1.html" target="_blank" rel="noopener">AWS Quick Start Contributor’s Guide</a>.
-</td>
-</tr>
-</table>
+<div class="paragraph">
+<p>+</p>
 </div>
 </div>
 <div class="sect2">
@@ -1829,7 +1742,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM Dispatcher version to install
 (<code>AemDispatcherVersion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>4.3.3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>4.3.5</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM Dispatcher version to install.</p></td>
 </tr>
 <tr>
@@ -2191,7 +2104,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM Dispatcher version to install
 (<code>AemDispatcherVersion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>4.3.3</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>4.3.5</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM Dispatcher version to install.</p></td>
 </tr>
 <tr>
@@ -2366,35 +2279,14 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </tr>
 </tbody>
 </table>
-<div class="olist arabic">
-<ol class="arabic" start="5">
-<li>
-<p>On the options page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you’re done, choose <strong>Next</strong>.</p>
-</li>
-<li>
-<p>On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources and might require the ability to automatically expand macros.</p>
-</li>
-<li>
-<p>Choose <strong>Create stack</strong> to deploy the stack.</p>
-</li>
-<li>
-<p>Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the AEM OpenCloud deployment is ready.</p>
-</li>
-<li>
-<p>Use the values displayed in the <strong>Outputs</strong> tab for the stack, as shown in <a href="#cfn_outputs">AEM OpenCloud outputs after successful deployment</a>, to view the created resources.</p>
-</li>
-</ol>
-</div>
-<div id="cfn_outputs" class="imageblock">
-<div class="content">
-<a class="image" href="images/cfn_outputs.png"><img src="images/cfn_outputs.png" alt="cfn_outputs" width="648" height="439"></a>
-</div>
-<div class="title">Figure 3. AEM OpenCloud outputs after successful deployment</div>
-</div>
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/additional_info.adoc</code></strong></em></p>
+<p>+
+. On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you’re finished, choose <strong>Next</strong>.
+. On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources and might require the ability to automatically expand macros.
+. Choose <strong>Create stack</strong> to deploy the stack.
+. Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the AEM OpenCloud deployment is ready.
+. To view the created resources, see the values displayed in the <strong>Outputs</strong> tab for the stack.</p>
 </div>
-<div class="preview_mode">
 </div>
 </div>
 </div>
@@ -2402,19 +2294,28 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <h2 id="_security">Security</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>The login credentials of the AEM system users are stored as json file <code>system_users_credentials.json</code> on S3 at the location <code>s3://S3DataBucketName/AOCStackPrefix/</code>. <code>S3DataBucketName</code> is the name of the provided, or if not provided the name of the generated, S3 Bucket and <code>AOCStackPrefix</code> is the provided stack prefix e.g. <code>s3://aem-opencloud/aoc-stack-1/system-users-credentials.json</code>.</p>
+<p>The login credentials of the AEM system users are stored as json file <code>system_users_credentials.json</code> on S3 at the location <code>s3://S3DataBucketName/AOCStackPrefix/</code>. <code>S3DataBucketName</code> is the name of the provided (or generated) S3 Bucket and <code>AOCStackPrefix</code> is the provided stack prefix (e.g. <code>s3://aem-opencloud/aoc-stack-1/system-users-credentials.json</code>.)</p>
 </div>
 <div class="paragraph">
 <p>To login to AEM use the credentials for the <code>admin</code> user.</p>
 </div>
-<div class="paragraph">
-<p><em>Changing the password of an AEM System User may cause system instabilities and is therefore not recommended.</em></p>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Changing the password of an AEM System User may cause system instabilities and is therefore not recommended.
+</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
-<p>Please follow the following steps if you decided to change the password of an AEM system user:</p>
+<p>If you changed the password of an AEM system user, do the following:</p>
 </div>
-<div class="ulist">
-<ul>
+<div class="olist arabic">
+<ol class="arabic">
 <li>
 <p>Update the <code>system_users_credentials.json</code> with the new password.</p>
 </li>
@@ -2427,12 +2328,8 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <li>
 <p>If you change the password of the <code>replicator</code> user, update all agents on the AEM Author &amp; AEM Publish EC2 instances with the new password. As an alternative, you can also terminate the AEM Publish instances one by one. Before terminating the second AEM Publish instance, verify provisioning of the recovered AEM Publish EC2 instance was successful by monitoring the EC2 tag <code>ComponentInitStatus</code>.</p>
 </li>
-</ul>
+</ol>
 </div>
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/faq_troubleshooting.adoc</code></strong></em></p>
-</div>
-<div class="preview_mode">
 </div>
 </div>
 <div class="sect1">
@@ -2463,7 +2360,7 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <p><strong>Q.</strong> I encountered a size limitation error when I deployed the AWS CloudFormation templates.</p>
 </div>
 <div class="paragraph">
-<p><strong>A.</strong> We recommend that you launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template size limitations. For more information about AWS CloudFormation quotas, see the <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html" target="_blank" rel="noopener">AWS documentation</a>.</p>
+<p><strong>A.</strong> We recommend that you launch the Quick Start templates from the links in this guide or from another S3 bucket. If you deploy the templates from a local copy on your computer or from a location other than an S3 bucket, you might encounter template size limitations. For more information about AWS CloudFormation quotas, see <a href="http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html" target="_blank" rel="noopener">AWS CloudFormation quotas</a>.</p>
 </div>
 <div class="paragraph">
 <p><strong>Q.</strong> Where are the deployment logs?</p>
@@ -2474,13 +2371,13 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <div class="ulist">
 <ul>
 <li>
-<p>All logfiles of the Lambda functions can be found in Amazon Cloudwatch Logs.</p>
+<p>All log files of the Lambda functions can be found in Amazon CloudWatch Logs.</p>
 </li>
 <li>
-<p>Installation logfiles of the AEM OpenCloud roles can be found in the EC2 instances at <code>/var/log/cloud-init.log</code> &amp; <code>/var/log/cloud-init-output.log</code></p>
+<p>Installation logfiles of the AEM OpenCloud roles can be found in the EC2 instances at <code>/var/log/cloud-init.log</code> and <code>/var/log/cloud-init-output.log</code>.</p>
 </li>
 <li>
-<p>Logfiles of the AEM OpenCloud Main Stack are found either in Amazon Cloudwatch Logs by the AOC Stack Prefix &amp; name of the log file e.g. <code>aoc-stack-1/var/log/shinesolutions/puppet-stack-init.log</code> or in the EC2 instances at <code>/var/log/shinesolutions/puppet-stack-init.log</code>, <code>/var/log/cloud-init.log</code> &amp; <code>/var/log/cloud-init-output.log</code>.</p>
+<p>Log files of the AEM OpenCloud Main Stack are found either in Amazon Cloudwatch Logs by the AOC Stack Prefix &amp; name of the log file (e.g., <code>aoc-stack-1/var/log/shinesolutions/puppet-stack-init.log</code>) or in the EC2 instances at <code>/var/log/shinesolutions/puppet-stack-init.log</code>, <code>/var/log/cloud-init.log</code>, and <code>/var/log/cloud-init-output.log</code>.</p>
 </li>
 </ul>
 </div>
@@ -2488,73 +2385,22 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <p><strong>Q.</strong> Where are the AEM System Users Login Credentials stored?</p>
 </div>
 <div class="paragraph">
-<p><strong>A.</strong> The login credentials of the AEM System users are stored on S3 in the AEM OpenCloud Stack data directory <code>s3://S3DataBucketName/AOCStackPrefix/system-users-credentials.json</code> e.g. <code>s3://aem-opencloud/aoc-stack-1/system-users-credentials.json</code>.</p>
+<p><strong>A.</strong> The login credentials of the AEM System users are stored on S3 in the AEM OpenCloud Stack data directory <code>s3://S3DataBucketName/AOCStackPrefix/system-users-credentials.json</code> (e.g., <code>s3://aem-opencloud/aoc-stack-1/system-users-credentials.json</code>.)</p>
 </div>
 <div class="paragraph">
-<p><strong>Q.</strong> Which versions of Oracle Java JDK8 are supported by AEM OpenCloud ?</p>
+<p><strong>Q.</strong> Which versions of Oracle Java JDK8 are supported by AEM OpenCloud?</p>
 </div>
 <div class="paragraph">
-<p><strong>A.</strong> Supported versions of Oracle Java JDK 8 and their allowed input value for the parameter <code>JavaJDKVersion</code> are listed in the table below.
-.Supported Java JDK8 Versions</p>
+<p><strong>A.</strong> All versions of Oracle Java JDK8 are supported. You just need to provide the version e.g. <code>8u271</code> as input value for the parameter <code>JavaJDKVersion</code></p>
+</div>
+<div class="paragraph">
+<p><strong>Q.</strong> What versions of AEM are supported by AEM OpenCloud?</p>
+</div>
+<div class="paragraph">
+<p><strong>A.</strong> Supported versions of AEM and their allowed input value for the parameter <code>AemVersion</code> including the expected name of the Service-Packs are listed in the table below.</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 50%;">
-<col style="width: 50%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Version</th>
-<th class="tableblock halign-left valign-top">Allowed input value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u171</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8u171</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u181</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8u181</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u191</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8u191</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u201</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8u201</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u211</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8u211</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u221</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8u221</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u231</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8u231</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u241</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8u241</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Java JDK 8u251</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">8u251</p></td>
-</tr>
-</tbody>
-</table>
-<div class="paragraph">
-<p><strong>Q.</strong> What versions of AEM are supported by AEM OpenCloud ?</p>
-</div>
-<div class="paragraph">
-<p><strong>A.</strong> Supported versions of AEM and their allowed input value for the parameter <code>AemVersion</code> including the expected name of the Service-Packs are listed in the table below.
-.Supported AEM Version</p>
-</div>
-<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 16. Supported AEM Version</caption>
 <colgroup>
 <col style="width: 33.3333%;">
 <col style="width: 33.3333%;">
@@ -2663,8 +2509,60 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <td class="tableblock halign-left valign-top"><p class="tableblock">65-SP4</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.5.4.0-6.5.4.zip</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP5</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.5.4.0-6.5.5.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP6</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM-6.5.4.0-6.5.6.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP7</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aem-service-pkg-6.5.7.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP8</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aem-service-pkg-6.5.8.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP9</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP9</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aem-service-pkg-6.5.9.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP10</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aem-service-pkg-6.5.10.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP11</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aem-service-pkg-6.5.11.zip</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AEM 65 SP13</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">65-SP13</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">aem-service-pkg-6.5.13.zip</p></td>
+</tr>
 </tbody>
 </table>
+<div class="paragraph">
+<p><strong>Q.</strong> What version of OpenSSL is supported by AEM OpenCloud?</p>
+</div>
+<div class="paragraph">
+<p><strong>A.</strong> AEM OpenCloud supports OpenSSL 1.1</p>
+</div>
+<div class="paragraph">
+<p><strong>Q.</strong> What versions of AEM Dispatcher are supported by AEM OpenCloud?</p>
+</div>
+<div class="paragraph">
+<p><strong>A.</strong> AEM OpenCloud supports all versions of the AEM Dispatcher with OpenSSL 1.1 support</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2675,7 +2573,7 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 <div class="ulist">
 <ul>
 <li>
-<p>If the stack <code>AmiCreationStack</code> failed to create, the installation of the AEM OpenCloud roles failed. Start troubleshooting by analysing the log files in the EC2 instances or the Lambda logs in Amazon Cloudwatch Logs.</p>
+<p>If the stack <code>AmiCreationStack</code> failed to create, the installation of the AEM OpenCloud roles failed. Start troubleshooting by analysing the log files in the EC2 instances or the Lambda logs in Amazon CloudWatch Logs.</p>
 </li>
 <li>
 <p>The EC2 instances of the stack <code>AemOpenCloudMainStack</code> have the EC2 tag <code>ComponentInitStatus</code>, which helps to determine the provisioning state of the EC2 instances.</p>
@@ -2705,7 +2603,7 @@ The provisioning of the AEM OpenCloud role failed.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Amazon Cloudwatch logs contains all important log files of each main AEM OpenCloud role. Some important logs which support you troubleshooting are listed below.</p>
+<p>Amazon CloudWatch Logs contains all important log files of each main AEM OpenCloud role. Some important logs which support you troubleshooting are listed below.</p>
 </li>
 </ul>
 </div>
@@ -2813,7 +2711,7 @@ Test Summary: 0 successful, 1 failure, 0 skipped</code></pre>
 <p>The orchestrator log contains all log messages of all orchestration event.</p>
 </div>
 <div class="paragraph">
-<p>This message indicates the Orchestrator was not able to download the <code>system-users-credentials</code> file from  S3. Which happens if the file was deleted or if the <code>S3DataBucket</code> is not in the same region as where <em>quickstart-aem-opencloud</em> is deployed to.</p>
+<p>This message indicates that the Orchestrator was unable to download the <code>system-users-credentials</code> file from S3. This happens if the <code>system-users-credentials</code> file was deleted or if the <code>S3DataBucket</code> is not in the same Region in which the AEM OpenCloud Quick Start is deployed.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2835,12 +2733,11 @@ ERROR c.s.a.c.AemConfig$$EnhancerBySpringCGLIB$$56cbacf8 - Failed to read AEM cr
 </div>
 </div>
 </div>
-</div>
 <div class="sect1">
 <h2 id="_send_us_feedback">Send us feedback</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To post feedback, submit feature ideas, or report bugs, use the <strong>Issues</strong> section of the <a href="https://github.com/aws-quickstart/quickstart-aem-opencloud" target="_blank" rel="noopener">GitHub repository</a> for this Quick Start. If you’d like to submit code, please review the <a href="https://aws-quickstart.github.io/" target="_blank" rel="noopener">Quick Start Contributor’s Guide</a>.</p>
+<p>To post feedback, submit feature ideas, or report bugs, use the <strong>Issues</strong> section of the <a href="https://github.com/aws-quickstart/quickstart-aem-opencloud" target="_blank" rel="noopener">GitHub repository</a> for this Quick Start. To submit code, see the <a href="https://aws-quickstart.github.io/" target="_blank" rel="noopener">Quick Start Contributor’s Guide</a>.</p>
 </div>
 </div>
 </div>
@@ -2856,7 +2753,7 @@ ERROR c.s.a.c.AemConfig$$EnhancerBySpringCGLIB$$56cbacf8 - Failed to read AEM cr
 <h2 id="_github_repository">GitHub repository</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You can visit our <a href="https://github.com/aws-quickstart/quickstart-aem-opencloud" target="_blank" rel="noopener">GitHub repository</a> to download
+<p>Visit our <a href="https://github.com/aws-quickstart/quickstart-aem-opencloud" target="_blank" rel="noopener">GitHub repository</a> to download
 the templates and scripts for this Quick Start, to post your comments,
 and to share your customizations with others.</p>
 </div>
@@ -2870,15 +2767,15 @@ and to share your customizations with others.</p>
 <p>This document is provided for informational purposes only. It represents AWS’s current product offerings and practices as of the date of issue of this document, which are subject to change without notice. Customers are responsible for making their own independent assessment of the information in this document and any use of AWS’s products or services, each of which is provided “as is” without warranty of any kind, whether expressed or implied. This document does not create any warranties, representations, contractual commitments, conditions, or assurances from AWS, its affiliates, suppliers, or licensors. The responsibilities and liabilities of AWS to its customers are controlled by AWS agreements, and this document is not part of, nor does it modify, any agreement between AWS and its customers.</p>
 </div>
 <div class="paragraph">
-<p>The software included with this paper is licensed under the Apache License, version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at <a href="http://aws.amazon.com/apache2.0/" class="bare">http://aws.amazon.com/apache2.0/</a> or in the accompanying "license" file. This code is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied. See the License for specific language governing permissions and limitations.</p>
+<p>The software included with this paper is licensed under the Apache License, version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at <a href="http://aws.amazon.com/apache2.0/" target="_blank" rel="noopener">http://aws.amazon.com/apache2.0/</a> or in the accompanying "license" file. This code is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either expressed or implied. See the License for specific language governing permissions and limitations.</p>
 </div>
 </div>
 </div>
 </div>
 <p class="footer-text">
 <!-- We can use document attributes: -->
-<!-- Generated with Asciidoctor v2.0.10. -->
-<a href="https://aws.amazon.com/privacy/">Privacy</a> | <a href="https://aws.amazon.com/terms/">Site terms</a> | &copy; 2020, Amazon Web Services, Inc. or its affiliates and Shine Solutions Group. All rights reserved.
+<!-- Generated with Asciidoctor v2.0.17. -->
+<a href="https://aws.amazon.com/privacy/">Privacy</a> | <a href="https://aws.amazon.com/terms/">Site terms</a> | &copy; 2021, Amazon Web Services, Inc. or its affiliates and Shine Solutions Group. All rights reserved.
 </p>
 </body>
 </html>
