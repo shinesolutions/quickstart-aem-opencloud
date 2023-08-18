@@ -1,13 +1,17 @@
-import boto3
 import logging
 import re
+import os
+import tempfile
+import boto3
 from botocore.exceptions import ClientError
 from crhelper import CfnResource
 from ruamel.yaml import YAML
 
+# Create Temp file
 file_name = 'ami.yaml'
-tmp_path = '/tmp/'
-packer_config_path = tmp_path + file_name
+tmpdir = tempfile.mkdtemp()
+saved_umask = os.umask(0o077)
+packer_config_path = os.path.join(tmpdir, file_name)
 
 ssm = boto3.client('ssm')
 s3 = boto3.resource('s3')
@@ -82,15 +86,23 @@ def del_ssm_param(parameter_name):
             return e.response['Error']
 
 def read_file(file_path):
-    logger.info('Read Packer-AEM Configuration')
-    with open (file_path, 'r') as file_stream:
-        return file_stream.read()
+    logger.info('Read Packer-AEM Configuration from filesystem')
+    try:
+        with open (file_path, 'r') as file_stream:
+            return file_stream.read()
+    except Exception as e:
+        logger.error('Error while reading file from filesystem', exc_info=True)
+        return e
 
 def write_yaml_file(dest_file_path, yaml_content):
-    logger.info('Write Packer-AEM Configuration')
-    with open(dest_file_path, 'w', encoding='utf-8') as save_file:
-        yaml.default_flow_style = False
-        yaml.dump(yaml_content, save_file)
+    logger.info('Write Packer-AEM Configuration to filesystem')
+    try:
+        with open(dest_file_path, 'w', encoding='utf-8') as save_file:
+            yaml.default_flow_style = False
+            yaml.dump(yaml_content, save_file)
+    except Exception as e:
+        logger.error('Error while writing file to filesystem', exc_info=True)
+        return e
 
 @helper.create
 def create(event, _):
@@ -152,9 +164,14 @@ def create(event, _):
     local_yaml['timezone::region'] = timezone_region
     local_yaml['timezone::locality'] = timezone_locality
 
-    write_yaml_file(tmp_path + file_name, local_yaml)
+    write_yaml_file(packer_config_path, local_yaml)
 
     s3_upload(packer_config_path, s3_data_bucket, aoc_stack_prefix + '/ami.yaml')
+
+    # Remove created temp file
+    os.remove(packer_config_path)
+    os.umask(saved_umask)
+    os.rmdir(tmpdir)
 
 @helper.update
 def no_op(_, __):
