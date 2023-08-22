@@ -74,9 +74,13 @@ fi
 
 set +o errexit
 
-echo "Finished preparing AEM OpenCloud installation"
+echo "G"
 
 echo "Starting AEM OpenCloud installation"
+
+echo "Installing OpenSSL 1.1"
+sudo yum -y install openssl11
+echo "Finished installation of OpenSSL 1.1"
 
 export FACTER_component=$COMPONENT && \
   export FACTER_platform_type='aws' && \
