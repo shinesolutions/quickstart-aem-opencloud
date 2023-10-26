@@ -51,7 +51,7 @@ Resources:
             - ec2.amazonaws.com
         Version: '2012-10-17'
       ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Path: /
       Policies:
       - PolicyDocument:
@@ -105,7 +105,7 @@ Resources:
             - ec2.amazonaws.com
         Version: '2012-10-17'
       ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Path: /
       Policies:
       - PolicyDocument:
@@ -165,7 +165,7 @@ Resources:
             - ec2.amazonaws.com
         Version: '2012-10-17'
       ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Path: /
       Policies:
       - PolicyDocument:
@@ -251,7 +251,7 @@ Resources:
             - ec2.amazonaws.com
         Version: '2012-10-17'
       ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Path: /
       Policies:
       - PolicyDocument:
@@ -309,7 +309,7 @@ Resources:
             - ec2.amazonaws.com
         Version: '2012-10-17'
       ManagedPolicyArns:
-      - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
       Path: /
       Policies:
       - PolicyDocument:
